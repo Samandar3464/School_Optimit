@@ -1,0 +1,20 @@
+package com.example.model.response;
+
+import com.example.model.response.UserResponseDto;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.util.List;
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+public class UserResponseListForAdmin {
+
+    private List<UserResponseDto> userResponseDtoList;
+    private long allSize;
+    private int allPage;
+    private int currentPage;
+
+}

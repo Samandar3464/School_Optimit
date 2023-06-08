@@ -26,7 +26,7 @@ public class JwtGenerate {
                 .setSubject(user.getPhoneNumber())
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(new Date().getTime() + accessTokenLiveTime))
-                .signWith(SignatureAlgorithm.HS512, JWT_ACCESS_KEY)
+                .signWith(SignatureAlgorithm.HS256, JWT_ACCESS_KEY)
                 .claim("authorities", user.getAuthorities())
                 .compact();
     }

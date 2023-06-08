@@ -47,8 +47,8 @@ public class JwtFilter extends OncePerRequestFilter {
                     SecurityContextHolder.getContext().setAuthentication(authToken);
                     filterChain.doFilter(request, response);
                 }
-                filterChain.doFilter(request, response);
             }
+            filterChain.doFilter(request, response);
         } catch(ExpiredJwtException | UnsupportedJwtException | MalformedJwtException |
                 IllegalArgumentException | IOException | ServletException e){
             resolver.resolveException(request, response, null, e);
