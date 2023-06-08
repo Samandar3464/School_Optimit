@@ -2,6 +2,7 @@ package com.example.entity;
 
 
 import com.example.enums.Gender;
+import com.example.model.request.UserDto;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -94,14 +95,13 @@ public class User implements UserDetails {
         return isBlocked;
     }
 
-//    public static User from(UserRegisterDto userRegisterDto){
-//        return User.builder()
-//                .fullName(userRegisterDto.getFullName())
-//                .phone(userRegisterDto.getPhone())
-//                .gender(userRegisterDto.getGender())
-//                .registeredDate(LocalDateTime.now())
-//                .status(userRegisterDto.getStatus())
-//                .isBlocked(true)
-//                .build();
-//    }
+    public static User from(UserDto userDto){
+        return User.builder()
+                .fullName(userDto.getFullName())
+                .phoneNumber(userDto.getPhoneNumber())
+                .gender(userDto.getGender())
+                .registeredDate(LocalDateTime.now())
+                .isBlocked(true)
+                .build();
+    }
 }
