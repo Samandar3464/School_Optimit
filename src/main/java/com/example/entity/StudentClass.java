@@ -6,17 +6,28 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
 @Data
-@Entity
 @AllArgsConstructor
 @NoArgsConstructor
+@Entity
 @Builder
-public class FireBaseToken {
+public class StudentClass {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(columnDefinition="TEXT")
-    private String token;
+    @Column(nullable = false)
+    private String className;
+
+    private LocalDate startDate;
+
+    private LocalDate endDate;
+
+    private boolean active;
+
+    private LocalDateTime createdDate;
 }

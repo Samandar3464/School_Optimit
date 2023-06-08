@@ -21,7 +21,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserResponseDto {
-    private UUID id;
+    private Integer id;
 
     private String fullName;
 

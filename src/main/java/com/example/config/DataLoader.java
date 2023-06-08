@@ -44,7 +44,7 @@ public class DataLoader implements CommandLineRunner {
                     .isBlocked(true)
                     .roles(List.of(role))
                     .build();
-            User save = userRepository.save(admin);
+             userRepository.save(admin);
         }
     }
 }

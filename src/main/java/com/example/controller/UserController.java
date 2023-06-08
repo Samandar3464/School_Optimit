@@ -41,19 +41,19 @@ public class UserController {
 
     @GetMapping("/getById/{id}")
     @PreAuthorize("hasAnyRole('ADMIN')")
-    public ApiResponse getUserById(@PathVariable UUID id) {
+    public ApiResponse getUserById(@PathVariable Integer id) {
         return userService.getByUserId(id);
     }
 
     @PutMapping("/block/{id}")
     @PreAuthorize("hasAnyRole('ADMIN')")
-    public ApiResponse blockUserById(@PathVariable UUID id) {
+    public ApiResponse blockUserById(@PathVariable Integer id) {
         return userService.addBlockUserByID(id);
     }
 
     @PutMapping("/openBlock/{id}")
     @PreAuthorize("hasAnyRole('ADMIN')")
-    public ApiResponse openBlockUserById(@PathVariable UUID id) {
+    public ApiResponse openBlockUserById(@PathVariable Integer id) {
         return userService.openToBlockUserByID(id);
     }
 

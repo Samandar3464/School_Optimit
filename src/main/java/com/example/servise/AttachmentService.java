@@ -4,7 +4,6 @@ import com.example.entity.Attachment;
 import com.example.exception.FileUploadException;
 import com.example.exception.OriginalFileNameNullException;
 import com.example.exception.RecordNotFoundException;
-import com.example.model.common.ApiResponse;
 import com.example.repository.AttachmentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -80,7 +79,7 @@ public class AttachmentService {
     public List<Attachment> saveToSystemListFile(List<MultipartFile> fileList) {
         List<Attachment> attachments = new ArrayList<>();
         fileList.forEach((file) -> {
-                attachments.add(saveToSystem(file));
+            attachments.add(saveToSystem(file));
         });
         return attachments;
     }
@@ -92,10 +91,10 @@ public class AttachmentService {
     }
 
     public String getUrl(Attachment attachment) {
-        if (attachment!=null){
+        if (attachment != null) {
             return attachUploadFolder + attachment.getPath() + "/" + attachment.getNewName() + "." + attachment.getType();
-        }else {
-            return attachUploadFolder+"avatar.png";
+        } else {
+            return attachUploadFolder + "avatar.png";
         }
     }
 
@@ -115,17 +114,30 @@ public class AttachmentService {
         return attachmentRepository.findByNewName(newName).orElseThrow(() -> new RecordNotFoundException(FILE_NOT_FOUND));
     }
 
-//    File systendan ochirib tashlaydi
-    public ApiResponse deleteNewNameId(String fileName) {
+    //    File systendan ochirib tashlaydi
+    public boolean deleteNewName(Attachment attachment) {
         try {
-            Attachment entity = getAttachment(fileName);
-            Path file = Paths.get(attachUploadFolder + entity.getPath() + "/" + fileName);
+
+            Path file = Paths.get(attachUploadFolder + attachment.getPath() + "/" + attachment.getNewName());
             Files.delete(file);
-            attachmentRepository.deleteById(entity.getId());
-            return new ApiResponse("DELETED", true);
+            attachmentRepository.deleteById(attachment.getId());
+            return true;
         } catch (IOException e) {
             throw new RecordNotFoundException(FILE_NOT_FOUND);
         }
+    }
+
+    public boolean deleteListFilesByNewName(List<Attachment> attachmentList) {
+
+        attachmentList.forEach(attachment -> {
+            try {
+                Path file = Paths.get(attachUploadFolder + attachment.getPath() + "/" + attachment.getNewName());
+                Files.delete(file);
+                attachmentRepository.deleteById(attachment.getId());
+            } catch (IOException e) {
+                throw new RecordNotFoundException(FILE_NOT_FOUND);
+            }});
+        return true;
     }
 }
 
