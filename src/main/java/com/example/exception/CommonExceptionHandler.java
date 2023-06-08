@@ -1,6 +1,6 @@
 package com.example.exception;
 
-import com.example.apiResponse.ApiResponse;
+import com.example.model.common.ApiResponse;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.UnsupportedJwtException;

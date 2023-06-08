@@ -1,10 +1,10 @@
 package com.example.servise;
 
-import com.example.apiResponse.ApiResponse;
 import com.example.entity.Attachment;
 import com.example.exception.FileUploadException;
 import com.example.exception.OriginalFileNameNullException;
 import com.example.exception.RecordNotFoundException;
+import com.example.model.common.ApiResponse;
 import com.example.repository.AttachmentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;

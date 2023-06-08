@@ -1,4 +1,4 @@
-package com.example.apiResponse;
+package com.example.model.common;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
