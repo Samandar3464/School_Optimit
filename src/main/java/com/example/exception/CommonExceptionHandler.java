@@ -46,6 +46,15 @@ public class CommonExceptionHandler {
                 , null);
     }
 
+    @ExceptionHandler(PermissionNotFound.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ApiResponse handleObjectNotException(PermissionNotFound e) {
+        return new ApiResponse(
+                e.getMessage()
+                , false
+                , null);
+    }
+
     @ExceptionHandler(RecordAlreadyExistException.class)
     @ResponseStatus(HttpStatus.ALREADY_REPORTED)
     public ApiResponse handleObjectAlreadyExist(RecordAlreadyExistException e) {
@@ -127,42 +136,6 @@ public class CommonExceptionHandler {
                 , null);
     }
 
-    @ExceptionHandler(AnnouncementNotFoundException.class)
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ApiResponse announcementNotFoundException(AnnouncementNotFoundException e) {
-        return new ApiResponse(
-                e.getMessage()
-                , false
-                , null);
-    }
-
-    @ExceptionHandler(AnnouncementAlreadyExistException.class)
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ApiResponse announcementAlreadyExistException(AnnouncementAlreadyExistException e) {
-        return new ApiResponse(
-                e.getMessage()
-                , false
-                , null);
-    }
-
-
-    @ExceptionHandler(CarNotFound.class)
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ApiResponse carNotFound(CarNotFound e) {
-        return new ApiResponse(
-                CAR_NOT_FOUND
-                , false
-                , null);
-    }
-
-    @ExceptionHandler(CarAlreadyExistException.class)
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ApiResponse carAlreadyExist(CarAlreadyExistException e) {
-        return new ApiResponse(
-                CAR_NOT_FOUND
-                , false
-                , null);
-    }
 
     @ExceptionHandler(SmsServiceBroken.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
@@ -182,12 +155,4 @@ public class CommonExceptionHandler {
                 , null);
     }
 
-    @ExceptionHandler(AnnouncementAvailable.class)
-    @ResponseStatus(HttpStatus.ALREADY_REPORTED)
-    public ApiResponse announcementAvailable(AnnouncementAvailable e) {
-        return new ApiResponse(
-                e.getMessage()
-                , false
-                , null);
-    }
 }
