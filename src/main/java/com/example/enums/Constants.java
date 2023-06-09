@@ -34,6 +34,7 @@ public class Constants {
     public static final String STUDENT_NOT_FOUND="STUDENT NOT FOUND";
     public static final String CLASS_NOT_FOUND="CLASS NOT FOUND";
     public static final String FAMILY_NOT_FOUND="FAMILY NOT FOUND";
+    public static final String PHONE_NUMBER_ALREADY_REGISTERED="PHONE_NUMBER_ALREADY_REGISTERED";
 
     public static final String ROLE_ALREADY_EXIST = "ROLE_ALREADY_EXIST!!!";
     public static final String ROLE_NOT_AVAILABLE = "ROLE NOT AVAILABLE";

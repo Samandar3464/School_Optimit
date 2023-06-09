@@ -32,6 +32,7 @@ public class Family {
     @Size(min = 6)
     private String password;
 
+
     private LocalDateTime registeredDate;
 
     private String fireBaseToken;
