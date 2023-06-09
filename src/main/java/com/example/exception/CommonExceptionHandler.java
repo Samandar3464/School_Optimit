@@ -59,7 +59,7 @@ public class CommonExceptionHandler {
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ApiResponse handleUserNotFoundException(UserNotFoundException e) {
         return new ApiResponse(
-                USER_NOT_FOUND
+                e.getMessage()
                 , false
                 , null);
     }
