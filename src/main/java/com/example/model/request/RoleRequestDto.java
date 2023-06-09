@@ -1,6 +1,5 @@
-package com.example.model.requestDto;
+package com.example.model.request;
 
-import jakarta.persistence.Column;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 

@@ -1,4 +1,4 @@
-package com.example.servise;
+package com.example.service;
 
 import com.example.config.jwtConfig.JwtGenerate;
 import com.example.entity.Attachment;
@@ -6,14 +6,12 @@ import com.example.entity.User;
 import com.example.exception.UserAlreadyExistException;
 import com.example.exception.UserNotFoundException;
 import com.example.model.common.ApiResponse;
-import com.example.model.request.FireBaseTokenRegisterDto;
-import com.example.model.request.SmsModel;
-import com.example.model.request.UserDto;
-import com.example.model.request.UserVerifyDto;
+import com.example.model.request.*;
 import com.example.model.response.NotificationMessageResponse;
 import com.example.model.response.TokenResponse;
 import com.example.model.response.UserResponseDto;
 import com.example.model.response.UserResponseListForAdmin;
+import com.example.repository.RoleRepository;
 import com.example.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -33,7 +31,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 
 import java.util.*;
-import java.util.random.RandomGenerator;
 
 import static com.example.enums.Constants.*;
 
@@ -49,11 +46,11 @@ public class UserService {
     private final AuthenticationManager authenticationManager;
     private final SmsService service;
     private final FireBaseMessagingService fireBaseMessagingService;
-    //    private final RoleRepository roleRepository;
+    private final RoleRepository roleRepository;
 
     @ResponseStatus(HttpStatus.CREATED)
     @Transactional(rollbackFor = {Exception.class})
-    public ApiResponse registerUser(UserDto userDto) {
+    public ApiResponse registerUser(UserRegisterDto userDto) {
         boolean byPhone = userRepository.existsByPhoneNumber(userDto.getPhoneNumber());
         if (byPhone) {
             throw new UserAlreadyExistException(USER_ALREADY_EXIST);
@@ -77,7 +74,7 @@ public class UserService {
         user.setVerificationCode(0);
         user.setBlocked(true);
         userRepository.save(user);
-        return new ApiResponse(USER_VERIFIED_SUCCESSFULLY, true,new TokenResponse(JwtGenerate.generateAccessToken(user), fromUserToResponse(user)));
+        return new ApiResponse(USER_VERIFIED_SUCCESSFULLY, true, new TokenResponse(JwtGenerate.generateAccessToken(user), fromUserToResponse(user)));
     }
 
     @ResponseStatus(HttpStatus.OK)
@@ -171,6 +168,7 @@ public class UserService {
         User user1 = userRepository.findByPhoneNumber(user.getPhoneNumber()).orElseThrow(() -> new UserNotFoundException(USER_NOT_FOUND));
         return new ApiResponse(fromUserToResponse(user1), true);
     }
+
     @ResponseStatus(HttpStatus.OK)
     public ApiResponse reSendSms(String number) {
         Integer integer = verificationCodeGenerator();
@@ -183,11 +181,12 @@ public class UserService {
                 .build());
         return new ApiResponse(SUCCESSFULLY, true);
     }
+
     @ResponseStatus(HttpStatus.OK)
     public ApiResponse removeUserFromContext() {
         User user = checkUserExistByContext();
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if(authentication != null && authentication.getName().equals(user.getPhoneNumber())) {
+        if (authentication != null && authentication.getName().equals(user.getPhoneNumber())) {
             SecurityContextHolder.getContext().setAuthentication(null);
         }
         return new ApiResponse(SUCCESSFULLY, true);
@@ -206,10 +205,10 @@ public class UserService {
         return userRepository.findById(id).orElseThrow(() -> new UserNotFoundException(USER_NOT_FOUND));
     }
 
-    private User from(UserDto userDto, int verificationCode) {
-        User user = User.from(userDto);
+    private User from(UserRegisterDto userRegisterDto, int verificationCode) {
+        User user = User.from(userRegisterDto);
         user.setVerificationCode(verificationCode);
-        user.setPassword(passwordEncoder.encode(userDto.getPassword()));
+        user.setPassword(passwordEncoder.encode(userRegisterDto.getPassword()));
 //        user.setRoles(List.of(roleRepository.findByName(CLIENT), roleRepository.findByName(DRIVER)));
         return user;
     }
@@ -227,7 +226,7 @@ public class UserService {
 
     private Integer verificationCodeGenerator() {
         Random random = new Random();
-        return random.nextInt(1000,9999);
+        return random.nextInt(1000, 9999);
     }
 
 //    public ApiResponse updateUser(UserUpdateDto userUpdateDto) {

@@ -3,8 +3,9 @@ package com.example.controller;
 import com.example.model.common.ApiResponse;
 import com.example.model.request.FireBaseTokenRegisterDto;
 import com.example.model.request.UserDto;
+import com.example.model.request.UserRegisterDto;
 import com.example.model.request.UserVerifyDto;
-import com.example.servise.UserService;
+import com.example.service.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
@@ -19,7 +20,7 @@ public class UserController {
     private UserService userService;
 
     @PostMapping("/register")
-    public ApiResponse registerUser(@RequestBody @Validated UserDto userRegisterDto) {
+    public ApiResponse registerUser(@RequestBody @Validated UserRegisterDto userRegisterDto) {
         return userService.registerUser(userRegisterDto);
     }
 

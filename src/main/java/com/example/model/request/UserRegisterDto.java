@@ -1,4 +1,4 @@
-package com.example.model.requestDto;
+package com.example.model.request;
 
 import com.example.entity.Achievement;
 import com.example.entity.Attachment;

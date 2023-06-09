@@ -2,7 +2,7 @@ package com.example.entity;
 
 
 import com.example.enums.Gender;
-import com.example.model.requestDto.UserRegisterDto;
+import com.example.model.request.UserRegisterDto;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -72,7 +72,6 @@ public class User implements UserDetails {
 
     @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private List<Role> roles;
-
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

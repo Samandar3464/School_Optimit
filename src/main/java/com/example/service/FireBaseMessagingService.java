@@ -1,4 +1,4 @@
-package com.example.servise;
+package com.example.service;
 
 import com.example.exception.FirebaseConnectionException;
 import com.example.model.response.NotificationMessageResponse;

@@ -16,12 +16,12 @@ public class PermissionController {
     private final PermissionService permissionService;
 
     @GetMapping("getPermissionList")
-    public ApiResponse getList(){
+    public ApiResponse getList() {
         return permissionService.getList();
     }
 
     @GetMapping("getById/{id}")
-    public ApiResponse getList(@PathVariable Integer id){
+    public ApiResponse getList(@PathVariable Integer id) {
         return permissionService.getByID(id);
     }
 }

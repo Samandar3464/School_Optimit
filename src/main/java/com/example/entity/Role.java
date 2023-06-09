@@ -22,11 +22,16 @@ public class Role {
     @Column(unique = true)
     private String name;
 
-    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @ManyToMany(fetch = FetchType.EAGER)
     private List<Permission> permissions;
 
     public Role(String name,List<Permission> permissions) {
         this.name=name;
         this.permissions=permissions;
+    }
+
+    public Role(Integer id,String  name) {
+        this.id=id;
+        this.name=name;
     }
 }

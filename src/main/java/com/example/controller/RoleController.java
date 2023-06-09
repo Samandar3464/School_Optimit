@@ -1,7 +1,7 @@
 package com.example.controller;
 
 import com.example.model.common.ApiResponse;
-import com.example.model.requestDto.RoleRequestDto;
+import com.example.model.request.RoleRequestDto;
 import com.example.service.RoleService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -15,31 +15,29 @@ public class RoleController {
     private final RoleService roleService;
 
     @PostMapping("/save")
-    @PreAuthorize("hasAuthority('ROLE_ACCESS')")
+//    @PreAuthorize("hasAuthority('ROLE_ACCESS' or 'SUPER_ADMIN')")
     public ApiResponse save(@RequestBody RoleRequestDto requestDto) {
         return roleService.save(requestDto);
     }
 
     @PutMapping("/update")
-    @PreAuthorize("hasAuthority('ROLE_ACCESS')")
+//    @PreAuthorize("hasAuthority('ROLE_ACCESS' or 'SUPER_ADMIN')")
     public ApiResponse update(@RequestBody RoleRequestDto requestDto) {
         return roleService.update(requestDto);
     }
 
-    @PutMapping("/getRoleByID/{id}")
-    @PreAuthorize("hasAuthority('ROLE_ACCESS')")
+    @GetMapping("/getRoleByID/{id}")
     public ApiResponse getRoleByID(@PathVariable Integer id) {
         return roleService.getRoleByID(id);
     }
 
-    @PutMapping("/getList")
-    @PreAuthorize("hasAuthority('ROLE_ACCESS')")
+    @GetMapping("/getList")
     public ApiResponse getList() {
         return roleService.getList();
     }
 
     @DeleteMapping("/remove/{id}")
-    @PreAuthorize("hasAuthority('ROLE_ACCESS')")
+//    @PreAuthorize("hasAuthority('ROLE_ACCESS' or 'SUPER_ADMIN')")
     public ApiResponse remove(@PathVariable Integer id) {
         return roleService.remove(id);
     }

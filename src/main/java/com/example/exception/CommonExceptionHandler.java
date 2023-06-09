@@ -46,14 +46,6 @@ public class CommonExceptionHandler {
                 , null);
     }
 
-    @ExceptionHandler(PermissionNotFound.class)
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ApiResponse handleObjectNotException(PermissionNotFound e) {
-        return new ApiResponse(
-                e.getMessage()
-                , false
-                , null);
-    }
 
     @ExceptionHandler(RecordAlreadyExistException.class)
     @ResponseStatus(HttpStatus.ALREADY_REPORTED)
