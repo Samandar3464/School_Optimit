@@ -9,6 +9,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -27,8 +28,8 @@ public class JwtFilter extends OncePerRequestFilter {
     private final AuthService authService;
     private final JwtGenerate jwtGenerate;
     @Qualifier("handlerExceptionResolver")
-//    @Autowired
-    private HandlerExceptionResolver resolver;
+    @Autowired
+    private  HandlerExceptionResolver resolver;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
@@ -47,8 +48,8 @@ public class JwtFilter extends OncePerRequestFilter {
                     SecurityContextHolder.getContext().setAuthentication(authToken);
                     filterChain.doFilter(request, response);
                 }
-                filterChain.doFilter(request, response);
             }
+            filterChain.doFilter(request, response);
         } catch(ExpiredJwtException | UnsupportedJwtException | MalformedJwtException |
                 IllegalArgumentException | IOException | ServletException e){
             resolver.resolveException(request, response, null, e);

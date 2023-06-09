@@ -82,15 +82,15 @@ public class CommonExceptionHandler {
                 , null);
     }
 
-    @ExceptionHandler(value = {ExpiredJwtException.class, SignatureException.class,
-            UnsupportedJwtException.class, MalformedJwtException.class, IllegalArgumentException.class, IOException.class})
-    @ResponseStatus(HttpStatus.UNAUTHORIZED)
-    public ApiResponse handleAccessTokenTimeExceeded(Exception e) {
-        return new ApiResponse(
-                TOKEN_TIME_OUT
-                , false
-                , null);
-    }
+//    @ExceptionHandler(value = {ExpiredJwtException.class, SignatureException.class,
+//            UnsupportedJwtException.class, MalformedJwtException.class, IllegalArgumentException.class, IOException.class})
+//    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+//    public ApiResponse handleAccessTokenTimeExceeded(Exception e) {
+//        return new ApiResponse(
+//                TOKEN_TIME_OUT
+//                , false
+//                , null);
+//    }
 
     @ExceptionHandler(value = {FileInputException.class})
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
