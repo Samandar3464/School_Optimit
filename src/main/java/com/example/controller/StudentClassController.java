@@ -6,6 +6,8 @@ import com.example.service.StudentClassService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/class")
@@ -31,5 +33,17 @@ public class StudentClassController {
     @DeleteMapping("/delete/{id}")
     public ApiResponse delete(@PathVariable Integer id){
         return service.delete(id);
+    }
+
+    @GetMapping("/getAllActiveClasses")
+    public ApiResponse getAllActiveClasses(){
+        return service.getAllActiveClasses();
+    }
+
+    @GetMapping("/getAllNeActiveClassesByYear")
+    public ApiResponse getAllNeActiveClassesByYear(
+            @RequestParam(name = "startDate") LocalDate startDate,
+            @RequestParam(name = "endDate") LocalDate endDate){
+        return service.getAllNeActiveClassesByYear(startDate,endDate);
     }
 }

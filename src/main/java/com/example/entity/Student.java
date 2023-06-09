@@ -1,6 +1,7 @@
 package com.example.entity;
 
 import com.example.model.request.StudentDto;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.OnDelete;
@@ -36,6 +37,10 @@ public class Student {
     @Column(nullable = false)
     private String docNumber;
 
+    private boolean active;
+
+    private LocalDateTime addedTime;
+
     @Column(nullable = false)
     @OneToMany(cascade = CascadeType.ALL)
     private List<Attachment> docPhoto; // guvohnoma yoki pasport rasmi
@@ -50,19 +55,19 @@ public class Student {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private StudentClass studentClass;
 
-    private boolean active;
+    @JsonIgnore
+    @ManyToMany(cascade = CascadeType.ALL)
+    private List<Family> family;
 
-    private LocalDateTime addedTime;
 //    @OneToOne(cascade = CascadeType.ALL)
 //    private Attachment medDocPhoto;  // med sprafka rasmi
 
-    public static Student from(StudentDto studentDto){
+    public static Student from(StudentDto studentDto) {
         return Student.builder()
                 .firstName(studentDto.getFirstName())
                 .lastName(studentDto.getLastName())
                 .fatherName(studentDto.getFatherName())
                 .birthDate(studentDto.getBirthDate())
-                .docNumber(studentDto.getDocNumber())
                 .docNumber(studentDto.getDocNumber())
                 .addedTime(LocalDateTime.now())
                 .active(true)

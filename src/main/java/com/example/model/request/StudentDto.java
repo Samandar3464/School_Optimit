@@ -28,9 +28,6 @@ public class StudentDto {
     @Column(nullable = false)
     private String fatherName;
 
-    @Column(nullable = false)
-    private Integer orderNumber;
-
     private LocalDate birthDate;
 
     @Column(nullable = false)

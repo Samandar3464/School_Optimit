@@ -14,7 +14,7 @@ public class StudentController {
     private final StudentService service;
 
     @PostMapping("/create")
-    public ApiResponse create(@RequestBody StudentDto studentDto) {
+    public ApiResponse create(@ModelAttribute StudentDto studentDto) {
         return service.create(studentDto);
     }
 
@@ -24,7 +24,7 @@ public class StudentController {
     }
 
     @PutMapping("/update")
-    public ApiResponse update(@RequestBody StudentDto studentDto) {
+    public ApiResponse update(@ModelAttribute StudentDto studentDto) {
         return service.update(studentDto);
     }
 
@@ -42,5 +42,10 @@ public class StudentController {
     @GetMapping("/getAllByClassName/{id}")
     public ApiResponse getAllByClassName(@PathVariable Integer id) {
         return service.getListByClassNumber(id);
+    }
+
+    @GetMapping("/getAllNeActiveStudents")
+    public ApiResponse getAllNeActiveStudents() {
+        return service.getAllNeActiveStudents();
     }
 }
