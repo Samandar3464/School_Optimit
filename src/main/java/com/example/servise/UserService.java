@@ -108,26 +108,25 @@ public class UserService {
 
 
     @ResponseStatus(HttpStatus.OK)
-    public ApiResponse getByUserId(UUID id) {
+    public ApiResponse getByUserId(Integer id) {
         User user = checkUserExistById(id);
         return new ApiResponse(fromUserToResponse(user), true);
     }
 
     @ResponseStatus(HttpStatus.OK)
     @Transactional(rollbackFor = {Exception.class})
-    public ApiResponse addBlockUserByID(UUID id) {
+    public ApiResponse addBlockUserByID(Integer id) {
         User user = checkUserExistById(id);
-        Optional<User> byId = userRepository.findById(id);
-        byId.get().setBlocked(false);
-        userRepository.save(byId.get());
-        NotificationMessageResponse notificationMessageResponse = NotificationMessageResponse.from(user.getFireBaseToken(), BLOCKED, new HashMap<>());
-        fireBaseMessagingService.sendNotificationByToken(notificationMessageResponse);
+        user.setBlocked(false);
+        userRepository.save(user);
+//        NotificationMessageResponse notificationMessageResponse = NotificationMessageResponse.from(user.getFireBaseToken(), BLOCKED, new HashMap<>());
+//        fireBaseMessagingService.sendNotificationByToken(notificationMessageResponse);
         return new ApiResponse(DELETED, true);
     }
 
     @ResponseStatus(HttpStatus.OK)
     @Transactional(rollbackFor = {Exception.class})
-    public ApiResponse openToBlockUserByID(UUID id) {
+    public ApiResponse openToBlockUserByID(Integer id) {
         User user = checkUserExistById(id);
         Optional<User> byId = userRepository.findById(id);
         byId.get().setBlocked(true);
@@ -203,7 +202,7 @@ public class UserService {
         return userRepository.findByPhoneNumber(user.getPhoneNumber()).orElseThrow(() -> new UserNotFoundException(USER_NOT_FOUND));
     }
 
-    public User checkUserExistById(UUID id) {
+    public User checkUserExistById(Integer id) {
         return userRepository.findById(id).orElseThrow(() -> new UserNotFoundException(USER_NOT_FOUND));
     }
 
@@ -238,7 +237,7 @@ public class UserService {
 //        if (userUpdateDto.getProfilePhoto() != null) {
 //            Attachment attachment = attachmentService.saveToSystem(userUpdateDto.getProfilePhoto());
 //            if (user.getProfilePhoto() != null) {
-//                attachmentService.deleteNewNameId(user.getProfilePhoto().getNewName() + "." + user.getProfilePhoto().getType());
+//                attachmentService.deleteNewName(user.getProfilePhoto().getNewName() + "." + user.getProfilePhoto().getType());
 //            }
 //            user.setProfilePhoto(attachment);
 //        }
@@ -246,6 +245,7 @@ public class UserService {
 //        userRepository.save(user);
 //        return new ApiResponse(SUCCESSFULLY, true);
 //    }
+
 }
 
 

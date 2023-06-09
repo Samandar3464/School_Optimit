@@ -73,15 +73,15 @@ public class CommonExceptionHandler {
                 , null);
     }
 
-    @ExceptionHandler(value = {ExpiredJwtException.class, SignatureException.class,
-            UnsupportedJwtException.class, MalformedJwtException.class, IllegalArgumentException.class, IOException.class})
-    @ResponseStatus(HttpStatus.UNAUTHORIZED)
-    public ApiResponse handleAccessTokenTimeExceeded(Exception e) {
-        return new ApiResponse(
-                TOKEN_TIME_OUT
-                , false
-                , null);
-    }
+//    @ExceptionHandler(value = {ExpiredJwtException.class, SignatureException.class,
+//            UnsupportedJwtException.class, MalformedJwtException.class, IllegalArgumentException.class, IOException.class})
+//    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+//    public ApiResponse handleAccessTokenTimeExceeded(Exception e) {
+//        return new ApiResponse(
+//                TOKEN_TIME_OUT
+//                , false
+//                , null);
+//    }
 
     @ExceptionHandler(value = {FileInputException.class})
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
@@ -127,42 +127,6 @@ public class CommonExceptionHandler {
                 , null);
     }
 
-    @ExceptionHandler(AnnouncementNotFoundException.class)
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ApiResponse announcementNotFoundException(AnnouncementNotFoundException e) {
-        return new ApiResponse(
-                e.getMessage()
-                , false
-                , null);
-    }
-
-    @ExceptionHandler(AnnouncementAlreadyExistException.class)
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ApiResponse announcementAlreadyExistException(AnnouncementAlreadyExistException e) {
-        return new ApiResponse(
-                e.getMessage()
-                , false
-                , null);
-    }
-
-
-    @ExceptionHandler(CarNotFound.class)
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ApiResponse carNotFound(CarNotFound e) {
-        return new ApiResponse(
-                CAR_NOT_FOUND
-                , false
-                , null);
-    }
-
-    @ExceptionHandler(CarAlreadyExistException.class)
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ApiResponse carAlreadyExist(CarAlreadyExistException e) {
-        return new ApiResponse(
-                CAR_NOT_FOUND
-                , false
-                , null);
-    }
 
     @ExceptionHandler(SmsServiceBroken.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
@@ -182,12 +146,4 @@ public class CommonExceptionHandler {
                 , null);
     }
 
-    @ExceptionHandler(AnnouncementAvailable.class)
-    @ResponseStatus(HttpStatus.ALREADY_REPORTED)
-    public ApiResponse announcementAvailable(AnnouncementAvailable e) {
-        return new ApiResponse(
-                e.getMessage()
-                , false
-                , null);
-    }
 }

@@ -10,10 +10,13 @@ import org.springframework.stereotype.Service;
 
 import java.util.Date;
 
+import static com.example.enums.Constants.AUTHORITIES;
+
 
 @Service
 @RequiredArgsConstructor
 public class JwtGenerate {
+
     private final UserRepository userRepository;
 
     private static final String JWT_ACCESS_KEY = "404E635266556A586E327235753878F413F4428472B4B6250645367566B5970";
@@ -27,7 +30,7 @@ public class JwtGenerate {
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(new Date().getTime() + accessTokenLiveTime))
                 .signWith(SignatureAlgorithm.HS256, JWT_ACCESS_KEY)
-                .claim("authorities", user.getAuthorities())
+                .claim(AUTHORITIES, user.getAuthorities())
                 .compact();
     }
 
