@@ -117,11 +117,10 @@ public class UserService {
     @Transactional(rollbackFor = {Exception.class})
     public ApiResponse addBlockUserByID(Integer id) {
         User user = checkUserExistById(id);
-        Optional<User> byId = userRepository.findById(id);
-        byId.get().setBlocked(false);
-        userRepository.save(byId.get());
-        NotificationMessageResponse notificationMessageResponse = NotificationMessageResponse.from(user.getFireBaseToken(), BLOCKED, new HashMap<>());
-        fireBaseMessagingService.sendNotificationByToken(notificationMessageResponse);
+        user.setBlocked(false);
+        userRepository.save(user);
+//        NotificationMessageResponse notificationMessageResponse = NotificationMessageResponse.from(user.getFireBaseToken(), BLOCKED, new HashMap<>());
+//        fireBaseMessagingService.sendNotificationByToken(notificationMessageResponse);
         return new ApiResponse(DELETED, true);
     }
 

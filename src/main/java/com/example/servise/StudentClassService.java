@@ -24,6 +24,7 @@ public class StudentClassService implements BaseService<StudentClass, Integer> {
                 .createdDate(LocalDateTime.now())
                 .startDate(studentClass.getStartDate())
                 .endDate(studentClass.getEndDate())
+                .roomNumber(studentClass.getRoomNumber())
                 .active(true)
                 .build();
         studentClassRepository.save(studentClass1);
@@ -44,7 +45,6 @@ public class StudentClassService implements BaseService<StudentClass, Integer> {
                 .className(studentClass.getClassName())
                 .startDate(studentClass.getStartDate())
                 .endDate(studentClass.getEndDate())
-                .active(studentClass.isActive())
                 .build();
         studentClassRepository.save(build);
         return new ApiResponse(SUCCESSFULLY, true);
