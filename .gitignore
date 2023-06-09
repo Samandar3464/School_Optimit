@@ -19,7 +19,6 @@ src
 *.iws
 *.iml
 *.ipr
-src/main/resources/*.properties
 ### NetBeans ###
 /nbproject/private/
 /nbbuild/
@@ -29,7 +28,7 @@ src/main/resources/*.properties
 build/
 !**/src/main/**/build/
 !**/src/test/**/build/
-#src/main/resources/application-dev.properties
+src/main/resources/
 src/main/resources/static
 
 ### VS Code ###
