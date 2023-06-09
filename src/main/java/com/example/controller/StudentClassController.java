@@ -2,7 +2,7 @@ package com.example.controller;
 
 import com.example.entity.StudentClass;
 import com.example.model.common.ApiResponse;
-import com.example.servise.StudentClassService;
+import com.example.service.StudentClassService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 

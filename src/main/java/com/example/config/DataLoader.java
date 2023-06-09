@@ -1,10 +1,13 @@
 package com.example.config;
 
+
+import com.example.entity.Permission;
 import com.example.entity.Role;
 import com.example.entity.User;
 import com.example.enums.Gender;
 import com.example.repository.RoleRepository;
 import com.example.repository.UserRepository;
+import com.example.service.PermissionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
@@ -20,6 +23,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class DataLoader implements CommandLineRunner {
 
+    private final PermissionService permissionService;
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
@@ -28,10 +32,18 @@ public class DataLoader implements CommandLineRunner {
     private String initMode;
 
     @Override
-    public void run(String... args) {
+    public void run(String... args) throws Exception {
+
+        permissionService.save(new Permission(1,"ROLE_ACCESS"));
+        permissionService.save(new Permission(2,"ADD"));
+        permissionService.save(new Permission(3,"read"));
+        System.out.println(permissionService.update(1, "ROLE"));
+        System.out.println(permissionService.getByID(1));
+        System.out.println(permissionService.remove(1));
+        System.out.println(permissionService.getList());
 
         if (initMode.equals("always")) {
-            Role supper_admin = new Role(1, "SUPPER_ADMIN");
+            Role supper_admin = new Role(1, "SUPER_ADMIN");
             Role role= roleRepository.save(supper_admin);
             User admin = User.builder()
                     .fullName("ADMIN")

@@ -2,7 +2,7 @@ package com.example.entity;
 
 
 import com.example.enums.Gender;
-import com.example.model.request.UserDto;
+import com.example.model.request.UserRegisterDto;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -35,12 +35,18 @@ public class User implements UserDetails {
     private String fullName;
 
     @NotBlank
-    @Size(min = 9,max = 9)
+    @Size(min = 9, max = 9)
     private String phoneNumber;
 
     @NotBlank
     @Size(min = 6)
     private String password;
+
+    private Long INN;
+
+    private Long INPS;
+
+    private String biography;
 
     private LocalDate birthDate;
 
@@ -58,15 +64,22 @@ public class User implements UserDetails {
     @OneToOne(cascade = CascadeType.ALL)
     private Attachment profilePhoto;
 
+    @OneToMany
+    private List<Achievement> achievements;
 
+    @OneToMany
+    private List<Subject> subjects;
 
-    @ManyToMany(fetch = FetchType.EAGER ,cascade = CascadeType.ALL)
+    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private List<Role> roles;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         List<SimpleGrantedAuthority> authorityList = new ArrayList<>();
-        roles.forEach(role -> authorityList.add(new SimpleGrantedAuthority("ROLE_" + role.getName())));
+        for (Role role : roles) {
+            authorityList.add(new SimpleGrantedAuthority("ROLE_" + role.getName()));
+            role.getPermissions().forEach(permission -> authorityList.add(new SimpleGrantedAuthority(permission.getName())));
+        }
         return authorityList;
     }
 
@@ -95,11 +108,11 @@ public class User implements UserDetails {
         return isBlocked;
     }
 
-    public static User from(UserDto userDto){
+    public static User from(UserRegisterDto userRegisterDto){
         return User.builder()
-                .fullName(userDto.getFullName())
-                .phoneNumber(userDto.getPhoneNumber())
-                .gender(userDto.getGender())
+                .fullName(userRegisterDto.getFullName())
+                .phoneNumber(userRegisterDto.getPhoneNumber())
+                .gender(userRegisterDto.getGender())
                 .registeredDate(LocalDateTime.now())
                 .isBlocked(true)
                 .build();

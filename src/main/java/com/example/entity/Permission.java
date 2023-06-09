@@ -6,15 +6,12 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.List;
-
-@Getter
-@Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Getter
+@Setter
 @Entity
-public class Role {
-
+public class Permission {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
@@ -22,16 +19,7 @@ public class Role {
     @Column(unique = true)
     private String name;
 
-    @ManyToMany(fetch = FetchType.EAGER)
-    private List<Permission> permissions;
-
-    public Role(String name,List<Permission> permissions) {
-        this.name=name;
-        this.permissions=permissions;
-    }
-
-    public Role(Integer id,String  name) {
-        this.id=id;
+    public Permission(String name) {
         this.name=name;
     }
 }

@@ -14,6 +14,7 @@ import static com.example.enums.Constants.USER_NOT_FOUND;
 @Service
 @RequiredArgsConstructor
 public class AuthService implements UserDetailsService {
+
     private final UserRepository userRepository;
     @Override
     public UserDetails loadUserByUsername(String phoneNumber) throws UsernameNotFoundException {

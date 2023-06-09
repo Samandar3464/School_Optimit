@@ -1,4 +1,4 @@
-package com.example.servise;
+package com.example.service;
 
 import com.example.entity.Attachment;
 import com.example.exception.FileUploadException;
