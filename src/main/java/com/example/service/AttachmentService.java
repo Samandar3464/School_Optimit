@@ -1,4 +1,4 @@
-package com.example.servise;
+package com.example.service;
 
 import com.example.entity.Attachment;
 import com.example.exception.FileUploadException;
@@ -118,7 +118,7 @@ public class AttachmentService {
     public boolean deleteNewName(Attachment attachment) {
         try {
 
-            Path file = Paths.get(attachUploadFolder + attachment.getPath() + "/" + attachment.getNewName());
+            Path file = Paths.get(attachUploadFolder + attachment.getPath() + "/" + attachment.getNewName() +"." +attachment.getType());
             Files.delete(file);
             attachmentRepository.deleteById(attachment.getId());
             return true;
@@ -131,7 +131,7 @@ public class AttachmentService {
 
         attachmentList.forEach(attachment -> {
             try {
-                Path file = Paths.get(attachUploadFolder + attachment.getPath() + "/" + attachment.getNewName());
+                Path file = Paths.get(attachUploadFolder + attachment.getPath() + "/" + attachment.getNewName() +"." +attachment.getType());
                 Files.delete(file);
                 attachmentRepository.deleteById(attachment.getId());
             } catch (IOException e) {

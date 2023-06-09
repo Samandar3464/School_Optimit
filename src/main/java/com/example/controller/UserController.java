@@ -4,7 +4,7 @@ import com.example.model.common.ApiResponse;
 import com.example.model.request.FireBaseTokenRegisterDto;
 import com.example.model.request.UserDto;
 import com.example.model.request.UserVerifyDto;
-import com.example.servise.UserService;
+import com.example.service.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;

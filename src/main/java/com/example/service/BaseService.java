@@ -1,4 +1,4 @@
-package com.example.servise;
+package com.example.service;
 
 import com.example.model.common.ApiResponse;
 

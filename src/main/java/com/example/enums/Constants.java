@@ -28,5 +28,6 @@ public class Constants {
     public static final String FILE_SIZE_MUST_BU_10MB_OR_LOWER="FILE SIZE MUST BU 10MB OR LOWER";
     public static final String STUDENT_NOT_FOUND="STUDENT NOT FOUND";
     public static final String CLASS_NOT_FOUND="CLASS NOT FOUND";
+    public static final String FAMILY_NOT_FOUND="FAMILY NOT FOUND";
 
 }

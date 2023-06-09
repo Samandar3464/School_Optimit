@@ -1,4 +1,4 @@
-package com.example.servise;
+package com.example.service;
 
 import com.example.config.jwtConfig.JwtGenerate;
 import com.example.entity.Attachment;
@@ -33,7 +33,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 
 import java.util.*;
-import java.util.random.RandomGenerator;
 
 import static com.example.enums.Constants.*;
 
