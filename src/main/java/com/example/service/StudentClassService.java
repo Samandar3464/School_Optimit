@@ -7,7 +7,9 @@ import com.example.repository.StudentClassRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 import static com.example.enums.Constants.*;
 
@@ -56,5 +58,15 @@ public class StudentClassService implements BaseService<StudentClass, Integer> {
         studentClass.setActive(false);
         studentClassRepository.save(studentClass);
         return new ApiResponse(DELETED, true);
+    }
+
+    public ApiResponse getAllActiveClasses() {
+        List<StudentClass> allByActiveTrue = studentClassRepository.findAllByActiveTrue();
+        return new ApiResponse(allByActiveTrue, true);
+    }
+
+    public ApiResponse getAllNeActiveClassesByYear(LocalDate startDate, LocalDate endDate) {
+        List<StudentClass> allByStartDateAfterAndEndDateBeforeAndActiveFalse = studentClassRepository.findAllByStartDateAfterAndEndDateBeforeAndActiveFalse(startDate, endDate);
+        return new ApiResponse(allByStartDateAfterAndEndDateBeforeAndActiveFalse, true);
     }
 }
