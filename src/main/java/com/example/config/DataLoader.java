@@ -34,7 +34,7 @@ public class DataLoader implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
 
-        if (permissionService.getList() == null) {
+        if (permissionService.getList1()) {
             permissionService.save(new Permission(1, "ROLE_ACCESS"));
             permissionService.save(new Permission(2, "ADD"));
             permissionService.save(new Permission(3, "read"));

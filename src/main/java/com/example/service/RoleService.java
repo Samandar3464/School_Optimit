@@ -10,6 +10,9 @@ import com.example.model.request.RoleRequestDto;
 import com.example.repository.PermissionRepository;
 import com.example.repository.RoleRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -53,12 +56,16 @@ public class RoleService {
 
 
     @ResponseStatus(HttpStatus.OK)
-    public ApiResponse getList() {
-        List<Role> all = roleRepository.findAll();
+    public ApiResponse getList(int size,int page) {
+        Pageable pageable = PageRequest.of(size, page);
+        Page<Role> all = roleRepository.findAll(pageable);
         if (all == null)
             return new ApiResponse(Constants.ROLE_NOT_AVAILABLE, true);
-
-        return new ApiResponse(all, true);
+        List<Role> roles = new ArrayList<>();
+        all.forEach(a->{
+            roles.add(Role.toRole(a));
+        });
+        return new ApiResponse(roles, true);
     }
 
     @ResponseStatus(HttpStatus.OK)
