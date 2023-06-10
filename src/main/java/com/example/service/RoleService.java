@@ -24,7 +24,6 @@ public class RoleService {
     private final RoleRepository roleRepository;
     private final PermissionRepository permissionRepository;
 
-
     @ResponseStatus(HttpStatus.CREATED)
     public ApiResponse save(RoleRequestDto requestDto) {
         if (requestDto.getName() == null)

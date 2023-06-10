@@ -38,4 +38,8 @@ public class Constants {
 
     public static final String ROLE_ALREADY_EXIST = "ROLE_ALREADY_EXIST!!!";
     public static final String ROLE_NOT_AVAILABLE = "ROLE NOT AVAILABLE";
+    public static final String TARIFF_NOT_FOUND = "TARIFF NOT FOUND";
+    public static final String FOUND = "FOUND  OBJECT";
+
+    public static final String LIFE_TIME_DONT_MATCH = "LIFE TIME DONT MATCH !! PLEASE ENTER CORRECT DATA";
 }
