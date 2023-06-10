@@ -11,7 +11,7 @@ import java.util.List;
 @NoArgsConstructor
 public class StudentResponseListForAdmin {
 
-    private List<StudentResponse> userResponseDtoList;
+    private List<StudentResponse> studentResponseDtoList;
     private long allSize;
     private int allPage;
     private int currentPage;

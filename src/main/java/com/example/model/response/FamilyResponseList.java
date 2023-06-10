@@ -11,7 +11,7 @@ import java.util.List;
 @NoArgsConstructor
 public class FamilyResponseList {
 
-    private List<FamilyResponse> userResponseDtoList;
+    private List<FamilyResponse> familyResponseDtoList;
     private long allSize;
     private int allPage;
     private int currentPage;
