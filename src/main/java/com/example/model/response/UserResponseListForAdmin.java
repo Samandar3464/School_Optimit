@@ -1,6 +1,6 @@
 package com.example.model.response;
 
-import com.example.model.response.UserResponseDto;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

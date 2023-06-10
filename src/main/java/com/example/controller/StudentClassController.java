@@ -16,34 +16,34 @@ public class StudentClassController {
     private final StudentClassService service;
 
     @PostMapping("/create")
-    public ApiResponse create(@RequestBody StudentClass studentClass){
+    public ApiResponse create(@RequestBody StudentClass studentClass) {
         return service.create(studentClass);
     }
 
     @GetMapping("/getById/{id}")
-    public ApiResponse getById(@PathVariable Integer id){
+    public ApiResponse getById(@PathVariable Integer id) {
         return service.getById(id);
     }
 
     @PutMapping("/update")
-    public ApiResponse update(@RequestBody StudentClass studentClass){
+    public ApiResponse update(@RequestBody StudentClass studentClass) {
         return service.update(studentClass);
     }
 
     @DeleteMapping("/delete/{id}")
-    public ApiResponse delete(@PathVariable Integer id){
+    public ApiResponse delete(@PathVariable Integer id) {
         return service.delete(id);
     }
 
     @GetMapping("/getAllActiveClasses")
-    public ApiResponse getAllActiveClasses(){
+    public ApiResponse getAllActiveClasses() {
         return service.getAllActiveClasses();
     }
 
     @GetMapping("/getAllNeActiveClassesByYear")
     public ApiResponse getAllNeActiveClassesByYear(
             @RequestParam(name = "startDate") LocalDate startDate,
-            @RequestParam(name = "endDate") LocalDate endDate){
-        return service.getAllNeActiveClassesByYear(startDate,endDate);
+            @RequestParam(name = "endDate") LocalDate endDate) {
+        return service.getAllNeActiveClassesByYear(startDate, endDate);
     }
 }
