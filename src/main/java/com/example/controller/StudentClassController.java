@@ -35,15 +35,17 @@ public class StudentClassController {
         return service.delete(id);
     }
 
-    @GetMapping("/getAllActiveClasses")
-    public ApiResponse getAllActiveClasses() {
-        return service.getAllActiveClasses();
+    @GetMapping("/getAllActiveClasses/{id}")
+    public ApiResponse getAllActiveClasses(@PathVariable Integer id) {
+        return service.getAllActiveClasses(id);
     }
 
-    @GetMapping("/getAllNeActiveClassesByYear")
+    @GetMapping("/getAllNeActiveClassesByYear/{id}")
     public ApiResponse getAllNeActiveClassesByYear(
             @RequestParam(name = "startDate") LocalDate startDate,
-            @RequestParam(name = "endDate") LocalDate endDate) {
-        return service.getAllNeActiveClassesByYear(startDate, endDate);
+            @RequestParam(name = "endDate") LocalDate endDate,
+            @PathVariable Integer id
+            ) {
+        return service.getAllNeActiveClassesByYear(startDate, endDate,id);
     }
 }
