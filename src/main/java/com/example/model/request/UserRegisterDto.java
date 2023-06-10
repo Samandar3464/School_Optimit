@@ -45,9 +45,11 @@ public class UserRegisterDto {
 
     private Attachment profilePhoto;
 
+    private List<Integer> roles;
+
     private List<Achievement> achievements;
 
     private List<Subject> subjects;
 
-    private List<RoleRequestDto> requestDtoList;
+    private List<Integer> requestDtoList;
 }

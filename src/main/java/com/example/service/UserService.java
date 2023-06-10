@@ -2,7 +2,10 @@ package com.example.service;
 
 import com.example.config.jwtConfig.JwtGenerate;
 import com.example.entity.Attachment;
+import com.example.entity.Role;
 import com.example.entity.User;
+import com.example.enums.Constants;
+import com.example.exception.RecordNotFoundException;
 import com.example.exception.UserAlreadyExistException;
 import com.example.exception.UserNotFoundException;
 import com.example.model.common.ApiResponse;
@@ -48,8 +51,8 @@ public class UserService {
     private final FireBaseMessagingService fireBaseMessagingService;
     private final RoleRepository roleRepository;
 
-    @ResponseStatus(HttpStatus.CREATED)
-    @Transactional(rollbackFor = {Exception.class})
+//    @ResponseStatus(HttpStatus.CREATED)
+//    @Transactional(rollbackFor = {Exception.class})
     public ApiResponse registerUser(UserRegisterDto userDto) {
         boolean byPhone = userRepository.existsByPhoneNumber(userDto.getPhoneNumber());
         if (byPhone) {
@@ -208,8 +211,8 @@ public class UserService {
     private User from(UserRegisterDto userRegisterDto, int verificationCode) {
         User user = User.from(userRegisterDto);
         user.setVerificationCode(verificationCode);
+        user.setRoles(getRoles(userRegisterDto.getRequestDtoList()));
         user.setPassword(passwordEncoder.encode(userRegisterDto.getPassword()));
-//        user.setRoles(List.of(roleRepository.findByName(CLIENT), roleRepository.findByName(DRIVER)));
         return user;
     }
 
@@ -227,6 +230,14 @@ public class UserService {
     private Integer verificationCodeGenerator() {
         Random random = new Random();
         return random.nextInt(1000, 9999);
+    }
+
+    public List<Role> getRoles(List<Integer> requestDtoList) {
+        List<Role> roleList = new ArrayList<>();
+        requestDtoList.forEach(roleId -> {
+            roleList.add(roleRepository.findById(roleId).orElseThrow(() -> new RecordNotFoundException(ROLE_NOT_AVAILABLE)));
+        });
+        return roleList;
     }
 
 //    public ApiResponse updateUser(UserUpdateDto userUpdateDto) {

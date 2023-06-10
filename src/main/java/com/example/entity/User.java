@@ -1,8 +1,8 @@
 package com.example.entity;
 
-
 import com.example.enums.Gender;
 import com.example.model.request.UserRegisterDto;
+import com.example.service.UserService;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -16,7 +16,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.UUID;
 
 @Getter
 @Setter
@@ -64,13 +63,13 @@ public class User implements UserDetails {
     @OneToOne(cascade = CascadeType.ALL)
     private Attachment profilePhoto;
 
-    @OneToMany
+    @OneToMany(fetch = FetchType.EAGER,cascade = CascadeType.ALL)
     private List<Achievement> achievements;
 
-    @OneToMany
+    @OneToMany(fetch = FetchType.EAGER)
     private List<Subject> subjects;
 
-    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @ManyToMany(fetch = FetchType.EAGER)
     private List<Role> roles;
 
     @Override
@@ -112,8 +111,17 @@ public class User implements UserDetails {
         return User.builder()
                 .fullName(userRegisterDto.getFullName())
                 .phoneNumber(userRegisterDto.getPhoneNumber())
-                .gender(userRegisterDto.getGender())
+                .INN(userRegisterDto.getINN())
+                .INPS(userRegisterDto.getINPS())
+                .biography(userRegisterDto.getBiography())
+                .birthDate(userRegisterDto.getBirthDate())
                 .registeredDate(LocalDateTime.now())
+                .isBlocked(true)
+                .fireBaseToken(userRegisterDto.getFireBaseToken())
+                .gender(userRegisterDto.getGender())
+                .profilePhoto(userRegisterDto.getProfilePhoto())
+                .achievements(userRegisterDto.getAchievements())
+                .subjects(userRegisterDto.getSubjects())
                 .isBlocked(true)
                 .build();
     }

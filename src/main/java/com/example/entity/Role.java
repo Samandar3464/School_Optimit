@@ -1,10 +1,7 @@
 package com.example.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.List;
 
@@ -12,6 +9,7 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 @Entity
 public class Role {
 
@@ -33,5 +31,13 @@ public class Role {
     public Role(Integer id,String  name) {
         this.id=id;
         this.name=name;
+    }
+
+    public static Role toRole(Role tariff) {
+        return Role
+                .builder()
+                .name(tariff.getName())
+                .permissions(tariff.getPermissions())
+                .build();
     }
 }

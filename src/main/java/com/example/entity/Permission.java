@@ -12,6 +12,7 @@ import lombok.Setter;
 @Setter
 @Entity
 public class Permission {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
