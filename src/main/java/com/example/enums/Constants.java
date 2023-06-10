@@ -13,6 +13,8 @@ public class Constants {
     public static final String SUCCESSFULLY="SUCCESSFULLY";
 
     public static final String DELETED="DELETED";
+    public static final String ACTIVATED="ACTIVATED";
+    public static final String DEACTIVATED="DEACTIVATED";
     public static final String FILE_NAME_NULL="FILE NAME NULL";
     public static final String FILE_COULD_NOT_UPLOADED="FILE COULD NOT UPLOADED";
     public static final String FILE_NOT_FOUND="FILE NOT FOUND";
@@ -36,6 +38,10 @@ public class Constants {
     public static final String FAMILY_NOT_FOUND="FAMILY NOT FOUND";
     public static final String PHONE_NUMBER_ALREADY_REGISTERED="PHONE_NUMBER_ALREADY_REGISTERED";
 
-    public static final String ROLE_ALREADY_EXIST = "ROLE_ALREADY_EXIST!!!";
+    public static final String ROLE_ALREADY_EXIST = "ROLE ALREADY EXIST!!!";
     public static final String ROLE_NOT_AVAILABLE = "ROLE NOT AVAILABLE";
+    public static final String BUSINESS_NAME_ALREADY_EXIST = "BUSINESS NAME ALREADY EXIST";
+    public static final String BUSINESS_NOT_FOUND = "BUSINESS NOT FOUND";
+    public static final String BRANCH_NOT_FOUND = "BRANCH NOT FOUND";
+    public static final String BRANCH_NAME_ALREADY_EXIST = "BRANCH NAME ALREADY EXIST";
 }

@@ -37,10 +37,6 @@ public class DataLoader implements CommandLineRunner {
         permissionService.save(new Permission(1,"ROLE_ACCESS"));
         permissionService.save(new Permission(2,"ADD"));
         permissionService.save(new Permission(3,"read"));
-        System.out.println(permissionService.update(1, "ROLE"));
-        System.out.println(permissionService.getByID(1));
-        System.out.println(permissionService.remove(1));
-        System.out.println(permissionService.getList());
 
         if (initMode.equals("always")) {
             Role supper_admin = new Role(1, "SUPER_ADMIN");
