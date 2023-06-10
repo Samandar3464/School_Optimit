@@ -35,17 +35,18 @@ public class StudentController {
 
     @GetMapping("/getAll")
     public ApiResponse getAll(@RequestParam(name = "page", defaultValue = "0") int page,
-                              @RequestParam(name = "size", defaultValue = "5") int size) {
-        return service.getList(page, size);
+                              @RequestParam(name = "size", defaultValue = "5") int size,
+                              @RequestParam(name = "id") int id) {
+        return service.getList(page, size,id);
     }
 
-    @GetMapping("/getAllByClassName/{id}")
-    public ApiResponse getAllByClassName(@PathVariable Integer id) {
-        return service.getListByClassNumber(id);
+    @GetMapping("/getAllByClassId/{id}/{branchId}")
+    public ApiResponse getAllByClassName(@PathVariable Integer id,@PathVariable Integer branchId) {
+        return service.getListByClassNumber(id,branchId);
     }
 
-    @GetMapping("/getAllNeActiveStudents")
-    public ApiResponse getAllNeActiveStudents() {
-        return service.getAllNeActiveStudents();
+    @GetMapping("/getAllNeActiveStudents/{branchId}")
+    public ApiResponse getAllNeActiveStudents(@PathVariable Integer branchId) {
+        return service.getAllNeActiveStudents(branchId);
     }
 }

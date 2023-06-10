@@ -1,6 +1,7 @@
 package com.example.service;
 
 import com.example.entity.Attachment;
+import com.example.entity.Branch;
 import com.example.entity.Student;
 import com.example.entity.StudentClass;
 import com.example.exception.*;
@@ -8,6 +9,7 @@ import com.example.model.common.ApiResponse;
 import com.example.model.request.StudentDto;
 import com.example.model.response.StudentResponse;
 import com.example.model.response.StudentResponseListForAdmin;
+import com.example.repository.BranchRepository;
 import com.example.repository.StudentClassRepository;
 import com.example.repository.StudentRepository;
 import lombok.RequiredArgsConstructor;
@@ -32,13 +34,15 @@ public class StudentService implements BaseService<StudentDto, Integer> {
     private final StudentRepository studentRepository;
     private final AttachmentService attachmentService;
     private final StudentClassRepository studentClassRepository;
+    private final BranchRepository branchRepository;
 
     @Override
     @ResponseStatus(HttpStatus.CREATED)
     @Transactional(rollbackFor = {FileNotFoundException.class,UserNotFoundException.class,
             FileInputException.class, OriginalFileNameNullException.class, InputException.class, RecordNotFoundException.class})
-    public ApiResponse create(StudentDto student) {
-        Student save = studentRepository.save(from(student));
+    public ApiResponse create(StudentDto studentDto) {
+        Branch branch = branchRepository.findById(studentDto.getBranchId()).orElseThrow(() -> new RecordNotFoundException(BRANCH_NOT_FOUND));
+        Student save = studentRepository.save(from(studentDto,branch));
         return new ApiResponse(StudentResponse.from(save), true);
     }
 
@@ -70,35 +74,36 @@ public class StudentService implements BaseService<StudentDto, Integer> {
     }
 
     @ResponseStatus(HttpStatus.OK)
-    public ApiResponse getList(int page, int size) {
+    public ApiResponse getList(int page, int size, int branchId) {
         Pageable pageable = PageRequest.of(page, size);
-        Page<Student> students = studentRepository.findAllByActiveTrue(pageable);
+        Page<Student> students = studentRepository.findAllByBranchIdAndActiveTrue(pageable,branchId);
         List<StudentResponse> studentResponseList = new ArrayList<>();
         students.forEach(student -> studentResponseList.add(StudentResponse.from(student)));
         return new ApiResponse(new StudentResponseListForAdmin(studentResponseList, students.getTotalElements(), students.getTotalPages(), students.getNumber()), true);
     }
     @ResponseStatus(HttpStatus.OK)
-    public ApiResponse getListByClassNumber(Integer classId) {
-        List<Student> students = studentRepository.findAllByStudentClassIdAndActiveTrue(classId);
+    public ApiResponse getListByClassNumber(Integer classId, int branchId) {
+        List<Student> students = studentRepository.findAllByStudentClassIdAndBranchIdAndActiveTrue(classId,branchId);
         List<StudentResponse> studentResponseList = new ArrayList<>();
         students.forEach(student -> studentResponseList.add(StudentResponse.from(student)));
         return new ApiResponse(studentResponseList, true);
     }
 
-    public ApiResponse getAllNeActiveStudents() {
-        List<Student> neActiveStudents = studentRepository.findAllByActiveFalseOrderByAddedTimeAsc();
+    public ApiResponse getAllNeActiveStudents(int branchId) {
+        List<Student> neActiveStudents = studentRepository.findAllByBranchIdAndActiveFalseOrderByAddedTimeAsc(branchId);
         List<StudentResponse> studentResponseList = new ArrayList<>();
         neActiveStudents.forEach(student -> studentResponseList.add(StudentResponse.from(student)));
         return new ApiResponse(studentResponseList, true);
     }
 
-    private Student from(StudentDto student) {
+    private Student from(StudentDto student,Branch branch) {
         Student from = Student.from(student);
         from.setStudentClass(studentClassRepository.findById(student.getStudentClassId()).orElseThrow(()->new RecordNotFoundException(CLASS_NOT_FOUND)));
         from.setPhoto(attachmentService.saveToSystem(student.getPhoto()));
         from.setReference(attachmentService.saveToSystem(student.getPhoto()));
 //        from.setMedDocPhoto(attachmentService.saveToSystem(student.getMedDocPhoto()));
         from.setDocPhoto(attachmentService.saveToSystemListFile(student.getDocPhoto()));
+        from.setBranch(branch);
         return from;
     }
 

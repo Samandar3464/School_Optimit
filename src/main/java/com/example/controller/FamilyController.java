@@ -34,12 +34,12 @@ public class FamilyController {
         return familyService.delete(id);
     }
 
-    @GetMapping("/getAllActiveClasses")
+    @GetMapping("/getAllActiveFamily")
     public ApiResponse getAllActiveClasses(
             @RequestParam(name = "page", defaultValue = "0") int page,
-            @RequestParam(name = "size", defaultValue = "5") int size
-    ) {
-        return familyService.getList(page, size);
+            @RequestParam(name = "size", defaultValue = "5") int size,
+            @RequestParam(name = "branchId") int branchId) {
+        return familyService.getList(page, size,branchId);
     }
 
 }

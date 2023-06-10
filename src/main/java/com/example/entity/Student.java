@@ -59,6 +59,10 @@ public class Student {
     @ManyToMany(cascade = CascadeType.ALL)
     private List<Family> family;
 
+    @ManyToOne
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    private Branch branch;
+
 //    @OneToOne(cascade = CascadeType.ALL)
 //    private Attachment medDocPhoto;  // med sprafka rasmi
 

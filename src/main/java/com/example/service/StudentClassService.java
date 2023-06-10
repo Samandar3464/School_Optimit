@@ -1,14 +1,15 @@
 package com.example.service;
 
+import com.example.entity.Branch;
 import com.example.entity.StudentClass;
 import com.example.exception.RecordNotFoundException;
 import com.example.model.common.ApiResponse;
+import com.example.repository.BranchRepository;
 import com.example.repository.StudentClassRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 
 import static com.example.enums.Constants.*;
@@ -18,18 +19,14 @@ import static com.example.enums.Constants.*;
 public class StudentClassService implements BaseService<StudentClass, Integer> {
 
     private final StudentClassRepository studentClassRepository;
+    private final BranchRepository branchRepository;
 
     @Override
     public ApiResponse create(StudentClass studentClass) {
-        StudentClass studentClass1 = StudentClass.builder()
-                .className(studentClass.getClassName())
-                .createdDate(LocalDateTime.now())
-                .startDate(studentClass.getStartDate())
-                .endDate(studentClass.getEndDate())
-                .roomNumber(studentClass.getRoomNumber())
-                .active(true)
-                .build();
-        studentClassRepository.save(studentClass1);
+        Branch branch = branchRepository.findById(studentClass.getComingBranchId())
+                .orElseThrow(() -> new RecordNotFoundException(BRANCH_NOT_FOUND));
+        StudentClass from = StudentClass.from(studentClass, branch);
+        studentClassRepository.save(from);
         return new ApiResponse(SUCCESSFULLY, true);
     }
 
@@ -60,13 +57,13 @@ public class StudentClassService implements BaseService<StudentClass, Integer> {
         return new ApiResponse(DELETED, true);
     }
 
-    public ApiResponse getAllActiveClasses() {
-        List<StudentClass> allByActiveTrue = studentClassRepository.findAllByActiveTrue();
+    public ApiResponse getAllActiveClasses(Integer branchId) {
+        List<StudentClass> allByActiveTrue = studentClassRepository.findAllByActiveTrueAndBranchId(branchId);
         return new ApiResponse(allByActiveTrue, true);
     }
 
-    public ApiResponse getAllNeActiveClassesByYear(LocalDate startDate, LocalDate endDate) {
-        List<StudentClass> allByStartDateAfterAndEndDateBeforeAndActiveFalse = studentClassRepository.findAllByStartDateAfterAndEndDateBeforeAndActiveFalse(startDate, endDate);
+    public ApiResponse getAllNeActiveClassesByYear(LocalDate startDate, LocalDate endDate,int id) {
+        List<StudentClass> allByStartDateAfterAndEndDateBeforeAndActiveFalse = studentClassRepository.findAllByBranchIdAndStartDateAfterAndEndDateBeforeAndActiveFalse(id,startDate, endDate);
         return new ApiResponse(allByStartDateAfterAndEndDateBeforeAndActiveFalse, true);
     }
 }
