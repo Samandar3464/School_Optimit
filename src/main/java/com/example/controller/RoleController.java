@@ -32,8 +32,11 @@ public class RoleController {
     }
 
     @GetMapping("/getList")
-    public ApiResponse getList() {
-        return roleService.getList();
+    public ApiResponse getList(
+            @RequestParam(name = "page", defaultValue = "0") int page,
+            @RequestParam(name = "page", defaultValue = "5") int size
+    ) {
+        return roleService.getList(size,page);
     }
 
     @DeleteMapping("/remove/{id}")

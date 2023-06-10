@@ -34,13 +34,15 @@ public class DataLoader implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
 
-        permissionService.save(new Permission(1,"ROLE_ACCESS"));
-        permissionService.save(new Permission(2,"ADD"));
-        permissionService.save(new Permission(3,"read"));
+        if (permissionService.getList1()) {
+            permissionService.save(new Permission(1, "ROLE_ACCESS"));
+            permissionService.save(new Permission(2, "ADD"));
+            permissionService.save(new Permission(3, "read"));
+        }
 
         if (initMode.equals("always")) {
             Role supper_admin = new Role(1, "SUPER_ADMIN");
-            Role role= roleRepository.save(supper_admin);
+            Role role = roleRepository.save(supper_admin);
             User admin = User.builder()
                     .fullName("ADMIN")
                     .phoneNumber("111111111")

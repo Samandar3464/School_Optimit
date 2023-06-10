@@ -20,7 +20,7 @@ public class UserController {
     private UserService userService;
 
     @PostMapping("/register")
-    public ApiResponse registerUser(@RequestBody @Validated UserRegisterDto userRegisterDto) {
+    public ApiResponse registerUser(@RequestBody UserRegisterDto userRegisterDto) {
         return userService.registerUser(userRegisterDto);
     }
 

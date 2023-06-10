@@ -45,6 +45,17 @@ public class PermissionService {
         return new ApiResponse(all, true);
     }
 
+    public boolean getList1() {
+        boolean flag = true;
+        List<Permission> all = permissionRepository.findAll();
+        for (Permission a:all) {
+            if (a!=null){
+                flag=false;
+            }
+        }
+        return flag;
+    }
+
     @ResponseStatus(HttpStatus.OK)
     public ApiResponse remove(Integer id) {
         permissionRepository.findById(id).orElseThrow(() -> new RecordNotFoundException(Constants.PERMISSION_NOT_FOUND));

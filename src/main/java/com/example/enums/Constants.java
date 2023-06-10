@@ -44,4 +44,8 @@ public class Constants {
     public static final String BUSINESS_NOT_FOUND = "BUSINESS NOT FOUND";
     public static final String BRANCH_NOT_FOUND = "BRANCH NOT FOUND";
     public static final String BRANCH_NAME_ALREADY_EXIST = "BRANCH NAME ALREADY EXIST";
+    public static final String TARIFF_NOT_FOUND = "TARIFF NOT FOUND";
+    public static final String FOUND = "FOUND  OBJECT";
+
+    public static final String LIFE_TIME_DONT_MATCH = "LIFE TIME DONT MATCH !! PLEASE ENTER CORRECT DATA";
 }
