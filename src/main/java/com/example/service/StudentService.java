@@ -88,7 +88,7 @@ public class StudentService implements BaseService<StudentDto, Integer> {
         students.forEach(student -> studentResponseList.add(StudentResponse.from(student)));
         return new ApiResponse(studentResponseList, true);
     }
-
+    @ResponseStatus(HttpStatus.OK)
     public ApiResponse getAllNeActiveStudents(int branchId) {
         List<Student> neActiveStudents = studentRepository.findAllByBranchIdAndActiveFalseOrderByAddedTimeAsc(branchId);
         List<StudentResponse> studentResponseList = new ArrayList<>();

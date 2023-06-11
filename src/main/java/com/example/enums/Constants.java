@@ -46,6 +46,10 @@ public class Constants {
     public static final String BRANCH_NAME_ALREADY_EXIST = "BRANCH NAME ALREADY EXIST";
     public static final String TARIFF_NOT_FOUND = "TARIFF NOT FOUND";
     public static final String FOUND = "FOUND  OBJECT";
+    public static final String ROOM_TYPE_ALREADY_EXIST = "ROOM TYPE ALREADY EXIST";
+    public static final String ROOM_TYPE_NOT_FOUND = "ROOM TYPE NOT FOUND";
+    public static final String ROOM_NOT_FOUND = "ROOM NOT FOUND";
+    public static final String ROOM_NUMBER_ALREADY_EXIST = "ROOM NUMBER ALREADY EXIST";
 
     public static final String LIFE_TIME_DONT_MATCH = "LIFE TIME DONT MATCH !! PLEASE ENTER CORRECT DATA";
 }
