@@ -46,6 +46,7 @@ public class StudentDto {
     private Integer branchId;
 
     private boolean active;
-//    private MultipartFile medDocPhoto;
+
+    private MultipartFile medDocPhoto;
 
 }

@@ -101,7 +101,7 @@ public class StudentService implements BaseService<StudentDto, Integer> {
         from.setStudentClass(studentClassRepository.findById(student.getStudentClassId()).orElseThrow(()->new RecordNotFoundException(CLASS_NOT_FOUND)));
         from.setPhoto(attachmentService.saveToSystem(student.getPhoto()));
         from.setReference(attachmentService.saveToSystem(student.getPhoto()));
-//        from.setMedDocPhoto(attachmentService.saveToSystem(student.getMedDocPhoto()));
+        from.setMedDocPhoto(attachmentService.saveToSystem(student.getMedDocPhoto()));
         from.setDocPhoto(attachmentService.saveToSystemListFile(student.getDocPhoto()));
         from.setBranch(branch);
         return from;

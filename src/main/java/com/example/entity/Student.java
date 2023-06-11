@@ -63,8 +63,8 @@ public class Student {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Branch branch;
 
-//    @OneToOne(cascade = CascadeType.ALL)
-//    private Attachment medDocPhoto;  // med sprafka rasmi
+    @OneToOne(cascade = CascadeType.ALL)
+    private Attachment medDocPhoto;  // med sprafka rasmi
 
     public static Student from(StudentDto studentDto) {
         return Student.builder()
