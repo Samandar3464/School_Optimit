@@ -19,8 +19,4 @@ public class Permission {
 
     @Column(unique = true)
     private String name;
-
-    public Permission(String name) {
-        this.name=name;
-    }
 }

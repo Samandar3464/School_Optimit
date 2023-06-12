@@ -1,5 +1,6 @@
 package com.example.entity;
 
+import com.example.model.request.RoleRequestDto;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -20,6 +21,8 @@ public class Role {
     @Column(unique = true)
     private String name;
 
+    private String parentRole;
+
     @ManyToMany(fetch = FetchType.EAGER)
     private List<Permission> permissions;
 
@@ -33,11 +36,12 @@ public class Role {
         this.name=name;
     }
 
-    public static Role toRole(Role tariff) {
+
+    public static Role toRole(RoleRequestDto requestDto) {
         return Role
                 .builder()
-                .name(tariff.getName())
-                .permissions(tariff.getPermissions())
+                .name(requestDto.getName())
+                .parentRole(requestDto.getParentRole())
                 .build();
     }
 }

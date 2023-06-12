@@ -4,9 +4,12 @@ import com.example.entity.Achievement;
 import com.example.entity.Attachment;
 import com.example.entity.Subject;
 import com.example.enums.Gender;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -25,31 +28,26 @@ public class UserRegisterDto {
     @Size(min = 6)
     private String password;
 
-    private Long INN;
+    private int inn;
 
-    private Long INPS;
+    private int inps;
 
     private String biography;
 
-    private LocalDate birthDate;
+    private String birthDate;
 
-    private LocalDateTime registeredDate;
-
-    private boolean isBlocked;
-
-    private String fireBaseToken;
-
-    private Integer verificationCode;
-
+    @Enumerated(EnumType.STRING)
     private Gender gender;
 
-    private Attachment profilePhoto;
+    private MultipartFile profilePhoto;
 
     private List<Integer> roles;
 
-    private List<Achievement> achievements;
+    private List<AchievementDto> achievements;
 
-    private List<Subject> subjects;
+    private List<Integer> subjects;
 
-    private List<Integer> requestDtoList;
+    private List<Integer> dailyLessons;
+
+    private List<WorkExperienceDto> workExperiences;
 }

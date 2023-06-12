@@ -10,6 +10,7 @@ import java.util.List;
 @NoArgsConstructor
 public class TariffDto {
 
+    private Integer id;
     private String name;
 
     private String description;

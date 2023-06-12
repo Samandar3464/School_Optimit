@@ -6,7 +6,6 @@ import com.example.enums.Lifetime;
 import com.example.exception.RecordNotFoundException;
 import com.example.model.common.ApiResponse;
 import com.example.model.request.TariffDto;
-import com.example.model.response.TariffResponse;
 import com.example.repository.PermissionRepository;
 import com.example.repository.TariffRepository;
 import lombok.RequiredArgsConstructor;
@@ -16,94 +15,70 @@ import java.util.*;
 
 @Service
 @RequiredArgsConstructor
-public class TariffService {
+public class TariffService implements BaseService<TariffDto, Integer> {
 
     private final TariffRepository repository;
 
     private final PermissionRepository permissionRepository;
 
-    public ApiResponse save(TariffDto tariffDto) {
+
+    @Override
+    public ApiResponse create(TariffDto tariffDto) {
         Tariff tariff = Tariff.toEntity(tariffDto);
-        tariff.setPermissions(permissionRepository.findAllById(tariffDto.getPermissionsList()));
-        repository.save(tariff);
-        return new ApiResponse(Constants.SUCCESSFULLY, true);
+        checkLifeTimeValid(tariffDto, tariff);
+        setPermission(tariffDto, tariff);
+        return new ApiResponse(Constants.SUCCESSFULLY, true, repository.save(tariff));
+    }
+
+    @Override
+    public ApiResponse getById(Integer id) {
+        return new ApiResponse(Constants.SUCCESSFULLY, true, checkById(id));
+    }
+
+    @Override
+    public ApiResponse update(TariffDto tariffDto) {
+        checkById(tariffDto.getId());
+        Tariff entity = Tariff.toEntity(tariffDto);
+        entity.setId(tariffDto.getId());
+        checkLifeTimeValid(tariffDto,entity);
+        setPermission(tariffDto,entity);
+        return new ApiResponse(Constants.SUCCESSFULLY, true, repository.save(entity));
+    }
+
+    @Override
+    public ApiResponse delete(Integer id) {
+        Tariff tariff = checkById(id);
+        tariff.setDelete(true);
+        return new ApiResponse(Constants.DELETED, true,repository.save(tariff));
     }
 
     public ApiResponse getTariffList() {
         List<Tariff> tariffList = repository.findAllByDelete(false);
         tariffList.sort(Comparator.comparing(Tariff::getPrice));
-        List<TariffResponse> tariffResponseList = toTariffResponse(tariffList);
-        return new ApiResponse(Constants.FOUND, true, tariffResponseList);
+        return new ApiResponse(Constants.FOUND, true, tariffList);
     }
 
 
     public ApiResponse getToChooseATariff() {
-        List<Tariff> tariffList = repository.findAllByActiveAndDelete(true,false);
+        List<Tariff> tariffList = repository.findAllByActiveAndDelete(true, false);
         tariffList.sort(Comparator.comparing(Tariff::getPrice));
-        List<TariffResponse> tariffResponse = toTariffResponse(tariffList);
-        return new ApiResponse(Constants.FOUND, true, tariffResponse);
+        return new ApiResponse(Constants.FOUND, true, tariffList);
     }
 
-    public ApiResponse getById(Integer id) {
-        Optional<Tariff> optionalTariff = repository.findById(id);
-        if (optionalTariff.isEmpty()) {
-            throw new RecordNotFoundException(Constants.TARIFF_NOT_FOUND);
-        }
-        Tariff tariff = optionalTariff.get();
-        TariffResponse response = TariffResponse.toResponse(tariff);
-        return new ApiResponse(Constants.SUCCESSFULLY, true, response);
-    }
-
-    public ApiResponse update(Integer id, TariffDto tariffDto) {
-        Optional<Tariff> optionalTariff = repository.findById(id);
-        if (optionalTariff.isEmpty()) {
-            throw new RecordNotFoundException(Constants.TARIFF_NOT_FOUND);
-        }
-        Tariff tariff = optionalTariff.get();
-        setTariff(tariffDto, tariff);
-        repository.save(tariff);
-
-        return new ApiResponse(Constants.SUCCESSFULLY, true);
-    }
-
-    public ApiResponse remove(Integer id) {
-        Optional<Tariff> optionalTariff = repository.findById(id);
-        if (optionalTariff.isEmpty()) {
-            throw new RecordNotFoundException(Constants.TARIFF_NOT_FOUND);
-        }
-        Tariff tariff = optionalTariff.get();
-        tariff.setDelete(true);
-        repository.save(tariff);
-        return new ApiResponse(Constants.SUCCESSFULLY, true);
+    private Tariff checkById(Integer id) {
+        return repository.findById(id).orElseThrow(() -> new RecordNotFoundException(Constants.TARIFF_NOT_FOUND));
     }
 
 
-    private static List<TariffResponse> toTariffResponse(List<Tariff> tariffList) {
-        List<TariffResponse> tariffResponseList = new ArrayList<>();
-        tariffList.forEach(tariff -> {
-            tariffResponseList.add(TariffResponse.toResponse(tariff));
-        });
-        return tariffResponseList;
-    }
-
-    private void setTariff(TariffDto tariffDto, Tariff tariff) {
-        tariff.setTradeAmount(tariffDto.getTradeAmount());
-        tariff.setProductAmount(tariffDto.getProductAmount());
-        tariff.setDelete(tariffDto.isDelete());
-        tariff.setName(tariffDto.getName());
-        tariff.setActive(tariffDto.isActive());
-        tariff.setDescription(tariffDto.getDescription());
-        tariff.setDiscount(tariffDto.getDiscount());
-        tariff.setInterval(tariffDto.getInterval());
-        tariff.setPrice(tariffDto.getPrice());
-        tariff.setBranchAmount(tariffDto.getBranchAmount());
-        tariff.setEmployeeAmount(tariffDto.getEmployeeAmount());
-       try {
-           tariff.setLifetime(Lifetime.valueOf(tariffDto.getLifetime()));
-       }catch (Exception e){
-           throw new RecordNotFoundException(Constants.LIFE_TIME_DONT_MATCH + "    "+e);
-       }
-        tariff.setTestDay(tariffDto.getTestDay());
+    private void setPermission(TariffDto tariffDto, Tariff tariff) {
         tariff.setPermissions(permissionRepository.findAllById(tariffDto.getPermissionsList()));
+    }
+
+    private static void checkLifeTimeValid(TariffDto tariffDto, Tariff tariff) {
+        try {
+            tariff.setLifetime(Lifetime.valueOf(tariffDto.getLifetime()));
+        } catch (Exception e) {
+            throw new RecordNotFoundException(Constants.LIFE_TIME_DONT_MATCH + "    " + e);
+        }
     }
 }

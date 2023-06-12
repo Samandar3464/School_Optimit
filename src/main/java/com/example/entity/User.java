@@ -2,8 +2,8 @@ package com.example.entity;
 
 import com.example.enums.Gender;
 import com.example.model.request.UserRegisterDto;
-import com.example.service.UserService;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.*;
@@ -13,6 +13,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -41,11 +42,18 @@ public class User implements UserDetails {
     @Size(min = 6)
     private String password;
 
-    private Long INN;
+    @Email
+    private String email;
 
-    private Long INPS;
+    private int inn;
+
+    private int inps;
 
     private String biography;
+
+    private boolean married;
+
+    private double overallSalary;
 
     private LocalDate birthDate;
 
@@ -63,14 +71,23 @@ public class User implements UserDetails {
     @OneToOne(cascade = CascadeType.ALL)
     private Attachment profilePhoto;
 
-    @OneToMany(fetch = FetchType.EAGER,cascade = CascadeType.ALL)
+    @OneToOne
+    private StudentClass studentClass;
+
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private List<Achievement> achievements;
 
     @OneToMany(fetch = FetchType.EAGER)
     private List<Subject> subjects;
 
+    @OneToMany(cascade = CascadeType.ALL)
+    private List<WorkExperience> workExperiences;
+
     @ManyToMany(fetch = FetchType.EAGER)
     private List<Role> roles;
+
+    @OneToMany(cascade = CascadeType.ALL)
+    private List<DailyLessons> dailyLessons;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -107,21 +124,19 @@ public class User implements UserDetails {
         return isBlocked;
     }
 
-    public static User from(UserRegisterDto userRegisterDto){
+    public static User from(UserRegisterDto userRegisterDto) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDate birthDate = LocalDate.parse(userRegisterDto.getBirthDate(), formatter);
         return User.builder()
                 .fullName(userRegisterDto.getFullName())
                 .phoneNumber(userRegisterDto.getPhoneNumber())
-                .INN(userRegisterDto.getINN())
-                .INPS(userRegisterDto.getINPS())
+                .inn(userRegisterDto.getInn())
+                .inps(userRegisterDto.getInps())
                 .biography(userRegisterDto.getBiography())
-                .birthDate(userRegisterDto.getBirthDate())
+                .birthDate(birthDate)
                 .registeredDate(LocalDateTime.now())
                 .isBlocked(true)
-                .fireBaseToken(userRegisterDto.getFireBaseToken())
                 .gender(userRegisterDto.getGender())
-                .profilePhoto(userRegisterDto.getProfilePhoto())
-                .achievements(userRegisterDto.getAchievements())
-                .subjects(userRegisterDto.getSubjects())
                 .isBlocked(true)
                 .build();
     }

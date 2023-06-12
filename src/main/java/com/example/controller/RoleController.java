@@ -17,7 +17,7 @@ public class RoleController {
     @PostMapping("/save")
 //    @PreAuthorize("hasAuthority('ROLE_ACCESS' or 'SUPER_ADMIN')")
     public ApiResponse save(@RequestBody RoleRequestDto requestDto) {
-        return roleService.save(requestDto);
+        return roleService.create(requestDto);
     }
 
     @PutMapping("/update")
@@ -28,7 +28,7 @@ public class RoleController {
 
     @GetMapping("/getRoleByID/{id}")
     public ApiResponse getRoleByID(@PathVariable Integer id) {
-        return roleService.getRoleByID(id);
+        return roleService.getById(id);
     }
 
     @GetMapping("/getList")
@@ -39,9 +39,9 @@ public class RoleController {
         return roleService.getList(size,page);
     }
 
-    @DeleteMapping("/remove/{id}")
+    @DeleteMapping("/delete/{id}")
 //    @PreAuthorize("hasAuthority('ROLE_ACCESS' or 'SUPER_ADMIN')")
     public ApiResponse remove(@PathVariable Integer id) {
-        return roleService.remove(id);
+        return roleService.delete(id);
     }
 }
