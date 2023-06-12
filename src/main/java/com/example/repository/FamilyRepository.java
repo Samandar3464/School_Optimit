@@ -9,7 +9,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 
 public interface FamilyRepository extends JpaRepository<Family,Integer> {
-    Page<Family> findAllByActiveTrue(Pageable pageable);
+    Page<Family> findAllByBranchIdAndActiveTrue(int branch_id,Pageable pageable);
 
     boolean existsByPhoneNumber(@NotBlank @Size(min = 9, max = 9) String phoneNumber);
 

@@ -12,7 +12,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 import java.util.List;
 import java.util.Optional;
@@ -27,6 +29,7 @@ public class BranchService implements BaseService<BranchDto, Integer> {
     private final BranchRepository branchRepository;
 
     @Override
+    @ResponseStatus(HttpStatus.CREATED)
     public ApiResponse create(BranchDto branchDto) {
         Optional<Branch> byBusinessIdAndName = branchRepository.findByBusinessIdAndName(branchDto.getBusinessId(), branchDto.getName());
         if (byBusinessIdAndName.isPresent()) {
@@ -40,12 +43,14 @@ public class BranchService implements BaseService<BranchDto, Integer> {
     }
 
     @Override
+    @ResponseStatus(HttpStatus.OK)
     public ApiResponse getById(Integer integer) {
         Branch branch = branchRepository.findById(integer).orElseThrow(() -> new RecordNotFoundException(BRANCH_NOT_FOUND));
         return new ApiResponse(branch, true);
     }
 
     @Override
+    @ResponseStatus(HttpStatus.OK)
     public ApiResponse update(BranchDto branchDto) {
         Branch branch = branchRepository.findById(branchDto.getId())
                 .orElseThrow(() -> new RecordNotFoundException(BRANCH_NOT_FOUND));
@@ -55,13 +60,14 @@ public class BranchService implements BaseService<BranchDto, Integer> {
     }
 
     @Override
+    @ResponseStatus(HttpStatus.OK)
     public ApiResponse delete(Integer integer) {
         Branch branch = branchRepository.findById(integer).orElseThrow(() -> new RecordNotFoundException(BRANCH_NOT_FOUND));
         branch.setDelete(true);
         branchRepository.save(branch);
         return new ApiResponse(DELETED, true);
     }
-
+    @ResponseStatus(HttpStatus.OK)
     public ApiResponse getByBusinessId(Integer integer) {
         List<Branch> allByBusinessId = branchRepository.findAllByBusinessIdAndDeleteFalse(integer);
         if (allByBusinessId.isEmpty()) {
@@ -69,7 +75,7 @@ public class BranchService implements BaseService<BranchDto, Integer> {
         }
         return new ApiResponse(allByBusinessId, true);
     }
-
+    @ResponseStatus(HttpStatus.OK)
     public ApiResponse getAll(int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         Page<Branch> all = branchRepository.findAllByDeleteFalse(pageable);

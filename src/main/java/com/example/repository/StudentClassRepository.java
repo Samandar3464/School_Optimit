@@ -7,6 +7,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 public interface StudentClassRepository extends JpaRepository<StudentClass, Integer> {
-    List<StudentClass> findAllByActiveTrue();
-    List<StudentClass> findAllByStartDateAfterAndEndDateBeforeAndActiveFalse(LocalDate startDate, LocalDate endDate);
+//    List<StudentClass> findAllByBranchIdAndActiveTrue(Integer branchId);
+    List<StudentClass> findAllByActiveTrueAndBranchId(Integer branchId);
+    List<StudentClass> findAllByBranchIdAndStartDateAfterAndEndDateBeforeAndActiveFalse(Integer branchId, LocalDate startDate, LocalDate endDate);
 }

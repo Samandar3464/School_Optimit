@@ -5,6 +5,8 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.*;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import java.time.LocalDateTime;
 
@@ -39,10 +41,16 @@ public class Family {
     private Gender gender;
 
     @Transient
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Integer studentId;
 
     private boolean active;
 
+    @ManyToOne
+    private Branch branch;
+
+    @Transient
+    private Integer comingBranchId;
     public static Family from(Family family){
         return Family.builder()
                 .fullName(family.getFullName())
