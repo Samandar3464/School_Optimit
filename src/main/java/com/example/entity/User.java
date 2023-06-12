@@ -45,9 +45,9 @@ public class User implements UserDetails {
     @Email
     private String email;
 
-    private Long INN;
+    private int inn;
 
-    private Long INPS;
+    private int inps;
 
     private String biography;
 
@@ -130,13 +130,12 @@ public class User implements UserDetails {
         return User.builder()
                 .fullName(userRegisterDto.getFullName())
                 .phoneNumber(userRegisterDto.getPhoneNumber())
-                .INN(userRegisterDto.getInn())
-                .INPS(userRegisterDto.getInps())
+                .inn(userRegisterDto.getInn())
+                .inps(userRegisterDto.getInps())
                 .biography(userRegisterDto.getBiography())
                 .birthDate(birthDate)
                 .registeredDate(LocalDateTime.now())
                 .isBlocked(true)
-                .fireBaseToken(userRegisterDto.getFireBaseToken())
                 .gender(userRegisterDto.getGender())
                 .isBlocked(true)
                 .build();

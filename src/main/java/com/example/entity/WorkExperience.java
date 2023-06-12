@@ -3,10 +3,8 @@ package com.example.entity;
 import com.example.model.request.WorkExperienceDto;
 import jakarta.persistence.*;
 import lombok.*;
-import org.yaml.snakeyaml.events.Event;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 @Getter
@@ -29,19 +27,24 @@ public class WorkExperience {
 
     private LocalDate endDate;
 
-    @OneToOne
-    private User employee;
+    private int employee;
 
     public static WorkExperience toWorkExperience(WorkExperienceDto workExperienceDto) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-        LocalDateTime startDate = LocalDateTime.parse(workExperienceDto.getStartDate(), formatter);
-        LocalDateTime endDate = LocalDateTime.parse(workExperienceDto.getEndDate(), formatter);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDate startDate = null;
+        LocalDate endDate = null;
+    try {
+         startDate = LocalDate.parse(workExperienceDto.getStartDate(), formatter);
+         endDate = LocalDate.parse(workExperienceDto.getEndDate(), formatter);
+    }catch (Exception e){
+        e.printStackTrace();
+    }
         return WorkExperience
                 .builder()
                 .placeOfWork(workExperienceDto.getPlaceOfWork())
                 .position(workExperienceDto.getPosition())
-                .startDate(startDate.toLocalDate())
-                .endDate(endDate.toLocalDate())
+                .startDate(startDate)
+                .endDate(endDate)
                 .build();
     }
 }

@@ -1,5 +1,6 @@
 package com.example.entity;
 
+import com.example.model.request.RoleRequestDto;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -35,12 +36,12 @@ public class Role {
         this.name=name;
     }
 
-    public static Role toRole(Role tariff) {
+
+    public static Role toRole(RoleRequestDto requestDto) {
         return Role
                 .builder()
-                .name(tariff.getName())
-                .parentRole(tariff.getParentRole())
-                .permissions(tariff.getPermissions())
+                .name(requestDto.getName())
+                .parentRole(requestDto.getParentRole())
                 .build();
     }
 }

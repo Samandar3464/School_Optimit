@@ -59,4 +59,7 @@ public class Constants {
 
     public static final String WORK_EXPERIENCE_ALREADY_EXIST = "WORK_EXPERIENCE_ALREADY_EXIST";
     public static final String WORK_EXPERIENCE_NOT_FOUND = "WORK_EXPERIENCE_NOT_FOUND";
+    public static final String ACHIEVEMENT_NOT_FOUND = "ACHIEVEMENT_NOT_FOUND";
+    public static final String ACHIEVEMENT_ALREADY_EXIST = "ACHIEVEMENT_ALREADY_EXIST";
+
 }

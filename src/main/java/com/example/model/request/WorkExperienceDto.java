@@ -1,8 +1,8 @@
 package com.example.model.request;
 
+import com.example.entity.WorkExperience;
 import lombok.*;
 
-import java.time.LocalDate;
 
 @Getter
 @Setter
@@ -22,4 +22,15 @@ public class WorkExperienceDto {
     private String endDate;
 
     private Integer employeeId;
+
+    public static WorkExperienceDto toWorkExperienceDto(WorkExperience workExperience){
+        return WorkExperienceDto
+                .builder()
+                .id(workExperience.getId())
+                .placeOfWork(workExperience.getPlaceOfWork())
+                .startDate(workExperience.getStartDate().toString())
+                .endDate(workExperience.getEndDate().toString())
+                .position(workExperience.getPosition())
+                .employeeId(workExperience.getEmployee()).build();
+    }
 }

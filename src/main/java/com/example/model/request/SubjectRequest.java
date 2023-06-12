@@ -18,6 +18,5 @@ public class SubjectRequest {
     private Integer id;
     private String name;
     private int level;
-    private List<Integer> topicList;
-    private Integer topicId;
+    private List<TopicRequest> topicList;
 }

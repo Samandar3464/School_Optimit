@@ -7,6 +7,8 @@ import com.example.exception.RecordAlreadyExistException;
 import com.example.exception.RecordNotFoundException;
 import com.example.model.common.ApiResponse;
 import com.example.model.request.SubjectRequest;
+import com.example.model.request.TopicDto;
+import com.example.model.request.TopicRequest;
 import com.example.repository.SubjectRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -25,116 +27,90 @@ public class SubjectService implements BaseService<SubjectRequest, Integer> {
     public ApiResponse create(SubjectRequest subjectRequest) {
         checkIfExist(subjectRequest);
         Subject subject = Subject.toSubject(subjectRequest);
-        Subject save = subjectRepository.save(subject);
-        return new ApiResponse(save, true);
+        subject.setTopicList(topicService.toAllEntity(subjectRequest.getTopicList()));
+        return new ApiResponse(subjectRepository.save(subject), true);
     }
 
     public ApiResponse addTopic(SubjectRequest subjectRequest) {
         Subject subject = checkById(subjectRequest.getId());
-        setTopic(subjectRequest, subject);
-        subject = subjectRepository.save(subject);
-        return new ApiResponse(subject, true);
-    }
-
-    public ApiResponse getTopicList(Integer subjectId) {
-        List<Topic> topicList = checkById(subjectId).getTopicList();
-        return new ApiResponse(topicList,true);
+        subject.setTopicList(doAddTopic(subjectRequest.getTopicList(), subject));
+        return new ApiResponse(subjectRepository.save(subject), true);
     }
 
     @Override
     public ApiResponse getById(Integer id) {
-        Subject subject = checkById(id);
-        return new ApiResponse(subject, true);
+        return new ApiResponse(checkById(id), true);
+    }
+
+    public ApiResponse getTopicList(Integer subjectId) {
+        return new ApiResponse(checkById(subjectId).getTopicList(), true);
     }
 
     @Override
     public ApiResponse update(SubjectRequest subjectRequest) {
-        Subject checkById = checkById(subjectRequest.getId());
+        checkById(subjectRequest.getId());
         Subject subject = Subject.toSubject(subjectRequest);
-        subject.setId(checkById.getId());
-        subject.setTopicList(topicService.checkAllById(subjectRequest.getTopicList()));
-        subject = subjectRepository.save(subject);
-        return new ApiResponse(subject, true);
+        subject.setId(subjectRequest.getId());
+        subject.setTopicList(topicService.toAllEntity(subjectRequest.getTopicList()));
+        return new ApiResponse(subjectRepository.save(subject), true);
     }
 
     @Override
     public ApiResponse delete(Integer id) {
         Subject subject = checkById(id);
+        topicService.deleteALL(subject.getTopicList());
         subjectRepository.deleteById(id);
-        return new ApiResponse(subject, true);
+        return new ApiResponse(Constants.DELETED, true, subject);
     }
 
 
     public ApiResponse deleteTopic(Integer subjectId, Integer topicId) {
         Subject subject = checkById(subjectId);
-        List<Topic> topicList = new ArrayList<>();
-        topicDelete(topicId, subject, topicList);
-        subject.setTopicList(topicList);
+        subject.setTopicList(topicDelete(topicId, subject));
         subjectRepository.save(subject);
+        topicService.delete(topicId);
         return new ApiResponse(Constants.DELETED, true);
     }
 
-    private void topicDelete(Integer topicId, Subject subject, List<Topic> topicList) {
+    private List<Topic> topicDelete(Integer topicId, Subject subject) {
+        List<Topic> topicList = new ArrayList<>();
+        isDelete(topicId, subject, topicList);
+        isEquals(subject, topicList);
+        return topicList;
+    }
+
+    private  void isDelete(Integer topicId, Subject subject, List<Topic> topicList) {
         subject.getTopicList().forEach(topic -> {
             if (!topic.getId().equals(topicId)) {
                 topicList.add(topic);
             }
         });
+    }
+
+    private static void isEquals(Subject subject, List<Topic> topicList) {
         if (subject.getTopicList().size() == topicList.size()) {
             throw new RecordNotFoundException(Constants.TOPIC_NOT_FOUND);
         }
     }
 
-    private void setTopic(SubjectRequest subjectRequest, Subject subject) {
+    private List<Topic> doAddTopic(List<TopicRequest> topics, Subject subject) {
         List<Topic> topicList = new ArrayList<>();
-        List<Integer> list = subjectRequest.getTopicList();
-        for (Integer id : list) {
-            Topic checkTopic = topicService.checkById(id);
-            subject.getTopicList().forEach(topic -> {
-                if (topic.getId().equals(checkTopic.getId())) {
-                    throw new RecordAlreadyExistException(Constants.TOPIC_ALREADY_EXIST + "  " + checkTopic);
-                }
-            });
-            topicList.add(checkTopic);
+        for (TopicRequest topicDto : topics) {
+            isExist(subject, topicDto.getName());
+            ApiResponse apiResponse = topicService.create(topicDto);
+            topicList.add((Topic) apiResponse.getData());
         }
         topicList.addAll(subject.getTopicList());
-        subject.setTopicList(topicList);
+        return topicList;
     }
 
-    //    public ApiResponse deleteTeacher(Integer subjectId,Integer teacherId) {
-//        Subject subject = checkById(subjectId);
-//        List<User> list = new ArrayList<>(subject.getTeachers().stream().toList());
-//        for (User teacher : list) {
-//            if (teacher.getId().equals(teacherId)){
-//                list.remove(teacher);
-//                subject.setTeachers(list);
-//                subjectRepository.save(subject);
-//                return new ApiResponse(Constants.DELETED, true,teacher);
-//            }
-//        }
-//        throw new RecordNotFoundException(Constants.TOPIC_NOT_FOUND);
-//    }
-
-    //    public ApiResponse addTeacher(SubjectRequest subjectRequest) {
-//        Subject subject = checkById(subjectRequest.getId());
-//        setTeacher(subjectRequest, subject);
-//        subject = subjectRepository.save(subject);
-//        return new ApiResponse(subject, true);
-//    }
-
-
-//    private void setTeacher(SubjectRequest subjectRequest, Subject subject) {
-//        List<User> userList = new ArrayList<>();
-//        User user = userService.checkUserExistById(subjectRequest.getTeacherId());
-//        subject.getTeachers().forEach(teacher -> {
-//            if (teacher.getId().equals(user.getId())) {
-//                throw new RecordAlreadyExistException(Constants.TEACHER_ALREADY_EXIST);
-//            }
-//        });
-//        userList.add(user);
-//        userList.addAll(subject.getTeachers());
-//        subject.setTeachers(userList);
-//    }
+    private void isExist(Subject subject, String topicName) {
+        subject.getTopicList().forEach(topic -> {
+            if (topic.getName().equals(topicName)) {
+                throw new RecordAlreadyExistException(Constants.TOPIC_ALREADY_EXIST + "   name: " + topicName);
+            }
+        });
+    }
 
     private void checkIfExist(SubjectRequest subjectRequest) {
         boolean present = subjectRepository.findByName(subjectRequest.getName()).isPresent();

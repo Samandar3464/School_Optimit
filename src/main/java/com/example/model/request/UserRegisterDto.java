@@ -4,6 +4,8 @@ import com.example.entity.Achievement;
 import com.example.entity.Attachment;
 import com.example.entity.Subject;
 import com.example.enums.Gender;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
@@ -26,29 +28,26 @@ public class UserRegisterDto {
     @Size(min = 6)
     private String password;
 
-    private Long inn;
+    private int inn;
 
-    private Long inps;
+    private int inps;
 
     private String biography;
 
     private String birthDate;
 
-    private String fireBaseToken;
-
-    private Integer verificationCode;
-
+    @Enumerated(EnumType.STRING)
     private Gender gender;
 
     private MultipartFile profilePhoto;
 
     private List<Integer> roles;
 
-    private List<Integer> achievements;
+    private List<AchievementDto> achievements;
 
     private List<Integer> subjects;
 
     private List<Integer> dailyLessons;
 
-    private List<Integer> workExperiences;
+    private List<WorkExperienceDto> workExperiences;
 }

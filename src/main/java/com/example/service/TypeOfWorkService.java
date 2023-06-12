@@ -9,8 +9,6 @@ import com.example.repository.TypeOfWorkRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-
 @Service
 @RequiredArgsConstructor
 public class TypeOfWorkService implements BaseService<TypeOfWorkRequest, Integer> {
@@ -20,28 +18,24 @@ public class TypeOfWorkService implements BaseService<TypeOfWorkRequest, Integer
     @Override
     public ApiResponse create(TypeOfWorkRequest typeOfWorkRequest) {
         TypeOfWork typeOfWork = TypeOfWork.toTypeOfWork(typeOfWorkRequest);
-        TypeOfWork save = typeOfWorkRepository.save(typeOfWork);
-        return new ApiResponse(save,true);
+        return new ApiResponse(typeOfWorkRepository.save(typeOfWork),true);
     }
 
     @Override
     public ApiResponse getById(Integer id) {
-        TypeOfWork typeOfWork = checkById(id);
-        return new ApiResponse(typeOfWork,true);
+        return new ApiResponse(checkById(id),true);
     }
 
     public ApiResponse getAll(){
-        List<TypeOfWork> all = typeOfWorkRepository.findAll();
-        return new ApiResponse(all,true);
+        return new ApiResponse(typeOfWorkRepository.findAll(),true);
     }
 
     @Override
     public ApiResponse update(TypeOfWorkRequest typeOfWorkRequest) {
-        TypeOfWork typeOfWork = checkById(typeOfWorkRequest.getId());
-        TypeOfWork set = TypeOfWork.toTypeOfWork(typeOfWorkRequest);
-        set.setId(typeOfWork.getId());
-        TypeOfWork save = typeOfWorkRepository.save(set);
-        return new ApiResponse(save,true);
+        checkById(typeOfWorkRequest.getId());
+        TypeOfWork typeOfWork = TypeOfWork.toTypeOfWork(typeOfWorkRequest);
+        typeOfWork.setId(typeOfWorkRequest.getId());
+        return new ApiResponse(typeOfWorkRepository.save(typeOfWork),true);
     }
 
     @Override

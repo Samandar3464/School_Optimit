@@ -10,6 +10,7 @@ import com.example.repository.WorkExperienceRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -20,10 +21,10 @@ public class WorkExperienceService implements BaseService<WorkExperienceDto,Inte
 
     @Override
     public ApiResponse create(WorkExperienceDto workExperienceDto) {
-        WorkExperience workExperience = WorkExperience.toWorkExperience(workExperienceDto);
         checkIfExist(workExperienceDto);
-        WorkExperience save = workExperienceRepository.save(workExperience);
-        return new ApiResponse(save,true);
+        WorkExperience workExperience = WorkExperience.toWorkExperience(workExperienceDto);
+        workExperienceRepository.save(workExperience);
+        return new ApiResponse(Constants.SUCCESSFULLY,true);
     }
 
     @Override
@@ -33,23 +34,23 @@ public class WorkExperienceService implements BaseService<WorkExperienceDto,Inte
 
     @Override
     public ApiResponse update(WorkExperienceDto workExperienceDto) {
-        WorkExperience workExperience = checkById(workExperienceDto.getId());
+        checkById(workExperienceDto.getId());
         WorkExperience experience = WorkExperience.toWorkExperience(workExperienceDto);
-        experience.setId(workExperience.getId());
-        workExperience = workExperienceRepository.save(experience);
-        return new ApiResponse(workExperience,true);
+        experience.setId(workExperienceDto.getId());
+        workExperienceRepository.save(experience);
+        return new ApiResponse(Constants.SUCCESSFULLY,true);
     }
 
     @Override
     public ApiResponse delete(Integer id) {
-        WorkExperience workExperience = checkById(id);
-        workExperienceRepository.delete(workExperience);
-        return new ApiResponse(workExperience,true);
+        WorkExperienceDto workExperience = checkById(id);
+        workExperienceRepository.deleteById(id);
+        return new ApiResponse(Constants.DELETED,true,workExperience);
     }
 
-    public WorkExperience checkById(Integer id) {
-        return workExperienceRepository.findById(id)
-                .orElseThrow(() -> new RecordNotFoundException(Constants.WORK_EXPERIENCE_NOT_FOUND));
+    public WorkExperienceDto checkById(Integer id) {
+        return WorkExperienceDto.toWorkExperienceDto(workExperienceRepository.findById(id)
+                .orElseThrow(() -> new RecordNotFoundException(Constants.WORK_EXPERIENCE_NOT_FOUND)));
     }
 
     public List<WorkExperience> checkAllById(List<Integer> workExperiences) {
@@ -62,5 +63,17 @@ public class WorkExperienceService implements BaseService<WorkExperienceDto,Inte
         if (present && position) {
             throw new RecordAlreadyExistException(Constants.WORK_EXPERIENCE_ALREADY_EXIST);
         }
+    }
+
+    public List<WorkExperience> toAllEntity(List<WorkExperienceDto> workExperiences) {
+        List<WorkExperience> workExperienceList = new ArrayList<>();
+        for (WorkExperienceDto workExperience : workExperiences) {
+            workExperienceList.add(WorkExperience.toWorkExperience(workExperience));
+        }
+        return workExperienceList;
+    }
+
+    public List<WorkExperience> saveAll(List<WorkExperience> allEntity) {
+        return workExperienceRepository.saveAll(allEntity);
     }
 }

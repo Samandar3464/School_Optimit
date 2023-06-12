@@ -9,6 +9,7 @@ import com.example.repository.TopicRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -20,8 +21,7 @@ public class TopicService implements BaseService<TopicRequest, Integer> {
     @Override
     public ApiResponse create(TopicRequest topicRequest) {
         Topic topic = Topic.toTopic(topicRequest);
-        Topic save = topicRepository.save(topic);
-        return new ApiResponse(save, true);
+        return new ApiResponse(topicRepository.save(topic), true);
     }
 
     @Override
@@ -31,11 +31,10 @@ public class TopicService implements BaseService<TopicRequest, Integer> {
 
     @Override
     public ApiResponse update(TopicRequest topicRequest) {
-        Topic topic = checkById(topicRequest.getId());
+        checkById(topicRequest.getId());
         Topic setTopic = Topic.toTopic(topicRequest);
-        setTopic.setId(topic.getId());
-        topic = topicRepository.save(setTopic);
-        return new ApiResponse(topic, true);
+        setTopic.setId(topicRequest.getId());
+        return new ApiResponse(topicRepository.save(setTopic), true);
     }
 
     @Override
@@ -45,11 +44,25 @@ public class TopicService implements BaseService<TopicRequest, Integer> {
         return new ApiResponse(Constants.DELETED, true, topic);
     }
 
+    public ApiResponse deleteALL(List<Topic> topics) {
+        topicRepository.deleteAll(topics);
+        return new ApiResponse(Constants.DELETED, true);
+    }
+
+
     public List<Topic> checkAllById(List<Integer> id) {
         return topicRepository.findAllById(id);
     }
 
     public Topic checkById(Integer id) {
         return topicRepository.findById(id).orElseThrow(() -> new RecordNotFoundException(Constants.TOPIC_NOT_FOUND));
+    }
+
+    public List<Topic> toAllEntity(List<TopicRequest> topicList) {
+        List<Topic> topics = new ArrayList<>();
+        topicList.forEach(topicRequest -> {
+            topics.add(Topic.toTopic(topicRequest));
+        });
+        return topics;
     }
 }

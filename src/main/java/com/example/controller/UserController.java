@@ -20,7 +20,7 @@ public class UserController {
     private UserService userService;
 
     @PostMapping("/register")
-    public ApiResponse registerUser(@io.swagger.v3.oas.annotations.parameters.RequestBody UserRegisterDto userRegisterDto) {
+    public ApiResponse registerUser(@RequestBody UserRegisterDto userRegisterDto) {
         return userService.create(userRegisterDto);
     }
 

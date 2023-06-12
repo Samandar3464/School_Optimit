@@ -1,9 +1,7 @@
 package com.example.controller;
 
 import com.example.model.common.ApiResponse;
-import com.example.model.request.TypeOfWorkRequest;
 import com.example.model.request.WorkExperienceDto;
-import com.example.service.TypeOfWorkService;
 import com.example.service.WorkExperienceService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;

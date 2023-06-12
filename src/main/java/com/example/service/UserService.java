@@ -1,9 +1,7 @@
 package com.example.service;
 
 import com.example.config.jwtConfig.JwtGenerate;
-import com.example.entity.Attachment;
-import com.example.entity.Role;
-import com.example.entity.User;
+import com.example.entity.*;
 import com.example.exception.UserAlreadyExistException;
 import com.example.exception.UserNotFoundException;
 import com.example.model.common.ApiResponse;
@@ -14,6 +12,7 @@ import com.example.model.response.UserResponseDto;
 import com.example.model.response.UserResponseListForAdmin;
 import com.example.repository.AchievementRepository;
 import com.example.repository.UserRepository;
+import com.example.repository.WorkExperienceRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -44,7 +43,7 @@ public class UserService implements BaseService<UserRegisterDto, Integer> {
 
     private final UserRepository userRepository;
     private final AttachmentService attachmentService;
-    private final AchievementRepository achievementRepository;
+    private final AchievementService achievementService;
     private final SubjectService subjectService;
     private final DailyLessonsService dailyLessonsService;
     private final WorkExperienceService workExperienceService;
@@ -156,7 +155,7 @@ public class UserService implements BaseService<UserRegisterDto, Integer> {
     @Transactional(rollbackFor = {Exception.class})
     public ApiResponse openToBlockUserByID(Integer id) {
         User user = checkUserExistById(id);
-        User byId = userRepository.findById(id).orElseThrow(()-> new UserNotFoundException(USER_NOT_FOUND));
+        User byId = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException(USER_NOT_FOUND));
         byId.setBlocked(true);
         userRepository.save(byId);
         NotificationMessageResponse notificationMessageResponse = NotificationMessageResponse.from(user.getFireBaseToken(), OPEN, new HashMap<>());
@@ -219,24 +218,48 @@ public class UserService implements BaseService<UserRegisterDto, Integer> {
         return userRepository.findByPhoneNumber(user.getPhoneNumber()).orElseThrow(() -> new UserNotFoundException(USER_NOT_FOUND));
     }
 
-    public List<Role> getRoles(List<Integer> requestDtoList) {
-        List<Role> roleList = new ArrayList<>();
-        requestDtoList.forEach(roleId -> roleList.add((Role) roleService.getById(roleId).getData()));
-        return roleList;
-    }
-
     private User toUser(UserRegisterDto userRegisterDto, int verificationCode) {
         User user = User.from(userRegisterDto);
         user.setVerificationCode(verificationCode);
-//        if (!userRegisterDto.getProfilePhoto().isEmpty())
-//        user.setProfilePhoto(attachmentService.saveToSystem(userRegisterDto.getProfilePhoto()));
-        user.setRoles(getRoles(userRegisterDto.getRoles()));
-//        user.setAchievements(achievementRepository.findAllById(userRegisterDto.getAchievements()));
-//        user.setSubjects(subjectService.checkAllById(userRegisterDto.getSubjects()));
-//        user.setDailyLessons(dailyLessonsService.checkAllById(userRegisterDto.getDailyLessons()));
-//        user.setWorkExperiences(workExperienceService.checkAllById(userRegisterDto.getWorkExperiences()));
+//        setPhoto(userRegisterDto, user);
+        setRoles(userRegisterDto, user);
+        setAchievements(userRegisterDto, user);
+//        setSubjects(userRegisterDto, user);
+//        setDailyLessons(userRegisterDto, user);
+//        setWorkExperiences(userRegisterDto, user);
         user.setPassword(passwordEncoder.encode(userRegisterDto.getPassword()));
         return user;
+    }
+
+    private void setPhoto(UserRegisterDto userRegisterDto, User user) {
+        if (!userRegisterDto.getProfilePhoto().isEmpty()) {
+            user.setProfilePhoto(attachmentService.saveToSystem(userRegisterDto.getProfilePhoto()));
+        }
+    }
+
+    private void setDailyLessons(UserRegisterDto userRegisterDto, User user) {
+        List<DailyLessons> dailyLessons = dailyLessonsService.checkAllById(userRegisterDto.getDailyLessons());
+        user.setDailyLessons(dailyLessons);
+    }
+
+    private void setSubjects(UserRegisterDto userRegisterDto, User user) {
+        List<Subject> subjects = subjectService.checkAllById(userRegisterDto.getSubjects());
+        user.setSubjects(subjects);
+    }
+
+    private void setRoles(UserRegisterDto userRegisterDto, User user) {
+        List<Role> roles = roleService.getAllByIds(userRegisterDto.getRoles());
+        user.setRoles(roles);
+    }
+
+    private void setAchievements(UserRegisterDto userRegisterDto, User user) {
+        List<Achievement> achievements = achievementService.toAllEntity(userRegisterDto.getAchievements());
+        user.setAchievements(achievementService.saveAll(achievements));
+    }
+
+    private void setWorkExperiences(UserRegisterDto userRegisterDto, User user) {
+        List<WorkExperience> allEntity = workExperienceService.toAllEntity(userRegisterDto.getWorkExperiences());
+        user.setWorkExperiences(workExperienceService.saveAll(allEntity));
     }
 
     public UserResponseDto toUserResponse(User user) {
@@ -258,7 +281,7 @@ public class UserService implements BaseService<UserRegisterDto, Integer> {
                 .mobile_phone(number)
                 .message("Tasdiqlash kodi: " + integer + ". Yo'linggiz bexatar  bo'lsin.")
                 .from(4546)
-                .callback_url("http://0000.uz/test.php")
+                .callback_url("https://0000.uz/test.php")
                 .build());
         return new ApiResponse(SUCCESSFULLY, true);
     }
@@ -270,10 +293,6 @@ public class UserService implements BaseService<UserRegisterDto, Integer> {
 
     public User checkUserExistById(Integer id) {
         return userRepository.findById(id).orElseThrow(() -> new UserNotFoundException(USER_NOT_FOUND));
-    }
-
-    public List<User> checkAllById(List<Integer> userIds) {
-        return userRepository.findAllById(userIds);
     }
 }
 

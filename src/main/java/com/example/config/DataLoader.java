@@ -34,11 +34,12 @@ public class DataLoader implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
 
-        if (permissionService.getList1()) {
+        if (permissionService.isEmpty()) {
             permissionService.create(new Permission(1, "ROLE_ACCESS"));
             permissionService.create(new Permission(2, "ADD"));
             permissionService.create(new Permission(3, "read"));
         }
+
 
         if (initMode.equals("always")) {
             Role supper_admin = new Role(1, "SUPER_ADMIN");
