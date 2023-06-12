@@ -1,5 +1,6 @@
 package com.example.entity;
 
+import com.example.model.request.SubjectRequest;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -19,9 +20,17 @@ public class Subject {
 
     private String name;
 
-    @OneToMany
+    private int level;
+
+    @OneToMany(cascade = CascadeType.ALL)
     private List<Topic> topicList;
 
-    @ManyToMany
-    private List<User> teachers;
+
+    public static Subject toSubject(SubjectRequest subjectRequest) {
+        return Subject
+                .builder()
+                .name(subjectRequest.getName())
+                .level(subjectRequest.getLevel())
+                .build();
+    }
 }

@@ -20,8 +20,8 @@ public class UserController {
     private UserService userService;
 
     @PostMapping("/register")
-    public ApiResponse registerUser(@RequestBody UserRegisterDto userRegisterDto) {
-        return userService.registerUser(userRegisterDto);
+    public ApiResponse registerUser(@io.swagger.v3.oas.annotations.parameters.RequestBody UserRegisterDto userRegisterDto) {
+        return userService.create(userRegisterDto);
     }
 
     @PostMapping("/login")
@@ -42,7 +42,7 @@ public class UserController {
     @GetMapping("/getById/{id}")
 //    @PreAuthorize("hasAnyRole('ADMIN')")
     public ApiResponse getUserById(@PathVariable Integer id) {
-        return userService.getByUserId(id);
+        return userService.getById(id);
     }
 
     @PutMapping("/block/{id}")
@@ -67,11 +67,11 @@ public class UserController {
         return userService.changePassword(number, password);
     }
 
-//    @PutMapping("/update")
-////    @PreAuthorize("hasAnyRole('DRIVER','CLIENT','ADMIN')")
-//    public ApiResponse update(@ModelAttribute UserUpdateDto userUpdateDto) {
-//        return userService.updateUser(userUpdateDto);
-//    }
+    @PutMapping("/update")
+//    @PreAuthorize("hasAnyRole('DRIVER','CLIENT','ADMIN')")
+    public ApiResponse update(@ModelAttribute UserRegisterDto userUpdateDto) {
+        return userService.update(userUpdateDto);
+    }
 
     @GetMapping("/getUserList")
     @PreAuthorize("hasRole('ADMIN')")
@@ -93,5 +93,10 @@ public class UserController {
     @GetMapping("/logout")
     public ApiResponse deleteUserFromContext() {
         return userService.removeUserFromContext();
+    }
+
+    @DeleteMapping("/delete/{id}")
+    public ApiResponse delete(@PathVariable Integer id) {
+        return userService.delete(id);
     }
 }

@@ -16,15 +16,51 @@ import java.util.*;
 
 @Service
 @RequiredArgsConstructor
-public class TariffService {
+public class TariffService implements BaseService<TariffDto,Integer> {
 
     private final TariffRepository repository;
 
     private final PermissionRepository permissionRepository;
 
-    public ApiResponse save(TariffDto tariffDto) {
+
+    @Override
+    public ApiResponse create(TariffDto tariffDto) {
         Tariff tariff = Tariff.toEntity(tariffDto);
         tariff.setPermissions(permissionRepository.findAllById(tariffDto.getPermissionsList()));
+        repository.save(tariff);
+        return new ApiResponse(Constants.SUCCESSFULLY, true);
+    }
+    @Override
+    public ApiResponse getById(Integer id) {
+        Optional<Tariff> optionalTariff = repository.findById(id);
+        if (optionalTariff.isEmpty()) {
+            throw new RecordNotFoundException(Constants.TARIFF_NOT_FOUND);
+        }
+        Tariff tariff = optionalTariff.get();
+        TariffResponse response = TariffResponse.toResponse(tariff);
+        return new ApiResponse(Constants.SUCCESSFULLY, true, response);
+    }
+
+    @Override
+    public ApiResponse update(TariffDto tariffDto) {
+        Optional<Tariff> optionalTariff = repository.findById(tariffDto.getId());
+        if (optionalTariff.isEmpty()) {
+            throw new RecordNotFoundException(Constants.TARIFF_NOT_FOUND);
+        }
+        Tariff tariff = optionalTariff.get();
+        setTariff(tariffDto, tariff);
+        repository.save(tariff);
+        return new ApiResponse(Constants.SUCCESSFULLY, true);
+    }
+
+    @Override
+    public ApiResponse delete(Integer id) {
+        Optional<Tariff> optionalTariff = repository.findById(id);
+        if (optionalTariff.isEmpty()) {
+            throw new RecordNotFoundException(Constants.TARIFF_NOT_FOUND);
+        }
+        Tariff tariff = optionalTariff.get();
+        tariff.setDelete(true);
         repository.save(tariff);
         return new ApiResponse(Constants.SUCCESSFULLY, true);
     }
@@ -43,40 +79,6 @@ public class TariffService {
         List<TariffResponse> tariffResponse = toTariffResponse(tariffList);
         return new ApiResponse(Constants.FOUND, true, tariffResponse);
     }
-
-    public ApiResponse getById(Integer id) {
-        Optional<Tariff> optionalTariff = repository.findById(id);
-        if (optionalTariff.isEmpty()) {
-            throw new RecordNotFoundException(Constants.TARIFF_NOT_FOUND);
-        }
-        Tariff tariff = optionalTariff.get();
-        TariffResponse response = TariffResponse.toResponse(tariff);
-        return new ApiResponse(Constants.SUCCESSFULLY, true, response);
-    }
-
-    public ApiResponse update(Integer id, TariffDto tariffDto) {
-        Optional<Tariff> optionalTariff = repository.findById(id);
-        if (optionalTariff.isEmpty()) {
-            throw new RecordNotFoundException(Constants.TARIFF_NOT_FOUND);
-        }
-        Tariff tariff = optionalTariff.get();
-        setTariff(tariffDto, tariff);
-        repository.save(tariff);
-
-        return new ApiResponse(Constants.SUCCESSFULLY, true);
-    }
-
-    public ApiResponse remove(Integer id) {
-        Optional<Tariff> optionalTariff = repository.findById(id);
-        if (optionalTariff.isEmpty()) {
-            throw new RecordNotFoundException(Constants.TARIFF_NOT_FOUND);
-        }
-        Tariff tariff = optionalTariff.get();
-        tariff.setDelete(true);
-        repository.save(tariff);
-        return new ApiResponse(Constants.SUCCESSFULLY, true);
-    }
-
 
     private static List<TariffResponse> toTariffResponse(List<Tariff> tariffList) {
         List<TariffResponse> tariffResponseList = new ArrayList<>();

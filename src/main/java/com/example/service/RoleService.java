@@ -22,13 +22,13 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class RoleService {
+public class RoleService implements BaseService<RoleRequestDto, Integer> {
 
     private final RoleRepository roleRepository;
     private final PermissionRepository permissionRepository;
 
-    @ResponseStatus(HttpStatus.CREATED)
-    public ApiResponse save(RoleRequestDto requestDto) {
+    @Override
+    public ApiResponse create(RoleRequestDto requestDto) {
         if (requestDto.getName() == null)
             throw new RecordNotFoundException(Constants.NAME_NOT_FOUND);
 
@@ -40,8 +40,8 @@ public class RoleService {
     }
 
 
-    @ResponseStatus(HttpStatus.OK)
-    public ApiResponse getRoleByID(Integer id) {
+    @Override
+    public ApiResponse getById(Integer id) {
         Role save = roleRepository.findById(id)
                 .orElseThrow(() -> new RecordNotFoundException(Constants.ROLE_NOT_AVAILABLE));
         return new ApiResponse(save, true);
@@ -54,26 +54,27 @@ public class RoleService {
         return new ApiResponse(setRole(requestDto, role), true);
     }
 
+    @Override
+    public ApiResponse delete(Integer id) {
+        roleRepository.findById(id).orElseThrow(() -> new RecordNotFoundException(Constants.ROLE_NOT_AVAILABLE));
+        roleRepository.deleteById(id);
+        return new ApiResponse(Constants.SUCCESSFULLY, true);
+    }
+
 
     @ResponseStatus(HttpStatus.OK)
-    public ApiResponse getList(int size,int page) {
+    public ApiResponse getList(int size, int page) {
         Pageable pageable = PageRequest.of(size, page);
         Page<Role> all = roleRepository.findAll(pageable);
         if (all == null)
             return new ApiResponse(Constants.ROLE_NOT_AVAILABLE, true);
         List<Role> roles = new ArrayList<>();
-        all.forEach(a->{
+        all.forEach(a -> {
             roles.add(Role.toRole(a));
         });
         return new ApiResponse(roles, true);
     }
 
-    @ResponseStatus(HttpStatus.OK)
-    public ApiResponse remove(Integer id) {
-        roleRepository.findById(id).orElseThrow(() -> new RecordNotFoundException(Constants.ROLE_NOT_AVAILABLE));
-        roleRepository.deleteById(id);
-        return new ApiResponse(Constants.SUCCESSFULLY, true);
-    }
 
     private Role setRole(RoleRequestDto requestDto, Role role) {
         List<Permission> permissionListByIds = getPermissionListByIds(requestDto.getPermissionIdList());

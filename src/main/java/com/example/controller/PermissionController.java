@@ -22,6 +22,6 @@ public class PermissionController {
 
     @GetMapping("getById/{id}")
     public ApiResponse getList(@PathVariable Integer id) {
-        return permissionService.getByID(id);
+        return permissionService.getById(id);
     }
 }

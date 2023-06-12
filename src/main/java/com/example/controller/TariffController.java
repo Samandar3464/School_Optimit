@@ -17,7 +17,7 @@ public class TariffController {
     @PostMapping("/save")
 //    @PreAuthorize("hasAnyRole('SUPER_ADMIN') or hasAnyAuthority('SAVE_TARIFF')")
     public ApiResponse save(@RequestBody TariffDto tariffDto) {
-        return tariffService.save(tariffDto);
+        return tariffService.create(tariffDto);
     }
 
     @GetMapping("/getTariffById/{id}")
@@ -35,17 +35,15 @@ public class TariffController {
         return tariffService.getToChooseATariff();
     }
 
-    @PutMapping("/update/{tariffId}")
+    @PutMapping("/update")
 //    @PreAuthorize("hasAnyRole('SUPER_ADMIN') or hasAnyAuthority('UPDATE_TARIFF')")
-    public ApiResponse update(@RequestBody TariffDto tariffDto,
-                              @PathVariable Integer tariffId
-    ) {
-        return tariffService.update(tariffId, tariffDto);
+    public ApiResponse update(@RequestBody TariffDto tariffDto) {
+        return tariffService.update(tariffDto);
     }
 
     @DeleteMapping("/remove/{id}")
 //    @PreAuthorize("hasAnyRole('SUPER_ADMIN') or hasAnyAuthority('REMOVE_TARIFF')")
     public ApiResponse remove(@PathVariable Integer id) {
-        return tariffService.remove(id);
+        return tariffService.delete(id);
     }
 }

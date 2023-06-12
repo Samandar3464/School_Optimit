@@ -40,15 +40,13 @@ public class UserResponseDto {
 
 //    private String fireBaseToken;
 
-    private LocalDateTime registeredDate;
+    private String registeredDate;
 
     private String phoneNumber;
 
     private String profilePhotoUrl;
 
-    @JsonSerialize(using = LocalDateTimeSerializer.class)
-    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
-    private LocalDate birthDate;
+    private String birthDate;
 
     @Enumerated(EnumType.STRING)
     private Gender gender;
@@ -69,7 +67,7 @@ public class UserResponseDto {
         return UserResponseDto.builder()
                 .id(user.getId())
 //                .fireBaseToken(user.getFireBaseToken())
-                .registeredDate(user.getRegisteredDate())
+                .registeredDate(user.getRegisteredDate().toString())
                 .fullName(user.getFullName())
                 .achievements(user.getAchievements())
                 .biography(user.getBiography())
@@ -78,7 +76,7 @@ public class UserResponseDto {
                 .subjects(user.getSubjects())
                 .roles(user.getRoles())
                 .phoneNumber(user.getPhoneNumber())
-                .birthDate(user.getBirthDate()==null ? null : user.getBirthDate())
+                .birthDate(user.getBirthDate().toString())
                 .gender(user.getGender())
                 .build();
     }

@@ -20,6 +20,8 @@ public class Role {
     @Column(unique = true)
     private String name;
 
+    private String parentRole;
+
     @ManyToMany(fetch = FetchType.EAGER)
     private List<Permission> permissions;
 
@@ -37,6 +39,7 @@ public class Role {
         return Role
                 .builder()
                 .name(tariff.getName())
+                .parentRole(tariff.getParentRole())
                 .permissions(tariff.getPermissions())
                 .build();
     }
