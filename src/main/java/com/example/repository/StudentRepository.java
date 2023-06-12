@@ -9,9 +9,9 @@ import java.util.List;
 
 public interface StudentRepository extends JpaRepository<Student, Integer> {
 
-    List<Student> findAllByStudentClassIdAndActiveTrue(Integer studentClass_id);
+    List<Student> findAllByStudentClassIdAndBranchIdAndActiveTrue(Integer studentClass_id, Integer branch_id);
 
-    Page<Student> findAllByActiveTrue(Pageable pageable);
+    Page<Student> findAllByBranchIdAndActiveTrue(Pageable pageable, Integer id);
 
-    List<Student> findAllByActiveFalseOrderByAddedTimeAsc();
+    List<Student> findAllByBranchIdAndActiveFalseOrderByAddedTimeAsc(Integer branch_id);
 }

@@ -1,14 +1,17 @@
 package com.example.service;
 
+import com.example.entity.Branch;
 import com.example.entity.StudentClass;
 import com.example.exception.RecordNotFoundException;
 import com.example.model.common.ApiResponse;
+import com.example.repository.BranchRepository;
 import com.example.repository.StudentClassRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 
 import static com.example.enums.Constants.*;
@@ -18,28 +21,27 @@ import static com.example.enums.Constants.*;
 public class StudentClassService implements BaseService<StudentClass, Integer> {
 
     private final StudentClassRepository studentClassRepository;
+    private final BranchRepository branchRepository;
 
     @Override
+    @ResponseStatus(HttpStatus.CREATED)
     public ApiResponse create(StudentClass studentClass) {
-        StudentClass studentClass1 = StudentClass.builder()
-                .className(studentClass.getClassName())
-                .createdDate(LocalDateTime.now())
-                .startDate(studentClass.getStartDate())
-                .endDate(studentClass.getEndDate())
-                .roomNumber(studentClass.getRoomNumber())
-                .active(true)
-                .build();
-        studentClassRepository.save(studentClass1);
+        Branch branch = branchRepository.findById(studentClass.getComingBranchId())
+                .orElseThrow(() -> new RecordNotFoundException(BRANCH_NOT_FOUND));
+        StudentClass from = StudentClass.from(studentClass, branch);
+        studentClassRepository.save(from);
         return new ApiResponse(SUCCESSFULLY, true);
     }
 
     @Override
+    @ResponseStatus(HttpStatus.OK)
     public ApiResponse getById(Integer integer) {
         StudentClass studentClass = studentClassRepository.findById(integer).orElseThrow(() -> new RecordNotFoundException(CLASS_NOT_FOUND));
         return new ApiResponse(studentClass, true);
     }
 
     @Override
+    @ResponseStatus(HttpStatus.OK)
     public ApiResponse update(StudentClass studentClass) {
         studentClassRepository.findById(studentClass.getId()).orElseThrow(() -> new RecordNotFoundException(CLASS_NOT_FOUND));
         StudentClass build = StudentClass.builder()
@@ -53,20 +55,21 @@ public class StudentClassService implements BaseService<StudentClass, Integer> {
     }
 
     @Override
+    @ResponseStatus(HttpStatus.OK)
     public ApiResponse delete(Integer integer) {
         StudentClass studentClass = studentClassRepository.findById(integer).orElseThrow(() -> new RecordNotFoundException(CLASS_NOT_FOUND));
         studentClass.setActive(false);
         studentClassRepository.save(studentClass);
         return new ApiResponse(DELETED, true);
     }
-
-    public ApiResponse getAllActiveClasses() {
-        List<StudentClass> allByActiveTrue = studentClassRepository.findAllByActiveTrue();
+    @ResponseStatus(HttpStatus.OK)
+    public ApiResponse getAllActiveClasses(Integer branchId) {
+        List<StudentClass> allByActiveTrue = studentClassRepository.findAllByActiveTrueAndBranchId(branchId);
         return new ApiResponse(allByActiveTrue, true);
     }
-
-    public ApiResponse getAllNeActiveClassesByYear(LocalDate startDate, LocalDate endDate) {
-        List<StudentClass> allByStartDateAfterAndEndDateBeforeAndActiveFalse = studentClassRepository.findAllByStartDateAfterAndEndDateBeforeAndActiveFalse(startDate, endDate);
+    @ResponseStatus(HttpStatus.OK)
+    public ApiResponse getAllNeActiveClassesByYear(LocalDate startDate, LocalDate endDate,int id) {
+        List<StudentClass> allByStartDateAfterAndEndDateBeforeAndActiveFalse = studentClassRepository.findAllByBranchIdAndStartDateAfterAndEndDateBeforeAndActiveFalse(id,startDate, endDate);
         return new ApiResponse(allByStartDateAfterAndEndDateBeforeAndActiveFalse, true);
     }
 }
