@@ -21,6 +21,8 @@ public class TypeOfWork {
     @Enumerated(EnumType.STRING)
     private SalaryType type;
 
+
+
     private String name;// asosiy | to'garaklar | vazifa darslar
 
     private double price;
