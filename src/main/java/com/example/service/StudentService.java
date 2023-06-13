@@ -98,7 +98,8 @@ public class StudentService implements BaseService<StudentDto, Integer> {
 
     private Student from(StudentDto student,Branch branch) {
         Student from = Student.from(student);
-        from.setStudentClass(studentClassRepository.findById(student.getStudentClassId()).orElseThrow(()->new RecordNotFoundException(CLASS_NOT_FOUND)));
+        from.setStudentClass(studentClassRepository.findById(student.getStudentClassId())
+                .orElseThrow(()->new RecordNotFoundException(CLASS_NOT_FOUND)));
         from.setPhoto(attachmentService.saveToSystem(student.getPhoto()));
         from.setReference(attachmentService.saveToSystem(student.getPhoto()));
         from.setMedDocPhoto(attachmentService.saveToSystem(student.getMedDocPhoto()));
