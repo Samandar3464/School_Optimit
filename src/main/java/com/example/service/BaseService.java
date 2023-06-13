@@ -11,6 +11,4 @@ public interface BaseService <T ,R> {
     ApiResponse update(T t);
 
     ApiResponse delete(R r);
-
-
 }

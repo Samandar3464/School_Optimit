@@ -14,52 +14,52 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class PermissionService {
+public class PermissionService implements BaseService<Permission, Integer> {
 
     private final PermissionRepository permissionRepository;
 
-    public void save(Permission permission) {
-        if (permission == null) {
+    @Override
+    public ApiResponse create(Permission permission) {
+        if (permission.getName() == null) {
             throw new RecordNotFoundException(Constants.PERMISSION_NOT_FOUND);
         }
-        permissionRepository.save(permission);
-    }
-
-    public ApiResponse getByID(Integer id) {
-        Permission permission = permissionRepository.findById(id)
-                .orElseThrow(() -> new RecordNotFoundException(Constants.PERMISSION_NOT_FOUND));
-        return new ApiResponse(permission, true);
-    }
-
-    @ResponseStatus(HttpStatus.OK)
-    public ApiResponse update(Integer id,String name) {
-        Permission permission = permissionRepository.findById(id)
-                .orElseThrow(() -> new RecordNotFoundException(Constants.PERMISSION_NOT_FOUND));
-        permission.setName(name);
         return new ApiResponse(permissionRepository.save(permission), true);
+    }
+
+    @Override
+    public ApiResponse getById(Integer id) {
+        return new ApiResponse(checkById(id), true);
     }
 
     @ResponseStatus(HttpStatus.OK)
     public ApiResponse getList() {
-        List<Permission> all = permissionRepository.findAll();
-        return new ApiResponse(all, true);
+        return new ApiResponse(permissionRepository.findAll(), true);
     }
 
-    public boolean getList1() {
-        boolean flag = true;
-        List<Permission> all = permissionRepository.findAll();
-        for (Permission a:all) {
-            if (a!=null){
-                flag=false;
-            }
-        }
-        return flag;
+
+    @Override
+    public ApiResponse update(Permission newPermission) {
+        checkById(newPermission.getId());
+        return new ApiResponse(permissionRepository.save(newPermission), true);
     }
 
-    @ResponseStatus(HttpStatus.OK)
-    public ApiResponse remove(Integer id) {
-        permissionRepository.findById(id).orElseThrow(() -> new RecordNotFoundException(Constants.PERMISSION_NOT_FOUND));
+    @Override
+    public ApiResponse delete(Integer id) {
+        Permission permission = checkById(id);
         permissionRepository.deleteById(id);
-        return new ApiResponse(Constants.SUCCESSFULLY, true);
+        return new ApiResponse(Constants.SUCCESSFULLY, true,permission);
+    }
+
+    public Permission checkById(Integer id) {
+        return permissionRepository.findById(id)
+                .orElseThrow(() -> new RecordNotFoundException(Constants.PERMISSION_NOT_FOUND));
+    }
+
+    public boolean isEmpty() {
+      return permissionRepository.findAll().isEmpty();
+    }
+
+    public List<Permission> checkAllById(List<Integer> permissionIdList) {
+        return permissionRepository.findAllById(permissionIdList);
     }
 }
