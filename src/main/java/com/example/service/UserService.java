@@ -224,9 +224,9 @@ public class UserService implements BaseService<UserRegisterDto, Integer> {
 //        setPhoto(userRegisterDto, user);
         setRoles(userRegisterDto, user);
         setAchievements(userRegisterDto, user);
-//        setSubjects(userRegisterDto, user);
+        setSubjects(userRegisterDto, user);
 //        setDailyLessons(userRegisterDto, user);
-//        setWorkExperiences(userRegisterDto, user);
+        setWorkExperiences(userRegisterDto, user);
         user.setPassword(passwordEncoder.encode(userRegisterDto.getPassword()));
         return user;
     }

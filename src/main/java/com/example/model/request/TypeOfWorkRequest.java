@@ -1,5 +1,8 @@
 package com.example.model.request;
 
+import com.example.enums.SalaryType;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import lombok.*;
 
 @Getter
@@ -15,4 +18,6 @@ public class TypeOfWorkRequest {
 
     private double price;
 
+    @Enumerated(EnumType.STRING)
+    private SalaryType type;
 }
