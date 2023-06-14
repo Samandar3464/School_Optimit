@@ -7,7 +7,6 @@ import com.example.exception.RecordAlreadyExistException;
 import com.example.exception.RecordNotFoundException;
 import com.example.model.common.ApiResponse;
 import com.example.model.request.SubjectRequest;
-import com.example.model.request.TopicDto;
 import com.example.model.request.TopicRequest;
 import com.example.repository.SubjectRepository;
 import lombok.RequiredArgsConstructor;

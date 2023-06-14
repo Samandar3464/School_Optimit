@@ -1,6 +1,7 @@
 package com.example.entity;
 
 import com.example.enums.Gender;
+import com.example.enums.Position;
 import com.example.model.request.UserRegisterDto;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
@@ -38,6 +39,9 @@ public class User implements UserDetails {
     @Size(min = 9, max = 9)
     private String phoneNumber;
 
+    @Enumerated(EnumType.STRING)
+    private Position position;
+
     @NotBlank
     @Size(min = 6)
     private String password;
@@ -68,6 +72,8 @@ public class User implements UserDetails {
     @Enumerated(EnumType.STRING)
     private Gender gender;
 
+
+
     @OneToOne(cascade = CascadeType.ALL)
     private Attachment profilePhoto;
 
@@ -77,16 +83,16 @@ public class User implements UserDetails {
     @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private List<Achievement> achievements;
 
-    @OneToMany(fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.EAGER)
     private List<Subject> subjects;
 
-    @OneToMany(cascade = CascadeType.ALL)
+    @ManyToMany(cascade = CascadeType.ALL)
     private List<WorkExperience> workExperiences;
 
     @ManyToMany(fetch = FetchType.EAGER)
     private List<Role> roles;
 
-    @OneToMany(cascade = CascadeType.ALL)
+    @ManyToMany(cascade = CascadeType.ALL)
     private List<DailyLessons> dailyLessons;
 
     @Override
