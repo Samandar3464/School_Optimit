@@ -50,9 +50,10 @@ public class Constants {
     public static final String ROOM_TYPE_NOT_FOUND = "ROOM TYPE NOT FOUND";
     public static final String ROOM_NOT_FOUND = "ROOM NOT FOUND";
     public static final String ROOM_NUMBER_ALREADY_EXIST = "ROOM NUMBER ALREADY EXIST";
+    public static final String SUBJECT_NOT_FOUND = "SUBJECT NOT FOUND";
+    public static final String LESSON_SCHEDULE_NOT_FOUND = "LESSON SCHEDULE NOT FOUND";
 
     public static final String LIFE_TIME_DONT_MATCH = "LIFE TIME DONT MATCH !! PLEASE ENTER CORRECT DATA";
-    public static final String SUBJECT_NOT_FOUND = "SUBJECT_NOT_FOUND";
     public static final String TYPE_OF_WORK_NOT_FOUND = "TYPE_OF_WORK_NOT_FOUND";
     public static final String SUBJECT_ALREADY_EXIST = "SUBJECT_ALREADY_EXIST";
 

@@ -1,5 +1,6 @@
 package com.example.entity;
 
+import com.example.model.request.StudentClassDto;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -40,7 +41,9 @@ public class StudentClass {
 
     private boolean active;
 
-    private Integer roomNumber;
+    @ManyToOne
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    private Room room;
 
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
@@ -51,18 +54,16 @@ public class StudentClass {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Branch branch;
 
-    @Transient
-    private Integer comingBranchId;
 
-    public static StudentClass from(StudentClass studentClass, Branch branch) {
+    public static StudentClass from(StudentClassDto studentClass, Branch branch, Room room) {
         return StudentClass.builder()
                 .className(studentClass.getClassName())
                 .createdDate(LocalDateTime.now())
                 .startDate(studentClass.getStartDate())
                 .endDate(studentClass.getEndDate())
-                .roomNumber(studentClass.getRoomNumber())
-                .active(true)
                 .branch(branch)
+                .room(room)
+                .active(true)
                 .build();
     }
 }
