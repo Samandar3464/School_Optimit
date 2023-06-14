@@ -26,8 +26,8 @@ public class LessonScheduleController {
     }
 
     @PutMapping("/update")
-    public ApiResponse update(@RequestBody List<LessonScheduleDto> lessonScheduleDtoList) {
-        return lessonScheduleService.update(lessonScheduleDtoList);
+    public ApiResponse update(@RequestBody LessonScheduleDto lessonScheduleDto) {
+        return lessonScheduleService.update(lessonScheduleDto);
     }
 
     @DeleteMapping("/delete/{id}")
@@ -35,13 +35,8 @@ public class LessonScheduleController {
         return lessonScheduleService.delete(id);
     }
 
-    @GetMapping("/getAllActiveClasses/{id}")
+    @GetMapping("/getAllActiveSchedule/{id}")
     public ApiResponse getAllActiveClasses(@PathVariable Integer id) {
-        return lessonScheduleService.getAllByBranchId(id);
-    }
-
-    @GetMapping("/getAllNeActiveClassesByYear/{id}")
-    public ApiResponse getAllNeActiveClassesByYear(@PathVariable Integer id) {
         return lessonScheduleService.getAllByBranchId(id);
     }
 }

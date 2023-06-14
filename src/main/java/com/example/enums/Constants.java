@@ -54,7 +54,6 @@ public class Constants {
     public static final String LESSON_SCHEDULE_NOT_FOUND = "LESSON SCHEDULE NOT FOUND";
 
     public static final String LIFE_TIME_DONT_MATCH = "LIFE TIME DONT MATCH !! PLEASE ENTER CORRECT DATA";
-    public static final String SUBJECT_NOT_FOUND = "SUBJECT_NOT_FOUND";
     public static final String TYPE_OF_WORK_NOT_FOUND = "TYPE_OF_WORK_NOT_FOUND";
     public static final String SUBJECT_ALREADY_EXIST = "SUBJECT_ALREADY_EXIST";
 

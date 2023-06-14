@@ -9,10 +9,10 @@ import java.util.Optional;
 
 public interface LessonScheduleRepository  extends JpaRepository<LessonSchedule ,Integer> {
 
-    Optional<LessonSchedule> findByBranchIdAndTeacherIdAndStartTime(Integer branchId, Integer teacherId, LocalDateTime startTime);
-    Optional<LessonSchedule> findByBranchIdAndStudentClassIdAndStartTime(Integer branchId, Integer studentClassId, LocalDateTime startTime);
-    Optional<LessonSchedule> findByBranchIdAndRoomIdAndStartTime(Integer branchId, Integer roomId, LocalDateTime startTime);
+    Optional<LessonSchedule> findFirstByBranchIdAndTeacherIdAndStartTimeAndActiveTrue(Integer branchId, Integer teacherId, LocalDateTime startTime);
+    Optional<LessonSchedule> findFirstByBranchIdAndStudentClassIdAndStartTimeAndActiveTrue(Integer branchId, Integer studentClassId, LocalDateTime startTime);
+    Optional<LessonSchedule> findFirstByBranchIdAndRoomIdAndStartTimeAndActiveTrue(Integer branchId, Integer roomId, LocalDateTime startTime);
 
-    List<LessonSchedule> findAllByBranchIdAndActiveTrue(Integer branch_id);
-    List<LessonSchedule> findAllByBranchIdAndStartTimeBetweenAndActiveTrue(Integer branch_id, LocalDateTime startTime, LocalDateTime startTime2);
+    List<LessonSchedule> findAllByBranchIdAndActiveTrue(Integer branchId);
+    List<LessonSchedule> findAllByBranchIdAndActiveTrueAndStartTimeBetween(Integer branchId, LocalDateTime startTime, LocalDateTime startTime2);
 }
