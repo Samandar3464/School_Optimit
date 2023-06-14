@@ -71,4 +71,6 @@ public class Constants {
     public static final String ATTENDANT_NOT_FOUND = "ATTENDANT_NOT_FOUND";
     public static final String CLASS_ALREADY_HAVE_JOURNAL = "CLASS ALREADY HAVE JOURNAL";
 
+    public static final String TEACHING_HOURS_NOT_FOUND = "TEACHING_HOURS_NOT_FOUND";
+    public static final String HOURS_NOT_ENOUGH = "HOURS_NOT_ENOUGH";
 }

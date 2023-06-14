@@ -18,6 +18,4 @@ public class TypeOfWorkRequest {
 
     private double price;
 
-    @Enumerated(EnumType.STRING)
-    private SalaryType type;
 }
