@@ -1,8 +1,8 @@
 package com.example.model.request;
 
-
-import com.example.entity.TeachingHours;
 import lombok.*;
+
+import java.util.List;
 
 @Getter
 @Setter
@@ -20,5 +20,7 @@ public class TeachingHoursRequest {
     private String date;
 
     private Integer teacherId;
+
+    private List<Integer> classIds;
 
 }

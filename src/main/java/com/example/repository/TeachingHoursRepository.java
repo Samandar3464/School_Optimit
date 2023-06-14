@@ -12,5 +12,4 @@ public interface TeachingHoursRepository extends JpaRepository<TeachingHours,Int
 
     List<TeachingHours> findAllByTeacherId(Integer teacherId);
     List<TeachingHours> findAllByTeacherIdAndDate(Integer teacherId, LocalDate date);
-
 }

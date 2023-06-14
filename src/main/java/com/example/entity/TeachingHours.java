@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Getter
 @Setter
@@ -27,11 +28,15 @@ public class TeachingHours {
 
     private Integer teacherId;
 
+    @ElementCollection
+    private List<Integer> classIds;
+
     public static TeachingHours toTeachingHours(TeachingHoursRequest teachingHoursRequest){
         return TeachingHours
                 .builder()
                 .lessonHours(teachingHoursRequest.getLessonHours())
                 .teacherId(teachingHoursRequest.getTeacherId())
+                .classIds(teachingHoursRequest.getClassIds())
                 .build();
     }
 }

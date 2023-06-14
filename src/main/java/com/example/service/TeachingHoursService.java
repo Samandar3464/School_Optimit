@@ -1,5 +1,6 @@
 package com.example.service;
 
+import com.example.entity.StudentClass;
 import com.example.entity.TeachingHours;
 import com.example.entity.TypeOfWork;
 import com.example.entity.User;
@@ -9,6 +10,7 @@ import com.example.exception.UserNotFoundException;
 import com.example.model.common.ApiResponse;
 import com.example.model.request.TeachingHoursRequest;
 import com.example.model.response.TeachingHoursResponse;
+import com.example.repository.StudentClassRepository;
 import com.example.repository.TeachingHoursRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -23,13 +25,14 @@ import java.util.List;
 public class TeachingHoursService implements BaseService<TeachingHoursRequest, Integer> {
 
     private final TeachingHoursRepository teachingHoursRepository;
+    private final StudentClassRepository studentClassRepository;
     private final TypeOfWorkService typeOfWorkService;
     private final UserService userService;
 
     @Override
     public ApiResponse create(TeachingHoursRequest teachingHoursRequest) {
         TeachingHours teachingHours = TeachingHours.toTeachingHours(teachingHoursRequest);
-        checkTeacherId(teachingHoursRequest);
+        checkTeacherIdAndClassesIds(teachingHoursRequest);
         teachingHours.setDate(toLocalDate(teachingHoursRequest.getDate()));
         teachingHours.setTypeOfWork(typeOfWorkService.checkById(teachingHoursRequest.getTypeOfWorkId()));
         teachingHoursRepository.save(teachingHours);
@@ -82,7 +85,7 @@ public class TeachingHoursService implements BaseService<TeachingHoursRequest, I
     public ApiResponse update(TeachingHoursRequest teachingHoursRequest) {
         checkById(teachingHoursRequest.getId());
         TeachingHours teachingHours = TeachingHours.toTeachingHours(teachingHoursRequest);
-        checkTeacherId(teachingHoursRequest);
+        checkTeacherIdAndClassesIds(teachingHoursRequest);
         teachingHours.setDate(toLocalDate(teachingHoursRequest.getDate()));
         teachingHours.setTypeOfWork(typeOfWorkService.checkById(teachingHoursRequest.getTypeOfWorkId()));
         teachingHours.setId(teachingHoursRequest.getId());
@@ -103,8 +106,12 @@ public class TeachingHoursService implements BaseService<TeachingHoursRequest, I
         });
     }
 
-    private void checkTeacherId(TeachingHoursRequest teachingHoursRequest) {
+    private void checkTeacherIdAndClassesIds(TeachingHoursRequest teachingHoursRequest) {
         User user = userService.checkUserExistById(teachingHoursRequest.getTeacherId());
+        List<StudentClass> all = studentClassRepository.findAllById(teachingHoursRequest.getClassIds());
+        if (all.size() != teachingHoursRequest.getClassIds().size()){
+            throw new RecordNotFoundException(Constants.CLASS_NOT_FOUND);
+        }
         if (user == null) {
             throw new UserNotFoundException(Constants.USER_NOT_FOUND);
         }
