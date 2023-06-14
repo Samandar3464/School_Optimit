@@ -85,7 +85,7 @@ public class LessonScheduleService implements BaseService<List<LessonScheduleDto
     public ApiResponse update(List<LessonScheduleDto> scheduleDtoList) {
         return null;
     }
-
+    @ResponseStatus(HttpStatus.OK)
     public ApiResponse update(LessonScheduleDto schd) {
         Optional<LessonSchedule> teacherBusy = lessonScheduleRepository.findFirstByBranchIdAndTeacherIdAndStartTimeAndActiveTrue(schd.getBranchId(), schd.getTeacherId(), schd.getStartTime());
         Optional<LessonSchedule> studentClassBusy = lessonScheduleRepository.findFirstByBranchIdAndStudentClassIdAndStartTimeAndActiveTrue(schd.getBranchId(), schd.getStudentClassId(), schd.getStartTime());
