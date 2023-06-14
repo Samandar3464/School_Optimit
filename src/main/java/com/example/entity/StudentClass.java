@@ -41,6 +41,8 @@ public class StudentClass {
 
     private boolean active;
 
+
+    @JsonIgnore
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Room room;
