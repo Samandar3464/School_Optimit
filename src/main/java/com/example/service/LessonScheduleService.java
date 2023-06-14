@@ -63,7 +63,7 @@ public class LessonScheduleService implements BaseService<List<LessonScheduleDto
 
         }
         for (ErrorResponseSchedule errorResponseSchedule : errorResponse) {
-            if (errorResponseSchedule.getMassage() != "Everything ok") {
+            if (!errorResponseSchedule.getMassage().equals("Everything ok")) {
                 return new ApiResponse(errorResponse, false);
             }
         }

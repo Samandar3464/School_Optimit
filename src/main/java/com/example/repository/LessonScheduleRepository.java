@@ -12,7 +12,5 @@ public interface LessonScheduleRepository  extends JpaRepository<LessonSchedule 
     Optional<LessonSchedule> findFirstByBranchIdAndTeacherIdAndStartTimeAndActiveTrue(Integer branchId, Integer teacherId, LocalDateTime startTime);
     Optional<LessonSchedule> findFirstByBranchIdAndStudentClassIdAndStartTimeAndActiveTrue(Integer branchId, Integer studentClassId, LocalDateTime startTime);
     Optional<LessonSchedule> findFirstByBranchIdAndRoomIdAndStartTimeAndActiveTrue(Integer branchId, Integer roomId, LocalDateTime startTime);
-
-    List<LessonSchedule> findAllByBranchIdAndActiveTrue(Integer branchId);
     List<LessonSchedule> findAllByBranchIdAndActiveTrueAndStartTimeBetween(Integer branchId, LocalDateTime startTime, LocalDateTime startTime2);
 }
