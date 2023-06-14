@@ -67,4 +67,6 @@ public class Constants {
     public static final String ACHIEVEMENT_NOT_FOUND = "ACHIEVEMENT_NOT_FOUND";
     public static final String ACHIEVEMENT_ALREADY_EXIST = "ACHIEVEMENT_ALREADY_EXIST";
 
+    public static final String TEACHING_HOURS_NOT_FOUND = "TEACHING_HOURS_NOT_FOUND";
+    public static final String HOURS_NOT_ENOUGH = "HOURS_NOT_ENOUGH";
 }
