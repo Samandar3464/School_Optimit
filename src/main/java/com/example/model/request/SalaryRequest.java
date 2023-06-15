@@ -1,29 +1,19 @@
-package com.example.entity;
+package com.example.model.request;
 
 import com.example.enums.Months;
-import jakarta.persistence.*;
-import lombok.*;
+import lombok.Builder;
+import lombok.Data;
 
 
-import java.time.LocalDate;
 
-@Getter
-@Setter
-@AllArgsConstructor
-@NoArgsConstructor
+@Data
 @Builder
-@Entity
-public class Salary {
+public class SalaryRequest {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    private LocalDate date;
+    private String date;
 
-    private boolean active;
-
-    @Enumerated(EnumType.STRING)
     private Months month;
 
     private Integer userId;

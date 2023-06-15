@@ -69,4 +69,9 @@ public class Constants {
 
     public static final String TEACHING_HOURS_NOT_FOUND = "TEACHING_HOURS_NOT_FOUND";
     public static final String HOURS_NOT_ENOUGH = "HOURS_NOT_ENOUGH";
+    public static final String OVERALL_REPORT_NOT_FOUND = "OVERALL_REPORT_NOT_FOUND";
+    public static final String SALARY_NOT_FOUND = "SALARY_NOT_FOUND";
+    public static final String SALARY_NOT_ENOUGH = "SALARY_NOT_ENOUGH";
+    public static final String FIX_NOT_ENOUGH = "FIX_NOT_ENOUGH";
+
 }

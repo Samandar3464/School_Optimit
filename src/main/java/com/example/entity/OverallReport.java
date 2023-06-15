@@ -6,6 +6,7 @@ import lombok.*;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
+import java.time.Month;
 import java.util.List;
 
 @Getter
@@ -20,25 +21,24 @@ public class OverallReport {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    private String fullName;
-
-    private String phoneNumber;
-
     @Enumerated(EnumType.STRING)
     private Position position;
+
+    @Enumerated(EnumType.STRING)
+    private Month month;
+
+    private String classLeadership;
+
+    @ManyToOne
+    private Salary salary;
+
+    @ManyToOne
+    private User user;
+
+    @ManyToMany
+    private List<TeachingHours> teachingHours;
 
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Branch branch;
-
-    private String classLeadership;
-
-    private double fix;
-
-    private double remain;
-
-    private double cashAdvance;
-
-    @ManyToMany
-    private List<TeachingHours> teachingHours;
 }

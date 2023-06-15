@@ -1,5 +1,6 @@
 package com.example.entity;
 
+import com.example.enums.Months;
 import com.example.model.request.TeachingHoursRequest;
 import jakarta.persistence.*;
 import lombok.*;
@@ -23,6 +24,9 @@ public class TeachingHours {
     private TypeOfWork typeOfWork;
 
     private int lessonHours;
+
+    @Enumerated(EnumType.STRING)
+    private Months month;
 
     private LocalDate date;
 

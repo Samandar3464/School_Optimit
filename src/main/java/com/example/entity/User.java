@@ -14,7 +14,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -57,8 +56,6 @@ public class User implements UserDetails {
 
     private boolean married;
 
-    private double overallSalary;
-
     private LocalDate birthDate;
 
     private LocalDateTime registeredDate;
@@ -72,15 +69,19 @@ public class User implements UserDetails {
     @Enumerated(EnumType.STRING)
     private Gender gender;
 
-
-
     @OneToOne(cascade = CascadeType.ALL)
     private Attachment profilePhoto;
 
     @OneToOne
     private StudentClass studentClass;
 
-    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @ManyToOne
+    private Branch branch;
+
+    @ManyToMany(cascade = CascadeType.ALL)
+    private List<Salary> salaries;
+
+    @OneToMany(cascade = CascadeType.ALL)
     private List<Achievement> achievements;
 
     @ManyToMany(fetch = FetchType.EAGER)
@@ -94,6 +95,9 @@ public class User implements UserDetails {
 
     @ManyToMany(cascade = CascadeType.ALL)
     private List<DailyLessons> dailyLessons;
+
+    @ManyToMany(cascade = CascadeType.ALL)
+    private List<TeachingHours> teachingHours;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -131,15 +135,12 @@ public class User implements UserDetails {
     }
 
     public static User from(UserRegisterDto userRegisterDto) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        LocalDate birthDate = LocalDate.parse(userRegisterDto.getBirthDate(), formatter);
         return User.builder()
                 .fullName(userRegisterDto.getFullName())
                 .phoneNumber(userRegisterDto.getPhoneNumber())
                 .inn(userRegisterDto.getInn())
                 .inps(userRegisterDto.getInps())
                 .biography(userRegisterDto.getBiography())
-                .birthDate(birthDate)
                 .registeredDate(LocalDateTime.now())
                 .isBlocked(true)
                 .gender(userRegisterDto.getGender())
