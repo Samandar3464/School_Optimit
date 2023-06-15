@@ -66,6 +66,10 @@ public class Constants {
     public static final String WORK_EXPERIENCE_NOT_FOUND = "WORK_EXPERIENCE_NOT_FOUND";
     public static final String ACHIEVEMENT_NOT_FOUND = "ACHIEVEMENT_NOT_FOUND";
     public static final String ACHIEVEMENT_ALREADY_EXIST = "ACHIEVEMENT_ALREADY_EXIST";
+    public static final String JOURNAL_NOT_FOUND = "JOURNAL_NOT_FOUND";
+    public static final String SCORE_NOT_FOUND = "SCORE_NOT_FOUND";
+    public static final String ATTENDANT_NOT_FOUND = "ATTENDANT_NOT_FOUND";
+    public static final String CLASS_ALREADY_HAVE_JOURNAL = "CLASS ALREADY HAVE JOURNAL";
 
     public static final String TEACHING_HOURS_NOT_FOUND = "TEACHING_HOURS_NOT_FOUND";
     public static final String HOURS_NOT_ENOUGH = "HOURS_NOT_ENOUGH";
