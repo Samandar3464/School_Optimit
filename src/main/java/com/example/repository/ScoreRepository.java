@@ -1,6 +1,5 @@
 package com.example.repository;
 
-import com.example.entity.Attendance;
 import com.example.entity.Score;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -12,8 +11,11 @@ import java.util.UUID;
 
 public interface ScoreRepository extends JpaRepository<Score, UUID> {
 
-    Page<Score> findAllByJournalIdAndTeacherIdAndSubjectId(Integer journalId,Integer teacherId,Integer subjectId, Pageable pageable);
+    Page<Score> findAllByJournalIdAndTeacherIdAndSubjectId(Integer journalId, Integer teacherId, Integer subjectId, Pageable pageable);
+
     List<Score> findAllByJournalIdAndTeacherIdAndSubjectIdAndCreatedDateBetween(Integer journalId, Integer teacherId, Integer subjectId, LocalDateTime startWeek, LocalDateTime endWeek);
 
     List<Score> findAllByJournalId(Integer journalId);
+
+    Page<Score> findAllByJournalIdAndSubjectIdAndStudentId(Integer journalId, Integer subjectId, Integer studentId, Pageable pageable);
 }

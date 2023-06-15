@@ -10,10 +10,12 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ScoreDto {
-//    private Integer page;
-//    private Integer size;
+    private Integer page;
+    private Integer size;
     private Integer journalId;
     private Integer subjectId;
     private Integer teacherId;
+    private Integer studentId;
+    private Integer classId;
 
 }

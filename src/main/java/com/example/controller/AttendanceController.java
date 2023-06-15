@@ -42,4 +42,9 @@ public class AttendanceController {
     public ApiResponse getAllScores(@PathVariable Integer id) {
         return attendanceService.getAll(id);
     }
+
+    @PostMapping("/getForFamily")
+    public ApiResponse getForFamily(@RequestBody ScoreDto scoreDto) {
+        return attendanceService.getForStudentAndFamily(scoreDto);
+    }
 }

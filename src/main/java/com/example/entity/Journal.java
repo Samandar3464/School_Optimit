@@ -6,6 +6,8 @@ import lombok.*;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
+import java.util.List;
+
 
 @Getter
 @Setter
@@ -27,6 +29,9 @@ public class Journal {
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Branch branch;
+
+    @ManyToMany
+    private List<Subject> subjectList;
 
     private boolean active;
 }

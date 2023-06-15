@@ -40,4 +40,10 @@ public class ScoreController {
     public ApiResponse getAllScores(@RequestBody ScoreDto scoreDto) {
         return scoreService.getAll(scoreDto);
     }
+
+    @PostMapping("/getAllForStudentAndFamily")
+    public ApiResponse getAllForStudentAndFamily(@RequestBody ScoreDto scoreDto) {
+        return scoreService.getForStudentAndFamily(scoreDto);
+    }
+
 }

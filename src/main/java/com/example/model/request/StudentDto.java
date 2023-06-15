@@ -49,4 +49,8 @@ public class StudentDto {
 
     private MultipartFile medDocPhoto;
 
+    private String username;  // phoneNumber
+
+    private String password;
+
 }

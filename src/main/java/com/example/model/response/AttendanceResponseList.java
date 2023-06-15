@@ -1,7 +1,6 @@
 package com.example.model.response;
 
 
-import com.example.entity.Score;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -11,9 +10,9 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ScoreResponseList {
+public class AttendanceResponseList {
 
-    private List<ScoreResponseForStudent> scoreList;
+    private List<AttendanceResponse> scoreList;
     private long allSize;
     private int allPage;
     private int currentPage;
