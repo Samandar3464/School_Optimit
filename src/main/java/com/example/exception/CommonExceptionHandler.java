@@ -69,7 +69,7 @@ public class CommonExceptionHandler {
     @ResponseStatus(HttpStatus.ALREADY_REPORTED)
     public ApiResponse handleUserNotFoundException(UserAlreadyExistException e) {
         return new ApiResponse(
-                USER_ALREADY_EXIST
+                e.getMessage()
                 , false
                 , null);
     }

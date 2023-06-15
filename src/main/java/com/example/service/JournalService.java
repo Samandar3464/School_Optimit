@@ -10,6 +10,7 @@ import com.example.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.example.enums.Constants.*;
@@ -23,6 +24,7 @@ public class JournalService implements BaseService<JournalRequestDto, Integer> {
     private final BranchRepository branchRepository;
     private final AttendanceRepository attendanceRepository;
     private final ScoreRepository scoreRepository;
+    private final SubjectRepository subjectRepository;
 
     @Override
     public ApiResponse create(JournalRequestDto dto) {
@@ -31,10 +33,15 @@ public class JournalService implements BaseService<JournalRequestDto, Integer> {
         }
         Branch branch = branchRepository.findById(dto.getBranchId()).orElseThrow(() -> new RecordNotFoundException(BRANCH_NOT_FOUND));
         StudentClass studentClass = studentClassRepository.findById(dto.getStudentClassId()).orElseThrow(() -> new RecordNotFoundException(CLASS_NOT_FOUND));
+        List<Subject> subjects = new ArrayList<>();
+        dto.getSubjectIdList().forEach(id -> {
+            subjects.add(subjectRepository.findById(id).get());
+        });
         Journal journal = Journal.builder()
                 .active(true)
                 .branch(branch)
                 .studentClass(studentClass)
+                .subjectList(subjects)
                 .build();
         journalRepository.save(journal);
         return new ApiResponse(SUCCESSFULLY, true);
@@ -67,6 +74,9 @@ public class JournalService implements BaseService<JournalRequestDto, Integer> {
         Journal journal = journalRepository.findById(dto.getId()).orElseThrow(() -> new RecordNotFoundException(JOURNAL_NOT_FOUND));
         StudentClass studentClass = studentClassRepository.findById(dto.getStudentClassId()).orElseThrow(() -> new RecordNotFoundException(CLASS_NOT_FOUND));
         journal.setStudentClass(studentClass);
+        dto.getSubjectIdList().forEach(id -> {
+            journal.getSubjectList().add(subjectRepository.findById(id).get());
+        });
         journalRepository.save(journal);
         return new ApiResponse(SUCCESSFULLY, true);
     }

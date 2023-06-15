@@ -6,14 +6,20 @@ import com.example.exception.UserNotFoundException;
 import com.example.model.common.ApiResponse;
 import com.example.model.request.ScoreDto;
 import com.example.model.request.ScoreRequestDto;
+import com.example.model.response.ScoreResponseForStudent;
+import com.example.model.response.ScoreResponseList;
 import com.example.repository.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -79,11 +85,22 @@ public class ScoreService implements BaseService<ScoreRequestDto, UUID> {
         int dayOfWeek = LocalDate.now().atStartOfDay().getDayOfWeek().getValue();
         LocalDateTime startWeek = LocalDateTime.now().minusDays(dayOfWeek);
         LocalDateTime endWeek = startWeek.plusDays(7);
-//        Pageable pageable = PageRequest.of(scoreDto.getPage(), scoreDto.getSize());
-//        Page<Score> scoreList = scoreRepository.findAllByJournalIdAndTeacherIdAndSubjectId(scoreDto.getJournalId(), scoreDto.getTeacherId(), scoreDto.getSubjectId(), pageable);
-//        return new ApiResponse(new ScoreResponseList(
-//                scoreList.getContent(), scoreList.getTotalElements(), scoreList.getTotalPages(), scoreList.getNumber()), true);
         List<Score> all = scoreRepository.findAllByJournalIdAndTeacherIdAndSubjectIdAndCreatedDateBetween(scoreDto.getJournalId(), scoreDto.getTeacherId(), scoreDto.getSubjectId(), startWeek, endWeek);
-        return new ApiResponse(all, true);
+        List<ScoreResponseForStudent> scoreResponseForStudents = new ArrayList<>();
+        all.forEach(score -> scoreResponseForStudents.add(ScoreResponseForStudent.from(score)));
+        return new ApiResponse(scoreResponseForStudents, true);
     }
+
+    @ResponseStatus(HttpStatus.OK)
+    public ApiResponse getForStudentAndFamily(ScoreDto scoreDto) {
+        Journal journal = journalRepository.findByStudentClassIdAndActiveTrue(scoreDto.getClassId())
+                .orElseThrow(() -> new RecordNotFoundException(JOURNAL_NOT_FOUND));
+        Pageable pageable = PageRequest.of(scoreDto.getPage(), scoreDto.getSize());
+        Page<Score> all = scoreRepository.findAllByJournalIdAndSubjectIdAndStudentId(journal.getId(), scoreDto.getSubjectId(), scoreDto.getStudentId(), pageable);
+        List<ScoreResponseForStudent> scoreResponseForStudents = new ArrayList<>();
+        all.getContent().forEach(score -> scoreResponseForStudents.add(ScoreResponseForStudent.from(score)));
+        return new ApiResponse(new ScoreResponseList(scoreResponseForStudents, all.getTotalElements(), all.getTotalPages(), all.getNumber()), true);
+    }
+
+
 }

@@ -1,6 +1,7 @@
 package com.example.controller;
 
 import com.example.model.common.ApiResponse;
+import com.example.model.request.FamilyLoginDto;
 import com.example.model.request.StudentDto;
 import com.example.service.StudentService;
 import lombok.RequiredArgsConstructor;
@@ -49,4 +50,10 @@ public class StudentController {
     public ApiResponse getAllNeActiveStudents(@PathVariable Integer branchId) {
         return service.getAllNeActiveStudents(branchId);
     }
+
+    @PostMapping("/studentLogin")
+    public ApiResponse studentLogin(@RequestBody FamilyLoginDto studentLogin) {
+        return service.studentLogIn(studentLogin);
+    }
+
 }

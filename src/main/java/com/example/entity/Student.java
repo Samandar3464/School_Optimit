@@ -2,6 +2,12 @@ package com.example.entity;
 
 import com.example.model.request.StudentDto;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.OnDelete;
@@ -32,6 +38,12 @@ public class Student {
     @Column(nullable = false)
     private String fatherName;
 
+    private String username;  // phoneNumber
+
+    private String password;
+
+    @JsonSerialize(using = LocalDateSerializer.class)
+    @JsonDeserialize(using = LocalDateDeserializer.class)
     private LocalDate birthDate;
 
     @Column(nullable = false)
@@ -39,6 +51,8 @@ public class Student {
 
     private boolean active;
 
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
+    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     private LocalDateTime addedTime;
 
     @Column(nullable = false)
@@ -74,6 +88,8 @@ public class Student {
                 .birthDate(studentDto.getBirthDate())
                 .docNumber(studentDto.getDocNumber())
                 .addedTime(LocalDateTime.now())
+                .username(studentDto.getUsername())
+                .password(studentDto.getPassword())
                 .active(true)
                 .build();
     }
