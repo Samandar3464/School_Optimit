@@ -73,4 +73,7 @@ public class Constants {
 
     public static final String TEACHING_HOURS_NOT_FOUND = "TEACHING_HOURS_NOT_FOUND";
     public static final String HOURS_NOT_ENOUGH = "HOURS_NOT_ENOUGH";
+    public static final String REASON_NOT_FOUND = "REASON NOT FOUND";
+    public static final String ACCOUNT_NOT_FOUND = "ACCOUNT NOT FOUND";
+    public static final String ACCOUNT_ALREADY_EXIST = "ACCOUNT ALREADY EXIST";
 }

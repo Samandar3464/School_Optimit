@@ -19,7 +19,7 @@ public class ScoreResponseForStudent {
 
     private UUID id;
 
-    private int score;
+    private char score;
 
     private String teacherName;
 

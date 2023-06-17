@@ -23,7 +23,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import static com.example.enums.Constants.*;
 
@@ -124,13 +123,10 @@ public class StudentService implements BaseService<StudentDto, Integer> {
 
     private StudentResponse from(Student student) {
         StudentResponse from = StudentResponse.from(student);
-        Attachment photo = student.getPhoto();
-        Attachment reference = student.getReference();
-        List<Attachment> docPhoto = student.getDocPhoto();
         List<String> docPhotoList = new ArrayList<>();
-        docPhoto.forEach(obj -> docPhotoList.add(attachmentService.attachUploadFolder + obj.getPath() + "/" + obj.getNewName() + "." + obj.getType()));
-        from.setPhoto(attachmentService.attachUploadFolder + photo.getPath() + "/" + photo.getNewName() + "." + photo.getType());
-        from.setReference(attachmentService.attachUploadFolder + reference.getPath() + "/" + reference.getNewName() + "." + reference.getType());
+        student.getDocPhoto().forEach(obj -> docPhotoList.add(attachmentService.getUrl(obj)));
+        from.setPhoto(attachmentService.getUrl(student.getPhoto()));
+        from.setReference(attachmentService.getUrl(student.getReference()));
         from.setDocPhoto(docPhotoList);
         return from;
     }
