@@ -7,11 +7,8 @@ import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 @Getter
 @Setter
@@ -19,32 +16,28 @@ import java.util.UUID;
 @NoArgsConstructor
 @Builder
 @Entity
-public class Score {
+public class StudentAccount {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private UUID id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
 
-    private char score;
+    private Double balance;
 
-    @ManyToOne
+    @OneToOne
     private Student student;
 
-    @ManyToOne
-    @JsonIgnore
-    private User teacher;
-
-    @ManyToOne
-    @JsonIgnore
-    private Subject subject;
-
     @JsonIgnore
     @ManyToOne
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    private Journal journal;
+    private Branch branch;
 
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     private LocalDateTime createdDate;
 
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
+    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
+    private LocalDateTime updatedDate;
+
+    private boolean active;
 }

@@ -19,7 +19,7 @@ import java.util.UUID;
 public class ScoreRequestDto {
     private UUID id;
 
-    private int score;
+    private char score;
 
     private Integer studentId;
 
