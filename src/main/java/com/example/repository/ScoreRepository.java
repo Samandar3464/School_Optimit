@@ -16,6 +16,7 @@ public interface ScoreRepository extends JpaRepository<Score, UUID> {
     List<Score> findAllByJournalIdAndTeacherIdAndSubjectIdAndCreatedDateBetween(Integer journalId, Integer teacherId, Integer subjectId, LocalDateTime startWeek, LocalDateTime endWeek);
 
     List<Score> findAllByJournalId(Integer journalId);
+    List<Score> findAllByStudentIdAndCreatedDateBetween(Integer studentId, LocalDateTime createdDate, LocalDateTime createdDate2);
 
     Page<Score> findAllByJournalIdAndSubjectIdAndStudentId(Integer journalId, Integer subjectId, Integer studentId, Pageable pageable);
 }

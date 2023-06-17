@@ -22,7 +22,7 @@ public class JournalService implements BaseService<JournalRequestDto, Integer> {
     private final JournalRepository journalRepository;
     private final StudentClassRepository studentClassRepository;
     private final BranchRepository branchRepository;
-    private final AttendanceRepository attendanceRepository;
+//    private final AttendanceRepository attendanceRepository;
     private final ScoreRepository scoreRepository;
     private final SubjectRepository subjectRepository;
 
@@ -51,10 +51,10 @@ public class JournalService implements BaseService<JournalRequestDto, Integer> {
     public ApiResponse getById(Integer integer) {
         Journal journal = journalRepository.findById(integer).orElseThrow(() -> new RecordNotFoundException(JOURNAL_NOT_FOUND));
         List<Score> scoreList = scoreRepository.findAllByJournalId(journal.getId());
-        List<Attendance> attendanceList = attendanceRepository.findAllByJournalId(journal.getId());
+//        List<Attendance> attendanceList = attendanceRepository.findAllByJournalId(journal.getId());
         JournalResponseDto journalResponseDto = JournalResponseDto.builder()
                 .journal(journal)
-                .attendanceList(attendanceList)
+//                .attendanceList(attendanceList)
                 .scoreList(scoreList)
                 .build();
         return new ApiResponse(journalResponseDto, true);

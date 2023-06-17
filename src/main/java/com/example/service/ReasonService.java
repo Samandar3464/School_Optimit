@@ -1,9 +1,6 @@
 package com.example.service;
 
-import com.example.entity.Attachment;
-import com.example.entity.Branch;
-import com.example.entity.Reason;
-import com.example.entity.Student;
+import com.example.entity.*;
 import com.example.exception.RecordNotFoundException;
 import com.example.exception.UserNotFoundException;
 import com.example.model.common.ApiResponse;
@@ -11,12 +8,14 @@ import com.example.model.request.ReasonRequestDto;
 import com.example.model.response.ReasonResponse;
 import com.example.repository.BranchRepository;
 import com.example.repository.ReasonRepository;
+import com.example.repository.ScoreRepository;
 import com.example.repository.StudentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -31,6 +30,8 @@ public class ReasonService implements BaseService<ReasonRequestDto, Integer> {
     private final StudentRepository studentRepository;
     private final AttachmentService attachmentService;
     private final BranchRepository branchRepository;
+    private final ScoreRepository scoreRepository;
+
     @Override
     @ResponseStatus(HttpStatus.CREATED)
     public ApiResponse create(ReasonRequestDto dto) {
@@ -38,17 +39,24 @@ public class ReasonService implements BaseService<ReasonRequestDto, Integer> {
         Branch branch = branchRepository.findById(dto.getBranchId()).orElseThrow(() -> new RecordNotFoundException(BRANCH_NOT_FOUND));
         Attachment attachment = attachmentService.saveToSystem(dto.getImage());
         Reason reason = Reason.builder()
+                .branch(branch)
                 .student(student)
                 .image(attachment)
                 .reason(dto.getReason())
                 .days(dto.getDays())
-                .branch(branch)
                 .startDate(dto.getStartDate())
                 .endDate(dto.getEndDate())
                 .createDate(LocalDateTime.now())
                 .active(true)
                 .build();
         reasonRepository.save(reason);
+        LocalDate startDate = dto.getStartDate();
+        LocalDate endDate = dto.getEndDate();
+        LocalDateTime start = LocalDateTime.of(startDate.getYear(), startDate.getMonth(), startDate.getDayOfMonth(), 00, 00);
+        LocalDateTime end = LocalDateTime.of(endDate.getYear(), endDate.getMonth(), endDate.getDayOfMonth(), 23, 59);
+        List<Score> all = scoreRepository.findAllByStudentIdAndCreatedDateBetween(student.getId(), start, end);
+        all.forEach(score -> score.setScore('s'));
+        scoreRepository.saveAll(all);
         return new ApiResponse(SUCCESSFULLY, true);
     }
 

@@ -12,7 +12,7 @@ import java.util.List;
 @NoArgsConstructor
 public class AttendanceResponseList {
 
-    private List<AttendanceResponse> scoreList;
+//    private List<AttendanceResponse> scoreList;
     private long allSize;
     private int allPage;
     private int currentPage;
