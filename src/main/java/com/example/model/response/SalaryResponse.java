@@ -1,32 +1,20 @@
-package com.example.entity;
+package com.example.model.response;
 
 import com.example.enums.Months;
-import jakarta.persistence.*;
-import lombok.*;
-
+import jakarta.persistence.Enumerated;
+import lombok.Builder;
+import lombok.Data;
 
 import java.time.LocalDate;
 
-@Getter
-@Setter
-@AllArgsConstructor
-@NoArgsConstructor
+@Data
 @Builder
-@Entity
-public class Salary {
+public class SalaryResponse {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    private LocalDate date;
-
-    private boolean active;
-
-    @Enumerated(EnumType.STRING)
+    @Enumerated
     private Months month;
-
-    private Integer userId;
 
     private double fix;
     //fix bu kelishilgan oylik

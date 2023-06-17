@@ -69,7 +69,7 @@ public class UserController {
 
     @PutMapping("/update")
 //    @PreAuthorize("hasAnyRole('DRIVER','CLIENT','ADMIN')")
-    public ApiResponse update(@ModelAttribute UserRegisterDto userUpdateDto) {
+    public ApiResponse update(@RequestBody UserRegisterDto userUpdateDto) {
         return userService.update(userUpdateDto);
     }
 

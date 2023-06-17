@@ -81,4 +81,8 @@ public class AchievementService implements BaseService<AchievementDto, Integer> 
             achievement.setPhotoCertificate(attachmentService.saveToSystem(achievementDto.getPhotoCertificate()));
         }
     }
+
+    public List<Achievement> findAllById(List<Integer> achievements) {
+        return achievementRepository.findAllById(achievements);
+    }
 }

@@ -17,6 +17,8 @@ import java.util.List;
 @Data
 public class UserRegisterDto {
 
+    private Integer id;
+
     @NotBlank
     private String fullName;
 
@@ -41,13 +43,13 @@ public class UserRegisterDto {
 
     private MultipartFile profilePhoto;
 
-    private List<Integer> roles;
+    private List<Integer> rolesIds;
 
-    private List<AchievementDto> achievements;
+    private List<Integer> achievementsIds;
 
-    private List<Integer> subjects;
+    private List<Integer> subjectsIds;
 
-    private List<Integer> dailyLessons;
+    private List<Integer> dailyLessonsIds;
 
-    private List<WorkExperienceDto> workExperiences;
+    private List<Integer> workExperiencesIds;
 }
