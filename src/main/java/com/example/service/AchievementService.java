@@ -62,27 +62,13 @@ public class AchievementService implements BaseService<AchievementDto, Integer> 
         }
     }
 
-    public List<Achievement> saveAll(List<Achievement> achievements) {
-        return achievementRepository.saveAll(achievements);
-    }
-
-    public List<Achievement> toAllEntity(List<AchievementDto> achievements) {
-        List<Achievement> achievementList = new ArrayList<>();
-        achievements.forEach(achievementDto -> {
-            Achievement achievement = Achievement.toAchievement(achievementDto);
-//            setPhoto(achievementDto, achievement);
-            achievementList.add(achievement);
-        });
-        return achievementList;
-    }
-
     private void setPhoto(AchievementDto achievementDto, Achievement achievement) {
         if (!achievementDto.getPhotoCertificate().isEmpty()){
             achievement.setPhotoCertificate(attachmentService.saveToSystem(achievementDto.getPhotoCertificate()));
         }
     }
 
-    public List<Achievement> findAllById(List<Integer> achievements) {
-        return achievementRepository.findAllById(achievements);
+    public List<Achievement> findAllByUserId(Integer id) {
+        return achievementRepository.findAllByUserId(id);
     }
 }

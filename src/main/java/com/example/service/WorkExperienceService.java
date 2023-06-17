@@ -6,6 +6,7 @@ import com.example.exception.RecordAlreadyExistException;
 import com.example.exception.RecordNotFoundException;
 import com.example.model.common.ApiResponse;
 import com.example.model.request.WorkExperienceDto;
+import com.example.repository.UserRepository;
 import com.example.repository.WorkExperienceRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -18,11 +19,14 @@ import java.util.List;
 public class WorkExperienceService implements BaseService<WorkExperienceDto,Integer>{
 
     private final WorkExperienceRepository workExperienceRepository;
+    private final UserRepository userRepository;
 
     @Override
     public ApiResponse create(WorkExperienceDto workExperienceDto) {
+        userRepository.findById(workExperienceDto.getEmployeeId()).orElseThrow(()->new RecordNotFoundException(Constants.USER_NOT_FOUND));
         checkIfExist(workExperienceDto);
         WorkExperience workExperience = WorkExperience.toWorkExperience(workExperienceDto);
+        workExperience.setEmployee(workExperienceDto.getEmployeeId());
         workExperienceRepository.save(workExperience);
         return new ApiResponse(Constants.SUCCESSFULLY,true);
     }
@@ -57,10 +61,13 @@ public class WorkExperienceService implements BaseService<WorkExperienceDto,Inte
         return workExperienceRepository.findAllById(workExperiences);
     }
 
+    public List<WorkExperience> getAllByUserId(Integer id) {
+        return workExperienceRepository.findAllByEmployee(id);
+    }
+
     private void checkIfExist(WorkExperienceDto workExperienceDto) {
-        boolean present = workExperienceRepository.findByPlaceOfWork(workExperienceDto.getPlaceOfWork()).isPresent();
-        boolean position = workExperienceRepository.findByPosition(workExperienceDto.getPosition()).isPresent();
-        if (present && position) {
+        boolean present = workExperienceRepository.findByPlaceOfWorkAndPosition(workExperienceDto.getPlaceOfWork(), workExperienceDto.getPosition()).isPresent();
+        if (present) {
             throw new RecordAlreadyExistException(Constants.WORK_EXPERIENCE_ALREADY_EXIST);
         }
     }

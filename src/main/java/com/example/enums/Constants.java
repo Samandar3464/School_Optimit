@@ -78,4 +78,6 @@ public class Constants {
     public static final String SALARY_NOT_ENOUGH = "SALARY_NOT_ENOUGH";
     public static final String FIX_NOT_ENOUGH = "FIX_NOT_ENOUGH";
 
+    public static final String DATE_DO_NOT_MATCH = "DATE_DO_NOT_MATCH";
+    public static final String STAFF_ATTENDANCE_NOT_FOUND = "STAFF_ATTENDANCE_NOT_FOUND";
 }

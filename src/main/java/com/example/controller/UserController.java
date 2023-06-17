@@ -24,6 +24,32 @@ public class UserController {
         return userService.create(userRegisterDto);
     }
 
+    @PostMapping("/addAchievementsToUser")
+    public ApiResponse addAchievementsToUser(@RequestBody UserRegisterDto userRegisterDto) {
+        return userService.addAchievementsToUser(userRegisterDto);
+    }
+
+    @PostMapping("/addSubjectToUser")
+    public ApiResponse addSubjectToUser(@RequestBody UserRegisterDto userRegisterDto) {
+        return userService.addSubjectToUser(userRegisterDto);
+    }
+
+    @PostMapping("/addSalariesToUser")
+    public ApiResponse addSalariesToUser(@RequestBody UserRegisterDto userRegisterDto) {
+        return userService.addSalariesToUser(userRegisterDto);
+    }
+
+    @PostMapping("/addDailyLessonToUser")
+    public ApiResponse addDailyLessonToUser(@RequestBody UserRegisterDto userRegisterDto) {
+        return userService.addDailyLessonToUser(userRegisterDto);
+    }
+
+    @PostMapping("/addWorkExperiencesToUser")
+    public ApiResponse addWorkExperiencesToUser(@RequestBody UserRegisterDto userRegisterDto) {
+        return userService.addWorkExperiencesToUser(userRegisterDto);
+    }
+
+
     @PostMapping("/login")
     public ApiResponse login(@RequestBody @Validated UserDto userLoginRequestDto) {
         return userService.login(userLoginRequestDto);

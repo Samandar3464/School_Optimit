@@ -1,12 +1,12 @@
 package com.example.entity;
 
+import com.example.enums.Months;
 import com.example.enums.Position;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
-import java.time.Month;
 import java.util.List;
 
 @Getter
@@ -25,7 +25,7 @@ public class OverallReport {
     private Position position;
 
     @Enumerated(EnumType.STRING)
-    private Month month;
+    private Months month;
 
     private String classLeadership;
 

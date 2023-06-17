@@ -24,11 +24,14 @@ public class Achievement {
     @OneToOne
     private Attachment photoCertificate;
 
+    private Integer userId;
+
     public static Achievement toAchievement(AchievementDto achievement) {
         return Achievement
                 .builder()
                 .name(achievement.getName())
                 .aboutAchievement(achievement.getAboutAchievement())
+                .userId(achievement.getUserId())
                 .build();
     }
 }

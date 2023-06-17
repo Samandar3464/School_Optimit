@@ -1,13 +1,16 @@
 package com.example.model.request;
 
 import com.example.enums.Months;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-
+import lombok.NoArgsConstructor;
 
 
 @Data
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class SalaryRequest {
 
     private Integer id;
