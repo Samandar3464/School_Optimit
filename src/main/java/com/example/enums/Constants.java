@@ -76,4 +76,8 @@ public class Constants {
     public static final String REASON_NOT_FOUND = "REASON NOT FOUND";
     public static final String ACCOUNT_NOT_FOUND = "ACCOUNT NOT FOUND";
     public static final String ACCOUNT_ALREADY_EXIST = "ACCOUNT ALREADY EXIST";
+    public static final String MEASUREMENT_NOT_FOUND = "MEASUREMENT NOT FOUND";
+    public static final String MEASUREMENT_ALREADY_EXIST = "MEASUREMENT ALREADY EXIST";
+    public static final String PRODUCT_NOT_FOUND = "PRODUCT NOT FOUND";
+    public static final String PRODUCT_ALREADY_EXIST = "PRODUCT ALREADY EXIST";
 }
