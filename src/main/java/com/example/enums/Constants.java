@@ -17,7 +17,8 @@ public class Constants {
     public static final String FILE_NOT_FOUND="FILE NOT FOUND";
     public static final String USER_VERIFIED_SUCCESSFULLY="USER VERIFIED SUCCESSFULLY";
     public static final String FIREBASE_EXCEPTION="FIREBASE EXCEPTION";
-
+    public static final String BLOCKED="Sizni accountinggiz blocklandi .";
+    public static final String OPEN="Sizni  accountinggiz blockdan ochildi.";
     public static final String REFRESH_TOKEN_TIME_OUT="REFRESH TOKEN TIME OUT";
     public static final String AUTHORITIES="authorities";
     public static final String AUTHORIZATION="Authorization";
@@ -79,4 +80,6 @@ public class Constants {
     public static final String MEASUREMENT_ALREADY_EXIST = "MEASUREMENT ALREADY EXIST";
     public static final String PRODUCT_NOT_FOUND = "PRODUCT NOT FOUND";
     public static final String PRODUCT_ALREADY_EXIST = "PRODUCT ALREADY EXIST";
+    public static final String WAREHOUSE_ALREADY_EXIST = "WAREHOUSE ALREADY EXIST";
+    public static final String WAREHOUSE_NOT_FOUND = "WAREHOUSE NOT FOUND";
 }
