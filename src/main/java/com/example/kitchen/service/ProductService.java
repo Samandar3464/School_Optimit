@@ -43,6 +43,7 @@ public class ProductService implements BaseService<ProductDto, Integer> {
                 .measurement(measurement)
                 .name(dto.getName())
                 .description(dto.getDescription())
+                .price(dto.getPrice())
                 .active(true)
                 .build();
         productRepository.save(product);
@@ -62,6 +63,7 @@ public class ProductService implements BaseService<ProductDto, Integer> {
         Product product = productRepository.findById(dto.getId()).orElseThrow(() -> new RecordNotFoundException(PRODUCT_NOT_FOUND));
         Measurement measurement = measurementRepository.findById(dto.getMeasurementId()).orElseThrow(() -> new RecordNotFoundException(MEASUREMENT_NOT_FOUND));
         product.setName(dto.getName());
+        product.setPrice(dto.getPrice());
         product.setMeasurement(measurement);
         product.setDescription(dto.getDescription());
         productRepository.save(product);

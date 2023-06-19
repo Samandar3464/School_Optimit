@@ -11,7 +11,7 @@ import lombok.*;
 @NoArgsConstructor
 @Builder
 @Entity
-public class Product {
+public class Warehouse {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -19,16 +19,9 @@ public class Product {
 
     private String name;
 
-    private String description;
-
-    @ManyToOne
-    private Measurement measurement;
-
     @JsonIgnore
     @ManyToOne
     private Branch branch;
 
     private boolean active;
-
-    private double price;
 }

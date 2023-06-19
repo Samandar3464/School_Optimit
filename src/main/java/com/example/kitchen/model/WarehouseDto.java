@@ -8,18 +8,11 @@ import lombok.*;
 @NoArgsConstructor
 @Builder
 
-public class ProductDto {
-
+public class WarehouseDto {
 
     private Integer id;
 
     private String name;
 
-    private String description;
-
-    private Integer measurementId;
-
     private Integer branchId;
-
-    private double price;
 }

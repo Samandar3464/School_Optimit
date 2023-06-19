@@ -5,13 +5,15 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.List;
+
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 @Entity
-public class Product {
+public class Meal {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -19,16 +21,12 @@ public class Product {
 
     private String name;
 
-    private String description;
-
-    @ManyToOne
-    private Measurement measurement;
+    @OneToMany
+    private List<Product> productList;
 
     @JsonIgnore
     @ManyToOne
     private Branch branch;
 
     private boolean active;
-
-    private double price;
 }

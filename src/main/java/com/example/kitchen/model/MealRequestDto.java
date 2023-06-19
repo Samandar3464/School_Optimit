@@ -2,24 +2,22 @@ package com.example.kitchen.model;
 
 import lombok.*;
 
+import java.util.List;
+
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-
-public class ProductDto {
-
+public class MealRequestDto {
 
     private Integer id;
 
     private String name;
 
-    private String description;
-
-    private Integer measurementId;
+    private List<Integer> productIdList;
 
     private Integer branchId;
 
-    private double price;
+    private boolean active;
 }
