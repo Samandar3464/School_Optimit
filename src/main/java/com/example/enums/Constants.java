@@ -82,5 +82,6 @@ public class Constants {
     public static final String PRODUCT_ALREADY_EXIST = "PRODUCT ALREADY EXIST";
     public static final String WAREHOUSE_ALREADY_EXIST = "WAREHOUSE ALREADY EXIST";
     public static final String WAREHOUSE_NOT_FOUND = "WAREHOUSE NOT FOUND";
+    public static final String MEAL_NOT_FOUND = "MEAL NOT FOUND";
     public static final String PRODUCT_NOT_ENOUGH_QUANTITY = "PRODUCT NOT ENOUGH QUANTITY";
 }
