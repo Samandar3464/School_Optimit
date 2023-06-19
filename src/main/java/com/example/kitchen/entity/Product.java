@@ -29,4 +29,6 @@ public class Product {
     private Branch branch;
 
     private boolean active;
+
+    private double price;
 }

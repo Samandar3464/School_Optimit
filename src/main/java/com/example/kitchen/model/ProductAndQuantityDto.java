@@ -12,4 +12,6 @@ public class ProductAndQuantityDto {
     private Integer productId;
 
     private double quantity;
+
+    private double totalPrice;
 }

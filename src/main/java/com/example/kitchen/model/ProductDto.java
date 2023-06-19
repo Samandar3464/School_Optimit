@@ -17,9 +17,9 @@ public class ProductDto {
 
     private String description;
 
-
     private Integer measurementId;
 
-
     private Integer branchId;
+
+    private double price;
 }

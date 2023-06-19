@@ -38,13 +38,13 @@ public class WarehouseController {
 
     @PostMapping("/addProductToWarehouse/{id}")
     public ApiResponse add(@RequestBody List<ProductAndQuantityDto> productAndQuantityDtos, @PathVariable Integer id) {
-        return warehouseService.addProductToWarehouse(productAndQuantityDtos,id);
+        return warehouseService.addProductToWarehouse(productAndQuantityDtos, id);
     }
 
-//    @PutMapping("/addProductToWarehouse1/{id}")
-//    public ApiResponse add1(@RequestBody List<ProductAndQuantityDto> productAndQuantity,@PathVariable Integer id) {
-//        return warehouseService.addProductToWarehouse1(productAndQuantity,id);
-//    }
+    @PostMapping("/getProductFromWarehouse/{id}")
+    public ApiResponse get(@RequestBody List<ProductAndQuantityDto> productAndQuantityDtos, @PathVariable Integer id) {
+        return warehouseService.getProductFromWarehouse(productAndQuantityDtos, id);
+    }
 
 
 //    @GetMapping("/getByBranchId")

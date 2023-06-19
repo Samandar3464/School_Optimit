@@ -7,7 +7,9 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ProductAndQuantityRepository extends JpaRepository<ProductAndQuantity, Integer> {
-    List<ProductAndQuantity> findAllByWarehouseId(Integer warehouse_id);
+    List<ProductAndQuantity> findAllByWarehouseIdOrderByQuantityDesc(Integer warehouseId);
 
-    Optional<ProductAndQuantity> findByWarehouseIdAndProductId(Integer warehouse_id, Integer product_id);
+    Optional<ProductAndQuantity> findByWarehouseIdAndProductId(Integer warehouseId, Integer productId);
+
+    List<ProductAndQuantity> findAllByWarehouseId(Integer warehouseId);
 }

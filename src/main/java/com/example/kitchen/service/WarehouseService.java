@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -55,7 +56,7 @@ public class WarehouseService implements BaseService<WarehouseDto, Integer> {
     @ResponseStatus(HttpStatus.OK)
     public ApiResponse getById(Integer integer) {
         Warehouse warehouse = warehouseRepository.findById(integer).orElseThrow(() -> new RecordNotFoundException(WAREHOUSE_NOT_FOUND));
-        List<ProductAndQuantity> allByWarehouseId = productAndQuantityRepository.findAllByWarehouseId(warehouse.getId());
+        List<ProductAndQuantity> allByWarehouseId = productAndQuantityRepository.findAllByWarehouseIdOrderByQuantityDesc(warehouse.getId());
         return new ApiResponse(new WarehouseResponse(warehouse, allByWarehouseId), true);
     }
 
@@ -85,8 +86,7 @@ public class WarehouseService implements BaseService<WarehouseDto, Integer> {
         if (allByWarehouseId.isEmpty()) {
             dto.forEach(obj -> {
                 Product product = productRepository.findById(obj.getProductId()).orElseThrow(() -> new RecordNotFoundException(PRODUCT_NOT_FOUND));
-                ProductAndQuantity productAndQuantity1 = ProductAndQuantity.builder().product(product).quantity(obj.getQuantity()).warehouse(warehouse).build();
-                productAndQuantityRepository.save(productAndQuantity1);
+                saveProductAndQuantity(warehouse, obj, product);
             });
             return new ApiResponse(SUCCESSFULLY, true);
         }
@@ -94,14 +94,69 @@ public class WarehouseService implements BaseService<WarehouseDto, Integer> {
             Optional<ProductAndQuantity> optional = productAndQuantityRepository.findByWarehouseIdAndProductId(warehouseId, obj.getProductId());
             if (optional.isPresent()) {
                 optional.get().setQuantity(optional.get().getQuantity() + obj.getQuantity());
+                optional.get().setTotalPrice(obj.getTotalPrice());
                 productAndQuantityRepository.save(optional.get());
             } else {
                 Product product = productRepository.findById(obj.getProductId()).orElseThrow(() -> new RecordNotFoundException(PRODUCT_NOT_FOUND));
-                ProductAndQuantity productAndQuantity1 = ProductAndQuantity.builder().product(product).quantity(obj.getQuantity()).warehouse(warehouse).build();
-                productAndQuantityRepository.save(productAndQuantity1);
+                saveProductAndQuantity(warehouse, obj, product);
             }
         }
         return new ApiResponse(SUCCESSFULLY, true);
+    }
+
+
+//    @ResponseStatus(HttpStatus.OK)
+//    @Transactional(rollbackFor = {Exception.class})
+//    public ApiResponse getProductFromWarehouse(List<ProductAndQuantityDto> dto, Integer warehouseId) {
+//        List<ProductAndQuantityDto> responseList = new ArrayList<>();
+//        List<ProductAndQuantity> productAndQuantities = new ArrayList<>();
+//        dto.forEach(obj -> {
+//            ProductAndQuantity productAndQuantity = productAndQuantityRepository.findByWarehouseIdAndProductId(warehouseId, obj.getProductId()).orElseThrow(() -> new RecordNotFoundException(PRODUCT_NOT_FOUND));
+//            if (productAndQuantity.getQuantity() >= obj.getQuantity()) {
+//                double v = productAndQuantity.getQuantity() - obj.getQuantity();
+//                productAndQuantity.setQuantity(v);
+//                productAndQuantities.add(productAndQuantity);
+//            } else {
+//                responseList.add(obj);
+//            }
+//        });
+//        if (responseList.isEmpty()) {
+//            productAndQuantityRepository.saveAll(productAndQuantities);
+//            return new ApiResponse(SUCCESSFULLY, true);
+//        }
+//        return new ApiResponse(PRODUCT_NOT_ENOUGH_QUANTITY, false, responseList);
+//    }
+
+    @ResponseStatus(HttpStatus.OK)
+    @Transactional(rollbackFor = {Exception.class})
+    public ApiResponse getProductFromWarehouse(List<ProductAndQuantityDto> dto, Integer warehouseId) {
+        List<ProductAndQuantityDto> responseList = new ArrayList<>();
+        dto.forEach(obj -> {
+            ProductAndQuantity productAndQuantity = productAndQuantityRepository.findByWarehouseIdAndProductId(warehouseId, obj.getProductId()).orElseThrow(() -> new RecordNotFoundException(PRODUCT_NOT_FOUND));
+            if (productAndQuantity.getQuantity() < obj.getQuantity()) {
+                responseList.add(obj);
+            }
+        });
+        if (!responseList.isEmpty()) {
+            return new ApiResponse(PRODUCT_NOT_ENOUGH_QUANTITY, false, responseList);
+        }
+        dto.forEach(obj -> {
+            ProductAndQuantity productAndQuantity = productAndQuantityRepository.findByWarehouseIdAndProductId(warehouseId, obj.getProductId()).orElseThrow(() -> new RecordNotFoundException(PRODUCT_NOT_FOUND));
+            productAndQuantity.setQuantity(productAndQuantity.getQuantity() - obj.getQuantity());
+//            productAndQuantityRepository.save(productAndQuantity);
+        });
+        return new ApiResponse(SUCCESSFULLY, true);
+    }
+
+
+    private void saveProductAndQuantity(Warehouse warehouse, ProductAndQuantityDto obj, Product product) {
+        ProductAndQuantity productAndQuantity1 = ProductAndQuantity.builder()
+                .product(product)
+                .quantity(obj.getQuantity())
+                .totalPrice(obj.getTotalPrice())
+                .warehouse(warehouse)
+                .build();
+        productAndQuantityRepository.save(productAndQuantity1);
     }
 
 

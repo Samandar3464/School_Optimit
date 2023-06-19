@@ -1,7 +1,5 @@
 package com.example.kitchen.entity;
 
-import com.example.entity.Branch;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.OnDelete;
@@ -28,4 +26,6 @@ public class ProductAndQuantity {
     private Warehouse warehouse;
 
     private double quantity;
+
+    private double totalPrice;
 }
