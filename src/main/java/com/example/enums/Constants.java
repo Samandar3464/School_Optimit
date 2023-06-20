@@ -3,12 +3,9 @@ public class Constants {
 
     public static final String USER_NOT_FOUND="USER NOT FOUND";
     public static final String PERMISSION_NOT_FOUND="PERMISSION NOT FOUND";
-    public static final String ID_NOT_FOUND="ID NOT FOUND";
     public static final String NAME_NOT_FOUND="NAME NOT FOUND";
     public static final String USER_ALREADY_EXIST="USER ALREADY EXIST";
     public static final String TOKEN_TIME_OUT="TOKEN TIME OUT";
-    public static final String BLOCKED="Sizni accountinggiz blocklandi .";
-    public static final String OPEN="Sizni  accountinggiz blockdan ochildi.";
 
     public static final String SUCCESSFULLY="SUCCESSFULLY";
 
@@ -23,7 +20,8 @@ public class Constants {
     public static final String YOU_ACCEPTED_REQUEST ="YOU ACCEPTED REQUEST";
 
     public static final String FIREBASE_EXCEPTION="FIREBASE EXCEPTION";
-
+    public static final String BLOCKED="Sizni accountinggiz blocklandi .";
+    public static final String OPEN="Sizni  accountinggiz blockdan ochildi.";
     public static final String REFRESH_TOKEN_TIME_OUT="REFRESH TOKEN TIME OUT";
     public static final String AUTHORITIES="authorities";
     public static final String AUTHORIZATION="Authorization";
@@ -80,4 +78,19 @@ public class Constants {
 
     public static final String DATE_DO_NOT_MATCH = "DATE_DO_NOT_MATCH";
     public static final String STAFF_ATTENDANCE_NOT_FOUND = "STAFF_ATTENDANCE_NOT_FOUND";
+    public static final String REASON_NOT_FOUND = "REASON NOT FOUND";
+    public static final String ACCOUNT_NOT_FOUND = "ACCOUNT NOT FOUND";
+    public static final String ACCOUNT_ALREADY_EXIST = "ACCOUNT ALREADY EXIST";
+    public static final String MEASUREMENT_NOT_FOUND = "MEASUREMENT NOT FOUND";
+    public static final String MEASUREMENT_ALREADY_EXIST = "MEASUREMENT ALREADY EXIST";
+    public static final String PRODUCT_NOT_FOUND = "PRODUCT NOT FOUND";
+    public static final String PRODUCT_ALREADY_EXIST = "PRODUCT ALREADY EXIST";
+    public static final String WAREHOUSE_ALREADY_EXIST = "WAREHOUSE ALREADY EXIST";
+    public static final String WAREHOUSE_NOT_FOUND = "WAREHOUSE NOT FOUND";
+    public static final String MEAL_NOT_FOUND = "MEAL NOT FOUND";
+    public static final String MEAL_ALREADY_EXIST = "MEAL ALREADY EXIST";
+    public static final String DRINK_ALREADY_EXIST = "DRINK ALREADY EXIST";
+    public static final String DRINK_NOT_FOUND = "DRINK NOT FOUND";
+    public static final String MEAL_SCHEDULE_NOT_FOUND = "MEAL SCHEDULE NOT FOUND";
+    public static final String PRODUCT_NOT_ENOUGH_QUANTITY = "PRODUCT NOT ENOUGH QUANTITY";
 }

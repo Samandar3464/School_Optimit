@@ -1,6 +1,5 @@
 package com.example.model.response;
 
-import com.example.entity.Attendance;
 import com.example.entity.Journal;
 import com.example.entity.Score;
 import lombok.AllArgsConstructor;
@@ -19,5 +18,5 @@ public class JournalResponseDto {
     private Journal journal;
 
     private List<Score> scoreList;
-    private List<Attendance> attendanceList;
+    private List<Score> attendanceList;
 }

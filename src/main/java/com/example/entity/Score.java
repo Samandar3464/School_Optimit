@@ -25,7 +25,7 @@ public class Score {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 
-    private int score;
+    private char score;
 
     @ManyToOne
     private Student student;
