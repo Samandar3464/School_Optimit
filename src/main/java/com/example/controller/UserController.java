@@ -24,6 +24,18 @@ public class UserController {
         return userService.create(userRegisterDto);
     }
 
+
+    @PostMapping("/addSubjectToUser")
+    public ApiResponse addSubjectToUser(@RequestBody UserRegisterDto userRegisterDto) {
+        return userService.addSubjectToUser(userRegisterDto);
+    }
+
+
+    @PostMapping("/addDailyLessonToUser")
+    public ApiResponse addDailyLessonToUser(@RequestBody UserRegisterDto userRegisterDto) {
+        return userService.addDailyLessonToUser(userRegisterDto);
+    }
+
     @PostMapping("/login")
     public ApiResponse login(@RequestBody @Validated UserDto userLoginRequestDto) {
         return userService.login(userLoginRequestDto);

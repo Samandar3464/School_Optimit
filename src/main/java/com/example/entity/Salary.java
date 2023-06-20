@@ -1,6 +1,8 @@
 package com.example.entity;
 
 import com.example.enums.Months;
+import com.example.model.request.SalaryHoursRequest;
+import com.example.model.request.SalaryRequest;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -26,7 +28,8 @@ public class Salary {
     @Enumerated(EnumType.STRING)
     private Months month;
 
-    private Integer userId;
+    @ManyToOne
+    private User user;
 
     private double fix;
     //fix bu kelishilgan oylik
@@ -46,4 +49,21 @@ public class Salary {
 
     private double cashAdvance;
     // bu naqd shaklida pul kerak bolib qolganda olgan puli
+
+    private double amountDebt;
+
+    // bu oyni oxirida qarzdor bolgan summasi
+
+    private double classLeaderSalary;
+
+    public static Salary toSalary(SalaryRequest salaryRequest){
+        return Salary
+                .builder()
+                .fix(salaryRequest.getFix())
+                .remainingSalary(salaryRequest.getFix())
+                .month(salaryRequest.getMonth())
+                .active(true)
+                .build();
+    }
+
 }

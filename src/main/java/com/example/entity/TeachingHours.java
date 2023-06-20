@@ -2,6 +2,7 @@ package com.example.entity;
 
 import com.example.enums.Months;
 import com.example.model.request.TeachingHoursRequest;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -20,17 +21,16 @@ public class TeachingHours {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @ManyToOne
-    private TypeOfWork typeOfWork;
-
     private int lessonHours;
-
-    @Enumerated(EnumType.STRING)
-    private Months month;
 
     private LocalDate date;
 
-    private Integer teacherId;
+    @ManyToOne
+    private TypeOfWork typeOfWork;
+
+    @ManyToOne
+    @JsonIgnore
+    private User teacher;
 
     @ElementCollection
     private List<Integer> classIds;
@@ -39,8 +39,6 @@ public class TeachingHours {
         return TeachingHours
                 .builder()
                 .lessonHours(teachingHoursRequest.getLessonHours())
-                .teacherId(teachingHoursRequest.getTeacherId())
-                .classIds(teachingHoursRequest.getClassIds())
                 .build();
     }
 }

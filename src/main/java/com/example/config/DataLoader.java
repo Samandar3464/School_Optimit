@@ -19,6 +19,10 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
@@ -45,23 +49,28 @@ public class DataLoader implements CommandLineRunner {
             permissionService.create(new Permission(3, "read"));
         }
 
-
         if (initMode.equals("always")) {
-//            Role supper_admin = new Role(1, "SUPER_ADMIN");
-//            Role role = roleRepository.save(supper_admin);
-//            User admin = User.builder()
-//                    .fullName("ADMIN")
-//                    .phoneNumber("111111111")
-//                    .birthDate(LocalDate.parse("1998-05-13"))
-//                    .gender(Gender.ERKAK)
-//                    .registeredDate(LocalDateTime.now())
-//                    .verificationCode(0)
-//                    .password(passwordEncoder.encode("111111"))
-//                    .isBlocked(true)
-//                    .roles(List.of(role))
-//                    .build();
-//             userRepository.save(admin);
-
+              Role supper_admin = new Role(1, "SUPER_ADMIN");
+            supper_admin.setPermissions(permissionService.getAll());
+            Role role = new Role();
+            if (roleRepository.findByName("SUPER_ADMIN").isEmpty()) {
+                 role = roleRepository.save(supper_admin);
+            }
+            User admin = User.builder()
+                    .fullName("ADMIN")
+                    .phoneNumber("907403767")
+                    .birthDate(LocalDate.parse("1998-05-13"))
+                    .gender(Gender.ERKAK)
+                    .registeredDate(LocalDateTime.now())
+                    .verificationCode(0)
+                    .password(passwordEncoder.encode("111111"))
+                    .isBlocked(true)
+                    .roles(List.of(role))
+                    .build();
+            Optional<User> phoneNumber = userRepository.findByPhoneNumber("907403767");
+            if (phoneNumber.isEmpty()){
+                userRepository.save(admin);
+            }
             Business business = Business.builder()
                     .name("Demo business")
                     .address("Demo")

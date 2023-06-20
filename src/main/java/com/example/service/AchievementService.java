@@ -1,12 +1,15 @@
 package com.example.service;
 
 import com.example.entity.Achievement;
+import com.example.entity.User;
 import com.example.enums.Constants;
 import com.example.exception.RecordAlreadyExistException;
 import com.example.exception.RecordNotFoundException;
+import com.example.exception.UserNotFoundException;
 import com.example.model.common.ApiResponse;
 import com.example.model.request.AchievementDto;
 import com.example.repository.AchievementRepository;
+import com.example.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +22,7 @@ public class AchievementService implements BaseService<AchievementDto, Integer> 
 
     private final AchievementRepository achievementRepository;
     private final AttachmentService attachmentService;
+    private final UserRepository userRepository;
 
 
     @Override
@@ -26,7 +30,14 @@ public class AchievementService implements BaseService<AchievementDto, Integer> 
         Achievement achievement = Achievement.toAchievement(achievementDto);
 //        setPhoto(achievementDto, achievement);
         checkIfExist(achievementDto);
-        return new ApiResponse(achievementRepository.save(achievement), true);
+        setUser(achievement, achievementDto.getUserId());
+        achievementRepository.save(achievement);
+        return new ApiResponse(achievementDto, true);
+    }
+
+    private void setUser(Achievement achievement, Integer userID) {
+        User user = userRepository.findById(userID).orElseThrow(() -> new UserNotFoundException(Constants.USER_NOT_FOUND));
+        achievement.setUser(user);
     }
 
     @Override
@@ -39,9 +50,11 @@ public class AchievementService implements BaseService<AchievementDto, Integer> 
     public ApiResponse update(AchievementDto achievementDto) {
         checkById(achievementDto.getId());
         Achievement achievement = Achievement.toAchievement(achievementDto);
+        setUser(achievement, achievementDto.getUserId());
 //        setPhoto(achievementDto,achievement);
         achievement.setId(achievementDto.getId());
-        return new ApiResponse(achievementRepository.save(achievement), true);
+        achievementRepository.save(achievement);
+        return new ApiResponse(achievementDto, true);
     }
 
     @Override
@@ -62,27 +75,10 @@ public class AchievementService implements BaseService<AchievementDto, Integer> 
         }
     }
 
-    public List<Achievement> saveAll(List<Achievement> achievements) {
-        return achievementRepository.saveAll(achievements);
-    }
-
-    public List<Achievement> toAllEntity(List<AchievementDto> achievements) {
-        List<Achievement> achievementList = new ArrayList<>();
-        achievements.forEach(achievementDto -> {
-            Achievement achievement = Achievement.toAchievement(achievementDto);
-//            setPhoto(achievementDto, achievement);
-            achievementList.add(achievement);
-        });
-        return achievementList;
-    }
-
     private void setPhoto(AchievementDto achievementDto, Achievement achievement) {
-        if (!achievementDto.getPhotoCertificate().isEmpty()){
+        if (!achievementDto.getPhotoCertificate().isEmpty()) {
             achievement.setPhotoCertificate(attachmentService.saveToSystem(achievementDto.getPhotoCertificate()));
         }
     }
 
-    public List<Achievement> findAllById(List<Integer> achievements) {
-        return achievementRepository.findAllById(achievements);
-    }
 }

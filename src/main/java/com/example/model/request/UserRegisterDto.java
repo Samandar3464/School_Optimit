@@ -8,13 +8,17 @@ import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class UserRegisterDto {
 
     private Integer id;
@@ -45,11 +49,12 @@ public class UserRegisterDto {
 
     private List<Integer> rolesIds;
 
-    private List<Integer> achievementsIds;
-
     private List<Integer> subjectsIds;
 
     private List<Integer> dailyLessonsIds;
 
-    private List<Integer> workExperiencesIds;
+    private List<Integer> teachingHours;
+
+    private Integer salaryId;
+    private Integer classId;
 }

@@ -6,9 +6,10 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 public interface TeachingHoursRepository extends JpaRepository<TeachingHours,Integer> {
-    TeachingHours findByTeacherIdAndDateAndTypeOfWork(Integer teacherId, LocalDate date, TypeOfWork typeOfWork);
+    Optional<TeachingHours> findByTeacherIdAndDateAndTypeOfWork(Integer teacherId, LocalDate date, TypeOfWork typeOfWork);
 
     List<TeachingHours> findAllByTeacherId(Integer teacherId);
     List<TeachingHours> findAllByTeacherIdAndDate(Integer teacherId, LocalDate date);

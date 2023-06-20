@@ -7,6 +7,8 @@ import lombok.*;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
+import java.util.List;
+
 @Getter
 @Setter
 @AllArgsConstructor
@@ -28,6 +30,9 @@ public class Branch {
     private Business business;
 
     private boolean delete;
+
+    @OneToMany(mappedBy = "branch")
+    private List<User> userList;
 
     public static Branch from(BranchDto branchDto, Business business) {
         return Branch.builder()

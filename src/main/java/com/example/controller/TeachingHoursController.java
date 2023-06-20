@@ -25,7 +25,7 @@ public class TeachingHoursController {
     }
 
     @GetMapping("/getByTeacherIdAndDate/{id}/{date}")
-    public ApiResponse getById(@PathVariable Integer id,
+    public ApiResponse getByTeacherIdAndDate(@PathVariable Integer id,
                                @PathVariable String date
     ) {
         return teachingHoursService.getByTeacherIdAndDate(id, date);

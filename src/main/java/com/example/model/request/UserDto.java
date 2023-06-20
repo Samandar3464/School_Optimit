@@ -15,8 +15,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class UserDto {
 
-    private String fullName;
-
     @NotBlank
     @Size(min = 9, max = 9)
     private String phoneNumber;
@@ -24,9 +22,4 @@ public class UserDto {
     @NotBlank
     @Size(min = 6)
     private String password;
-
-    @Enumerated(EnumType.STRING)
-    private Gender gender;
-
-    private int verificationCode;
 }
