@@ -1,12 +1,10 @@
 package com.example.service;
 
-import com.example.entity.StudentClass;
 import com.example.entity.TeachingHours;
 import com.example.entity.TypeOfWork;
-import com.example.entity.User;
 import com.example.enums.Constants;
+import com.example.exception.RecordAlreadyExistException;
 import com.example.exception.RecordNotFoundException;
-import com.example.exception.UserNotFoundException;
 import com.example.model.common.ApiResponse;
 import com.example.model.request.TeachingHoursRequest;
 import com.example.model.response.TeachingHoursResponse;
@@ -32,30 +30,34 @@ public class TeachingHoursService implements BaseService<TeachingHoursRequest, I
     @Override
     public ApiResponse create(TeachingHoursRequest teachingHoursRequest) {
         TeachingHours teachingHours = TeachingHours.toTeachingHours(teachingHoursRequest);
-        checkTeacherIdAndClassesIds(teachingHoursRequest);
-        teachingHours.setDate(toLocalDate(teachingHoursRequest.getDate()));
-        teachingHours.setTypeOfWork(typeOfWorkService.checkById(teachingHoursRequest.getTypeOfWorkId()));
+        checkIsAlready(teachingHoursRequest, teachingHours);
+        set(teachingHoursRequest, teachingHours);
         teachingHoursRepository.save(teachingHours);
         return new ApiResponse(Constants.SUCCESSFULLY, true);
     }
 
     public ApiResponse incrementHours(TeachingHoursRequest teachingHoursRequest) {
-        TypeOfWork typeOfWork = typeOfWorkService.checkById(teachingHoursRequest.getTypeOfWorkId());
-        TeachingHours teachingHours = teachingHoursRepository.findByTeacherIdAndDateAndTypeOfWork(teachingHoursRequest.getTeacherId(), toLocalDate(teachingHoursRequest.getDate()), typeOfWork);
+        TeachingHours teachingHours = getTeaching(teachingHoursRequest);
         teachingHours.setLessonHours(teachingHours.getLessonHours() + 1);
+        teachingHours.getClassIds().add(teachingHoursRequest.getClassId());
         teachingHoursRepository.save(teachingHours);
         return new ApiResponse(Constants.SUCCESSFULLY, true, TeachingHoursResponse.teachingHoursDTO(teachingHours));
     }
 
     public ApiResponse decrementHours(TeachingHoursRequest teachingHoursRequest) {
-        TypeOfWork typeOfWork = typeOfWorkService.checkById(teachingHoursRequest.getTypeOfWorkId());
-        TeachingHours teachingHours = teachingHoursRepository.findByTeacherIdAndDateAndTypeOfWork(teachingHoursRequest.getTeacherId(), toLocalDate(teachingHoursRequest.getDate()), typeOfWork);
+        TeachingHours teachingHours = getTeaching(teachingHoursRequest);
         if (teachingHours.getLessonHours() == 0) {
             throw new RecordNotFoundException(Constants.HOURS_NOT_ENOUGH);
         }
+        teachingHours.getClassIds().remove(teachingHoursRequest.getClassId());
         teachingHours.setLessonHours(teachingHours.getLessonHours() - 1);
         teachingHoursRepository.save(teachingHours);
         return new ApiResponse(Constants.SUCCESSFULLY, true, TeachingHoursResponse.teachingHoursDTO(teachingHours));
+    }
+
+    private TeachingHours getTeaching(TeachingHoursRequest teachingHoursRequest) {
+        TypeOfWork typeOfWork = typeOfWorkService.checkById(teachingHoursRequest.getTypeOfWorkId());
+        return teachingHoursRepository.findByTeacherIdAndDateAndTypeOfWork(teachingHoursRequest.getTeacherId(), toLocalDate(teachingHoursRequest.getDate()), typeOfWork).orElseThrow(() -> new RecordNotFoundException(Constants.TEACHING_HOURS_NOT_FOUND));
     }
 
     @Override
@@ -84,13 +86,20 @@ public class TeachingHoursService implements BaseService<TeachingHoursRequest, I
     @Override
     public ApiResponse update(TeachingHoursRequest teachingHoursRequest) {
         checkById(teachingHoursRequest.getId());
+        TeachingHours teachingHours = getTeachingHours(teachingHoursRequest);
+        teachingHoursRepository.save(teachingHours);
+        return new ApiResponse(teachingHours, true);
+    }
+
+    private TeachingHours getTeachingHours(TeachingHoursRequest teachingHoursRequest) {
         TeachingHours teachingHours = TeachingHours.toTeachingHours(teachingHoursRequest);
-        checkTeacherIdAndClassesIds(teachingHoursRequest);
+//        checkClassId(teachingHoursRequest);
+        teachingHours.setClassIds(teachingHoursRequest.getClassesIds());
+        teachingHours.setTeacher(userService.checkUserExistById(teachingHoursRequest.getTeacherId()));
         teachingHours.setDate(toLocalDate(teachingHoursRequest.getDate()));
         teachingHours.setTypeOfWork(typeOfWorkService.checkById(teachingHoursRequest.getTypeOfWorkId()));
         teachingHours.setId(teachingHoursRequest.getId());
-        teachingHoursRepository.save(teachingHours);
-        return new ApiResponse(teachingHours, true);
+        return teachingHours;
     }
 
     @Override
@@ -100,21 +109,26 @@ public class TeachingHoursService implements BaseService<TeachingHoursRequest, I
         return new ApiResponse(Constants.DELETED, true, teachingHoursResponse);
     }
 
+    private void set(TeachingHoursRequest teachingHoursRequest, TeachingHours teachingHours) {
+        teachingHours.setTeacher(userService.checkUserExistById(teachingHoursRequest.getTeacherId()));
+        teachingHours.setDate(toLocalDate(teachingHoursRequest.getDate()));
+        teachingHours.setTypeOfWork(typeOfWorkService.checkById(teachingHoursRequest.getTypeOfWorkId()));
+    }
+
+    private void checkIsAlready(TeachingHoursRequest teachingHoursRequest, TeachingHours teachingHours) {
+        if (teachingHoursRepository.findByTeacherIdAndDateAndTypeOfWork(teachingHoursRequest.getTeacherId(), toLocalDate(teachingHoursRequest.getDate()), teachingHours.getTypeOfWork()).isPresent()) {
+            throw new RecordAlreadyExistException(Constants.TEACHING_HOURS_ALREADY_EXIST_THIS_DATE);
+        }
+    }
+
     private void toAllHours(List<TeachingHoursResponse> all, List<TeachingHours> teachingHoursResponses) {
         teachingHoursResponses.forEach(teachingHours -> {
             all.add(TeachingHoursResponse.teachingHoursDTO(teachingHours));
         });
     }
 
-    private void checkTeacherIdAndClassesIds(TeachingHoursRequest teachingHoursRequest) {
-        User user = userService.checkUserExistById(teachingHoursRequest.getTeacherId());
-        List<StudentClass> all = studentClassRepository.findAllById(teachingHoursRequest.getClassIds());
-        if (all.size() != teachingHoursRequest.getClassIds().size()){
-            throw new RecordNotFoundException(Constants.CLASS_NOT_FOUND);
-        }
-        if (user == null) {
-            throw new UserNotFoundException(Constants.USER_NOT_FOUND);
-        }
+    private void checkClassId(TeachingHoursRequest teachingHoursRequest) {
+        studentClassRepository.findById(teachingHoursRequest.getClassId()).orElseThrow(() -> new RecordNotFoundException(Constants.CLASS_NOT_FOUND));
     }
 
     private LocalDate toLocalDate(String date) {

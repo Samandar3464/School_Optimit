@@ -2,9 +2,7 @@ package com.example.service;
 
 import com.example.config.jwtConfig.JwtGenerate;
 import com.example.entity.Attachment;
-import com.example.entity.Salary;
 import com.example.entity.User;
-import com.example.entity.WorkExperience;
 import com.example.exception.RecordAlreadyExistException;
 import com.example.exception.UserNotFoundException;
 import com.example.model.common.ApiResponse;
@@ -45,16 +43,14 @@ public class UserService implements BaseService<UserRegisterDto, Integer> {
 
     private final UserRepository userRepository;
     private final AttachmentService attachmentService;
-    private final AchievementService achievementService;
     private final SubjectService subjectService;
     private final DailyLessonsService dailyLessonsService;
-    private final WorkExperienceService workExperienceService;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
-    private final SalaryService salaryService;
     private final SmsService service;
     private final FireBaseMessagingService fireBaseMessagingService;
     private final RoleService roleService;
+
 
     @ResponseStatus(HttpStatus.CREATED)
     @Transactional(rollbackFor = {Exception.class})
@@ -216,37 +212,16 @@ public class UserService implements BaseService<UserRegisterDto, Integer> {
         User user = checkUserExistById(userRegisterDto.getId());
         user.setSubjects(subjectService.checkAllById(userRegisterDto.getSubjectsIds()));
         userRepository.save(user);
-        return new ApiResponse(SUCCESSFULLY,true,user.getSubjects());
+        return new ApiResponse(SUCCESSFULLY, true, user.getSubjects());
     }
 
     public ApiResponse addDailyLessonToUser(UserRegisterDto userRegisterDto) {
         User user = checkUserExistById(userRegisterDto.getId());
         user.setDailyLessons(dailyLessonsService.checkAllById(userRegisterDto.getDailyLessonsIds()));
         userRepository.save(user);
-        return new ApiResponse(SUCCESSFULLY,true,user.getDailyLessons());
+        return new ApiResponse(SUCCESSFULLY, true, user.getDailyLessons());
     }
 
-    public ApiResponse addAchievementsToUser(UserRegisterDto userRegisterDto) {
-        User user = checkUserExistById(userRegisterDto.getId());
-        user.setAchievements(achievementService.findAllByUserId(userRegisterDto.getId()));
-        userRepository.save(user);
-        return new ApiResponse(SUCCESSFULLY,true,user.getAchievements());
-    }
-
-    public ApiResponse addWorkExperiencesToUser(UserRegisterDto userRegisterDto) {
-        User user = checkUserExistById(userRegisterDto.getId());
-        List<WorkExperience> workExperiences = workExperienceService.getAllByUserId(user.getId());
-        user.setWorkExperiences(workExperiences);
-        userRepository.save(user);
-        return new ApiResponse(SUCCESSFULLY,true,user.getWorkExperiences());
-    }
-
-    public ApiResponse addSalariesToUser(UserRegisterDto userRegisterDto) {
-        User user = checkUserExistById(userRegisterDto.getId());
-        user.setSalaries(List.of((Salary) salaryService.getById(userRegisterDto.getSalaryId()).getData()));
-        userRepository.save(user);
-        return new ApiResponse(SUCCESSFULLY,true,user.getSalaries());
-    }
 
     private User toUser(UserRegisterDto userRegisterDto, int verificationCode) {
         User user = User.from(userRegisterDto);
@@ -271,7 +246,6 @@ public class UserService implements BaseService<UserRegisterDto, Integer> {
         return photoLink;
     }
 
-
     @ResponseStatus(HttpStatus.OK)
     public ApiResponse reSendSms(String number) {
         sendSms(number, verificationCodeGenerator());
@@ -284,11 +258,9 @@ public class UserService implements BaseService<UserRegisterDto, Integer> {
         return random.nextInt(1000, 9999);
     }
 
-
     public User checkUserExistById(Integer id) {
         return userRepository.findById(id).orElseThrow(() -> new UserNotFoundException(USER_NOT_FOUND));
     }
-
 
     private User checkByNumber(String number) {
         return userRepository.findByPhoneNumber(number).orElseThrow(() -> new UserNotFoundException(USER_NOT_FOUND));

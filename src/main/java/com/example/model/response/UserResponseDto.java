@@ -1,6 +1,9 @@
 package com.example.model.response;
 
 import com.example.entity.*;
+import com.example.model.request.AchievementDto;
+import com.example.model.request.StudentClassDto;
+import com.example.model.request.WorkExperienceDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -37,9 +40,11 @@ public class UserResponseDto {
 
     private Attachment profilePhoto;
 
-    private List<Achievement> achievements;
+    private StudentClassDto studentClass;
 
-    private List<WorkExperience> workExperiences;
+    private List<AchievementDto> achievements;
+
+    private List<WorkExperienceDto> workExperiences;
 
     private List<DailyLessons> dailyLessons;
 
@@ -47,15 +52,24 @@ public class UserResponseDto {
 
     private List<Role> roles;
 
+    private List<SalaryResponse> salaries;
+
+    private List<TeachingHoursResponse> teachingHoursResponses;
+
+
+
     public static UserResponseDto from(User user) {
         return UserResponseDto.builder()
                 .id(user.getId())
                 .registeredDate(user.getRegisteredDate().toString())
                 .fullName(user.getFullName())
                 .dailyLessons(user.getDailyLessons())
-                .workExperiences(user.getWorkExperiences())
-                .achievements(user.getAchievements())
+                .workExperiences(WorkExperienceDto.toAllResponse(user.getWorkExperiences()))
+                .achievements(AchievementDto.toAllResponse(user.getAchievements()))
+                .teachingHoursResponses(TeachingHoursResponse.toAllResponse(user.getTeachingHours()))
                 .biography(user.getBiography())
+                .studentClass(StudentClassDto.toResponse(user.getStudentClass()))
+                .salaries(SalaryResponse.toAllResponse(user.getSalaries()))
                 .inn(user.getInn())
                 .inps(user.getInps())
                 .subjects(user.getSubjects())

@@ -21,6 +21,6 @@ public class TeachingHoursRequest {
 
     private Integer teacherId;
 
-    private List<Integer> classIds;
-
+    private Integer classId;
+    private List<Integer> classesIds;
 }

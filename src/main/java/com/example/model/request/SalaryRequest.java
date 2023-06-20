@@ -21,6 +21,8 @@ public class SalaryRequest {
 
     private Integer userId;
 
+    private boolean anyWay;
+
     private double fix;
     //fix bu kelishilgan oylik
 

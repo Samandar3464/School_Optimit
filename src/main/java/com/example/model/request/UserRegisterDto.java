@@ -56,4 +56,5 @@ public class UserRegisterDto {
     private List<Integer> teachingHours;
 
     private Integer salaryId;
+    private Integer classId;
 }

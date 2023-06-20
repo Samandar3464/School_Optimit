@@ -29,6 +29,23 @@ public class SalaryController {
         return salaryService.givePartlySalary(salaryRequest);
     }
 
+    @GetMapping("currentMonthSalary/{fromDate}/{toDate}/{id}")
+    public ApiResponse currentMonthSalary(@PathVariable String fromDate,
+                                          @PathVariable String toDate,
+                                          @PathVariable Integer id){
+        return salaryService.currentMonthSalary(fromDate, toDate, id);
+    }
+
+//    @PostMapping("giveRemainSalary")
+//    public ApiResponse giveRemainSalary(@RequestBody SalaryRequest salaryRequest){
+//        return salaryService.giveRemainSalary(salaryRequest);
+//    }
+
+    @PostMapping("giveSalary")
+    public ApiResponse giveSalary(@RequestBody SalaryRequest salaryRequest){
+        return salaryService.giveSalary(salaryRequest);
+    }
+
     @PostMapping("getById/{id}")
     public ApiResponse getById(@PathVariable Integer id){
         return salaryService.getById(id);

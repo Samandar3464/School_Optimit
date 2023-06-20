@@ -36,6 +36,9 @@ public class PermissionService implements BaseService<Permission, Integer> {
         return new ApiResponse(permissionRepository.findAll(), true);
     }
 
+    public List<Permission> getAll() {
+        return permissionRepository.findAll();
+    }
 
     @Override
     public ApiResponse update(Permission newPermission) {

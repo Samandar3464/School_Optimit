@@ -2,8 +2,11 @@ package com.example.entity;
 
 import com.example.enums.SalaryType;
 import com.example.model.request.TypeOfWorkRequest;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.List;
 
 
 @Getter
@@ -22,8 +25,11 @@ public class TypeOfWork {
 
     private double price;
 
+    @OneToMany(mappedBy = "typeOfWork")
+    @JsonIgnore
+    private List<TeachingHours> teachingHoursList;
 
-    public static TypeOfWork toTypeOfWork(TypeOfWorkRequest typeOfWorkRequest){
+    public static TypeOfWork toTypeOfWork(TypeOfWorkRequest typeOfWorkRequest) {
         return TypeOfWork
                 .builder()
                 .name(typeOfWorkRequest.getName())

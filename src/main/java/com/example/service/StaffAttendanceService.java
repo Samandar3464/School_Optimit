@@ -3,16 +3,20 @@ package com.example.service;
 import com.example.entity.StaffAttendance;
 import com.example.entity.User;
 import com.example.enums.Constants;
+import com.example.exception.RecordAlreadyExistException;
 import com.example.exception.RecordNotFoundException;
+import com.example.exception.UserNotFoundException;
 import com.example.model.common.ApiResponse;
 import com.example.model.request.StaffAttendanceRequest;
 import com.example.model.response.StaffAttendanceResponse;
 import com.example.model.response.UserResponseDto;
 import com.example.repository.StaffAttendanceRepository;
+import com.example.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,17 +25,25 @@ import java.util.List;
 public class StaffAttendanceService implements BaseService<StaffAttendanceRequest, Integer> {
 
     private final StaffAttendanceRepository attendanceRepository;
-    private final UserService userService;
+    private final UserRepository userRepository;
 
 
     @Override
     public ApiResponse create(StaffAttendanceRequest staffAttendanceRequest) {
         StaffAttendance staffAttendance = StaffAttendance.toStaffAttendance(staffAttendanceRequest);
-        staffAttendance.setUser(userService.checkUserExistById(staffAttendanceRequest.getUserId()));
-        staffAttendance.setDate(userService.toLocalDate(staffAttendanceRequest.getDate()));
+        staffAttendance.setUser(getUser(staffAttendanceRequest.getUserId()));
+        staffAttendance.setDate(toLocalDate(staffAttendanceRequest.getDate()));
+        getByUserId(staffAttendanceRequest.getUserId(),toLocalDate(staffAttendanceRequest.getDate()));
         attendanceRepository.save(staffAttendance);
         return new ApiResponse(Constants.SUCCESSFULLY, true, toDto(staffAttendance));
     }
+
+    private void getByUserId(Integer userId,LocalDate date) {
+        if (attendanceRepository.findByUserIdAndDate(userId,date).isPresent()) {
+            throw new RecordAlreadyExistException(Constants.CAN_BE_ADDED_ONCE_A_DAY);
+        }
+    }
+
 
     @Override
     public ApiResponse getById(Integer integer) {
@@ -51,8 +63,8 @@ public class StaffAttendanceService implements BaseService<StaffAttendanceReques
         checkById(staffAttendanceRequest.getId());
         StaffAttendance staffAttendance = StaffAttendance.toStaffAttendance(staffAttendanceRequest);
         staffAttendance.setId(staffAttendanceRequest.getId());
-        staffAttendance.setDate(userService.toLocalDate(staffAttendanceRequest.getDate()));
-        staffAttendance.setUser(userService.checkUserExistById(staffAttendanceRequest.getUserId()));
+        staffAttendance.setDate(toLocalDate(staffAttendanceRequest.getDate()));
+        staffAttendance.setUser(getUser(staffAttendanceRequest.getUserId()));
         attendanceRepository.save(staffAttendance);
         return new ApiResponse(Constants.SUCCESSFULLY, true, toDto(staffAttendance));
     }
@@ -76,7 +88,7 @@ public class StaffAttendanceService implements BaseService<StaffAttendanceReques
                 .builder()
                 .id(staffAttendance.getId())
                 .cameToWork(staffAttendance.isCameToWork())
-                .date(staffAttendance.getDate())
+                .date(staffAttendance.getDate().toString())
                 .description(staffAttendance.getDescription())
                 .userResponseDto(UserResponseDto.from(staffAttendance.getUser()))
                 .build();
@@ -84,5 +96,13 @@ public class StaffAttendanceService implements BaseService<StaffAttendanceReques
 
     public List<StaffAttendance> findAllByUserAndDateBetween(LocalDate fromDate1, LocalDate toDate1, User user) {
         return attendanceRepository.findAllByUserAndDateBetweenAndCameToWorkTrue(user,fromDate1, toDate1);
+    }
+
+    private LocalDate toLocalDate(String toDate) {
+        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        return LocalDate.parse(toDate,dateTimeFormatter);
+    }
+    private User getUser(Integer id) {
+        return userRepository.findById(id).orElseThrow(() -> new UserNotFoundException(Constants.USER_NOT_FOUND));
     }
 }

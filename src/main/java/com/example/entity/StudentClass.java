@@ -57,6 +57,10 @@ public class StudentClass {
     private Branch branch;
 
 
+    @OneToOne
+    private User classLeader;
+
+
     public static StudentClass from(StudentClassDto studentClass, Branch branch, Room room) {
         return StudentClass.builder()
                 .className(studentClass.getClassName())

@@ -15,7 +15,7 @@ public class StaffAttendanceResponse {
 
     private boolean cameToWork;
 
-    private LocalDate date;
+    private String date;
 
     private String description;
 
