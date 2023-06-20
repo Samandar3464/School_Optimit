@@ -8,4 +8,6 @@ import java.util.List;
 public interface MealRepository extends JpaRepository<Meal, Integer> {
 
     List<Meal> findAllByBranchIdAndActiveTrue(Integer branchId);
+
+    boolean existsByName(String name);
 }

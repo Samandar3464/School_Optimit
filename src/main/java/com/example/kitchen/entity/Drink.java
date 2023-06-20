@@ -13,7 +13,7 @@ import java.util.List;
 @NoArgsConstructor
 @Builder
 @Entity
-public class Meal {
+public class Drink {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
