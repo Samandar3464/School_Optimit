@@ -1,9 +1,10 @@
 package com.example.model.request;
 
 
+import com.example.entity.*;
 import lombok.*;
 
-import java.util.List;
+import java.time.LocalDate;
 @Getter
 @Setter
 @Builder
@@ -13,13 +14,17 @@ public class DailyLessonsDto {
 
     private Integer id;
 
-    private double sumSalaryPerDay;
+    private int lessonTime;
 
-    private int workingHoursPerDay;
+    private String  day;
 
-    private String workingDay;
-
-    private List<Integer> typeOfWorkIds;
+    private Integer typeOfWorkId;
 
     private Integer teacherId;
+
+    private Integer subjectId;
+
+    private Integer studentClassId;
+
+    private Integer branchId;
 }

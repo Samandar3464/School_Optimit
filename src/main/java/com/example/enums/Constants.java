@@ -107,4 +107,6 @@ public class Constants {
     public static final String PRODUCT_NOT_ENOUGH_QUANTITY = "PRODUCT NOT ENOUGH QUANTITY";
     public static final String SALARY_NOT_CORRECT = "SALARY_NOT_CORRECT";
     public static final String CASH_ADDED_DEBIT_AMOUNT = "MABLAG YETARLIK EMASLIGI TUFAYLIK QARZDORLIK YOZILDI";
+    public static final String DAILY_LESSON_ALREADY_EXIST = "DAILY_LESSON_ALREADY_EXIST";
+    public static final String DAILY_LESSON_NOT_FOUND = "DAILY_LESSON_NOT_FOUND";
 }
