@@ -22,6 +22,10 @@ public class ExpenseRequestDto {
     @Column(nullable = false)
     private Integer takerId;
 
+
+    @Column(nullable = false)
+    private Integer paymentTypeId;
+
     @Column(nullable = false)
     private Integer branchId;
 }
