@@ -8,7 +8,6 @@ import com.example.enums.Constants;
 import com.example.exception.RecordNotFoundException;
 import com.example.exception.UserNotFoundException;
 import com.example.model.common.ApiResponse;
-import com.example.model.request.SalaryHoursRequest;
 import com.example.model.request.SalaryRequest;
 import com.example.model.response.SalaryResponse;
 import com.example.repository.SalaryRepository;
@@ -37,15 +36,36 @@ public class SalaryService implements BaseService<SalaryRequest, Integer> {
         User user = checkByUserId(salaryRequest);
         Salary salary = Salary.toSalaryCreate(salaryRequest);
         set(salaryRequest, user, salary);
+        salaryRepository.findAllByUserId(user.getId()).forEach(salary1 -> salary.setAmountDebt(salary.getAmountDebt() + salary1.getAmountDebt()));
         salaryRepository.save(salary);
         return new ApiResponse(Constants.SUCCESSFULLY, true);
+    }
+
+    public ApiResponse takeDebitAmount(Integer salaryId, double debitAmount) {
+        Salary salary = checkById(salaryId);
+        salary.setSalary(salary.getSalary() - debitAmount);
+        salary.setAmountDebt(salary.getAmountDebt() - debitAmount);
+        if (salary.getSalary() < 0) {
+            throw new RecordNotFoundException(Constants.SALARY_NOT_ENOUGH);
+        }
+        salaryRepository.save(salary);
+        return new ApiResponse(Constants.SUCCESSFULLY, true, SalaryResponse.toResponse(salary));
     }
 
     public ApiResponse giveCashAdvance(Integer salaryId, double cashSalary) {
         Salary salary = checkById(salaryId);
         salary.setCashAdvance(salary.getCashAdvance() + cashSalary);
         salary.setGivenSalary(salary.getGivenSalary() + cashSalary);
-        salary.setSalary(salary.getSalary() - cashSalary);
+        return getApiResponse(cashSalary, salary);
+    }
+
+    private ApiResponse getApiResponse(double cashSalary, Salary salary) {
+        double v = salary.getSalary() - cashSalary;
+        if (v >= 0) {
+            salary.setSalary(v);
+        } else {
+            return new ApiResponse(Constants.SALARY_NOT_ENOUGH, true, SalaryResponse.toResponse(salary));
+        }
         salaryRepository.save(salary);
         return new ApiResponse(Constants.SUCCESSFULLY, true, SalaryResponse.toResponse(salary));
     }
@@ -54,9 +74,7 @@ public class SalaryService implements BaseService<SalaryRequest, Integer> {
         Salary salary = checkById(salaryId);
         salary.setPartlySalary(salary.getPartlySalary() + partlySalary);
         salary.setGivenSalary(salary.getGivenSalary() + partlySalary);
-        salary.setSalary(salary.getSalary() - partlySalary);
-        salaryRepository.save(salary);
-        return new ApiResponse(Constants.SUCCESSFULLY, true, SalaryResponse.toResponse(salary));
+        return getApiResponse(partlySalary, salary);
     }
 
     public ApiResponse getCurrentMonthFixSalary(String fromDate, String toDate, Integer id) {
@@ -71,14 +89,19 @@ public class SalaryService implements BaseService<SalaryRequest, Integer> {
     public ApiResponse getCurrentMonthTeachingHoursSalary(Integer salaryId) {
         Salary salary = checkById(salaryId);
         double overall = 0;
-        List<TeachingHours> all = teachingHoursRepository.findAllByTeacherId(salary.getUser().getId());
-        for (TeachingHours teachingHours : all) {
-            overall += teachingHours.getTypeOfWork().getPrice() * teachingHours.getLessonHours();
-        }
+        overall = getOverall(salary, overall);
         salary.setCurrentMonthSalary(overall + salary.getClassLeaderSalary());
         setOylik(salary);
         salaryRepository.save(salary);
         return new ApiResponse(Constants.SUCCESSFULLY, true, SalaryResponse.toResponse(salary));
+    }
+
+    private double getOverall(Salary salary, double overall) {
+        List<TeachingHours> all = teachingHoursRepository.findAllByTeacherId(salary.getUser().getId());
+        for (TeachingHours teachingHours : all) {
+            overall += teachingHours.getTypeOfWork().getPrice() * teachingHours.getLessonHours();
+        }
+        return overall;
     }
 
     public ApiResponse giveSalary(Integer salaryId, double salaryAmount) {
@@ -99,24 +122,6 @@ public class SalaryService implements BaseService<SalaryRequest, Integer> {
         double salaryAmountBeGiven = salary.getCurrentMonthSalary() - salary.getGivenSalary();
         salaryAmountBeGiven = Math.round((salaryAmountBeGiven * 100) / 100D);
         return new ApiResponse(Constants.SUCCESSFULLY, true, salaryAmountBeGiven);
-    }
-
-    //bu korxona o'tgan oy uchun pul bera olmay qolgandagi oyligi
-    public ApiResponse giveRemainSalary(Integer salaryId, double salaryAmount) {
-        Salary salary = checkById(salaryId);
-        double remain = salary.getSalary() - salaryAmount;
-        if (remain == 0) {
-            double sal = Math.round((salary.getGivenSalary() + salaryAmount) * 100) / 100D;
-            salary.setGivenSalary(sal);
-            salary.setSalary(0);
-            salary.setActive(false);
-        } else if (remain < 0) {
-            throw new RecordNotFoundException(Constants.EXTRA_MONEY_WAS_ADDED);
-        } else {
-            throw new RecordNotFoundException(Constants.SALARY_NOT_FOUND);
-        }
-        salaryRepository.save(salary);
-        return new ApiResponse(Constants.SUCCESSFULLY, true, SalaryResponse.toResponse(salary));
     }
 
     @Override

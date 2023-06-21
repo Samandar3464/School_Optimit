@@ -104,4 +104,5 @@ public class Constants {
     public static final String MEAL_SCHEDULE_NOT_FOUND = "MEAL SCHEDULE NOT FOUND";
     public static final String PRODUCT_NOT_ENOUGH_QUANTITY = "PRODUCT NOT ENOUGH QUANTITY";
     public static final String SALARY_NOT_CORRECT = "SALARY_NOT_CORRECT";
+    public static final String CASH_ADDED_DEBIT_AMOUNT = "MABLAG YETARLIK EMASLIGI TUFAYLIK QARZDORLIK YOZILDI";
 }
