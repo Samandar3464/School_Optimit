@@ -37,7 +37,7 @@ public class ExpenseService implements BaseService<ExpenseRequestDto, Integer> {
                 .orElseThrow(() -> new RecordNotFoundException(BRANCH_NOT_FOUND));
         Balance balance = balanceRepository.findByBranchId(dto.getBranchId())
                 .orElseThrow(() -> new RecordNotFoundException(BALANCE_NOT_FOUND));
-        User user = userRepository.findById(dto.getId())
+        User user = userRepository.findById(dto.getTakerId())
                 .orElseThrow(() -> new UserNotFoundException(USER_NOT_FOUND));
         if (balance.getBalance() < dto.getSumma()) {
             throw new RecordNotFoundException(BALANCE_NOT_ENOUGH_SUMMA);
@@ -72,7 +72,7 @@ public class ExpenseService implements BaseService<ExpenseRequestDto, Integer> {
         Expense expense = expenseRepository.findById(dto.getId()).orElseThrow(() -> new RecordNotFoundException(EXPENSE_NOT_FOUND));
         Balance balance = balanceRepository.findByBranchId(dto.getBranchId())
                 .orElseThrow(() -> new RecordNotFoundException(BALANCE_NOT_FOUND));
-        User user = userRepository.findById(dto.getId())
+        User user = userRepository.findById(dto.getTakerId())
                 .orElseThrow(() -> new UserNotFoundException(USER_NOT_FOUND));
         if (dto.getSumma() > expense.getSumma()) {
             double v = dto.getSumma() - expense.getSumma();
@@ -91,7 +91,7 @@ public class ExpenseService implements BaseService<ExpenseRequestDto, Integer> {
         expense.setReason(dto.getReason());
         expense.setSumma(dto.getSumma());
         expenseRepository.save(expense);
-        return null;
+        return new ApiResponse(SUCCESSFULLY, true);
     }
 
     @Override
