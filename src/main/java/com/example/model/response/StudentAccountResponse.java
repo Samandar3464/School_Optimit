@@ -1,7 +1,6 @@
 package com.example.model.response;
 
-import com.example.entity.Student;
-import com.example.entity.StudentAccount;
+import com.example.entity.StudentBalance;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
@@ -31,7 +30,7 @@ public class StudentAccountResponse {
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     private LocalDateTime updatedDate;
 
-    public static StudentAccountResponse from(StudentAccount account){
+    public static StudentAccountResponse from(StudentBalance account){
         return StudentAccountResponse.builder()
                 .id(account.getId())
                 .balance(account.getBalance())

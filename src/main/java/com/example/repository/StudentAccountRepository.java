@@ -1,16 +1,16 @@
 package com.example.repository;
 
-import com.example.entity.StudentAccount;
+import com.example.entity.StudentBalance;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 import java.util.Optional;
 
-public interface StudentAccountRepository extends JpaRepository<StudentAccount , Integer> {
+public interface StudentAccountRepository extends JpaRepository<StudentBalance, Integer> {
 
 
-    Optional<StudentAccount> findByStudentIdAndActiveTrue(Integer integer);
-    Optional<StudentAccount> findByStudentId(Integer integer);
+    Optional<StudentBalance> findByStudentIdAndActiveTrue(Integer integer);
+    Optional<StudentBalance> findByStudentId(Integer integer);
 
-    List<StudentAccount> findAllByBranchIdAndActiveTrueOrderByCreatedDateAsc(Integer integer);
+    List<StudentBalance> findAllByBranchIdAndActiveTrueOrderByCreatedDateAsc(Integer integer);
 }
