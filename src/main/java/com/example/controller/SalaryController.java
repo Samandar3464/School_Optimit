@@ -1,8 +1,6 @@
 package com.example.controller;
 
-
 import com.example.model.common.ApiResponse;
-import com.example.model.request.SalaryHoursRequest;
 import com.example.model.request.SalaryRequest;
 import com.example.service.SalaryService;
 import lombok.RequiredArgsConstructor;
@@ -16,54 +14,64 @@ public class SalaryController {
     private final SalaryService salaryService;
 
     @PostMapping("save")
-    public ApiResponse save(@RequestBody SalaryRequest salaryRequest){
+    public ApiResponse save(@RequestBody SalaryRequest salaryRequest) {
         return salaryService.create(salaryRequest);
     }
 
-    @PostMapping("giveCashAdvance")
-    public ApiResponse giveCashAdvance(@RequestBody SalaryRequest salaryRequest){
-        return salaryService.giveCashAdvance(salaryRequest);
+    @GetMapping("giveCashAdvance/{salaryId}/{cashSalary}")
+    public ApiResponse giveCashAdvance(@PathVariable Integer salaryId,
+                                       @PathVariable double cashSalary) {
+        return salaryService.giveCashAdvance(salaryId, cashSalary);
     }
 
-    @PostMapping("givePartlySalary")
-    public ApiResponse givePartlySalary(@RequestBody SalaryRequest salaryRequest){
-        return salaryService.givePartlySalary(salaryRequest);
+    @GetMapping("takeDebitAmount/{salaryId}/{debitAmount}")
+    public ApiResponse takeDebitAmount(@PathVariable Integer salaryId,
+                                       @PathVariable double debitAmount) {
+        return salaryService.takeDebitAmount(salaryId, debitAmount);
     }
 
-    @GetMapping("currentMonthSalary/{fromDate}/{toDate}/{id}")
-    public ApiResponse currentMonthSalary(@PathVariable String fromDate,
-                                          @PathVariable String toDate,
-                                          @PathVariable Integer id){
-        return salaryService.currentMonthSalary(fromDate, toDate, id);
+    @GetMapping("givePartlySalary/{salaryId}/{partlySalary}")
+    public ApiResponse givePartlySalary(@PathVariable Integer salaryId,
+                                        @PathVariable double partlySalary) {
+        return salaryService.givePartlySalary(salaryId, partlySalary);
     }
 
-//    @PostMapping("giveRemainSalary")
-//    public ApiResponse giveRemainSalary(@RequestBody SalaryRequest salaryRequest){
-//        return salaryService.giveRemainSalary(salaryRequest);
-//    }
-
-    @PostMapping("giveSalary")
-    public ApiResponse giveSalary(@RequestBody SalaryRequest salaryRequest){
-        return salaryService.giveSalary(salaryRequest);
+    @GetMapping("getCurrentMonthFixSalary/{fromDate}/{toDate}/{salaryId}")
+    public ApiResponse getCurrentMonthFixSalary(@PathVariable String fromDate,
+                                                @PathVariable String toDate,
+                                                @PathVariable Integer salaryId) {
+        return salaryService.getCurrentMonthFixSalary(fromDate, toDate, salaryId);
     }
 
-    @PostMapping("getTeachingHoursSalary")
-    public ApiResponse giveSalary(@RequestBody SalaryHoursRequest salaryRequest){
-        return salaryService.getTeachingHoursSalary(salaryRequest);
+
+    @GetMapping("currentMonthSalaryAmount/{salaryId}")
+    public ApiResponse giveRemainSalary(@PathVariable Integer salaryId) {
+        return salaryService.currentMonthSalaryAmount(salaryId);
     }
 
-    @PostMapping("getById/{id}")
-    public ApiResponse getById(@PathVariable Integer id){
+    @GetMapping("giveSalary/{salaryId}/{salary}")
+    public ApiResponse giveSalary(@PathVariable Integer salaryId,
+                                  @PathVariable double salary) {
+        return salaryService.giveSalary(salaryId, salary);
+    }
+
+    @GetMapping("getCurrentMonthTeachingHoursSalary/{salaryId}")
+    public ApiResponse getCurrentMonthTeachingHoursSalary(@PathVariable Integer salaryId) {
+        return salaryService.getCurrentMonthTeachingHoursSalary(salaryId);
+    }
+
+    @GetMapping("getById/{id}")
+    public ApiResponse getById(@PathVariable Integer id) {
         return salaryService.getById(id);
     }
 
     @PutMapping("update")
-    public ApiResponse update(@RequestBody SalaryRequest salaryRequest){
+    public ApiResponse update(@RequestBody SalaryRequest salaryRequest) {
         return salaryService.update(salaryRequest);
     }
 
     @DeleteMapping("delete/{id}")
-    public ApiResponse delete(@PathVariable Integer id){
+    public ApiResponse delete(@PathVariable Integer id) {
         return salaryService.delete(id);
     }
 }
