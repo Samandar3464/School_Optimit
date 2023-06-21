@@ -2,6 +2,7 @@ package com.example.controller;
 
 
 import com.example.model.common.ApiResponse;
+import com.example.model.request.SalaryHoursRequest;
 import com.example.model.request.SalaryRequest;
 import com.example.service.SalaryService;
 import lombok.RequiredArgsConstructor;
@@ -44,6 +45,11 @@ public class SalaryController {
     @PostMapping("giveSalary")
     public ApiResponse giveSalary(@RequestBody SalaryRequest salaryRequest){
         return salaryService.giveSalary(salaryRequest);
+    }
+
+    @PostMapping("getTeachingHoursSalary")
+    public ApiResponse giveSalary(@RequestBody SalaryHoursRequest salaryRequest){
+        return salaryService.getTeachingHoursSalary(salaryRequest);
     }
 
     @PostMapping("getById/{id}")

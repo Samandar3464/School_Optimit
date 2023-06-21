@@ -54,7 +54,4 @@ public class UserRegisterDto {
     private List<Integer> dailyLessonsIds;
 
     private List<Integer> teachingHours;
-
-    private Integer salaryId;
-    private Integer classId;
 }
