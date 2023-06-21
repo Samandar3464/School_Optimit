@@ -99,6 +99,7 @@ public class Constants {
     public static final String DRINK_ALREADY_EXIST = "DRINK ALREADY EXIST";
     public static final String DRINK_NOT_FOUND = "DRINK NOT FOUND";
     public static final String BALANCE_NOT_FOUND = "BALANCE NOT FOUND";
+    public static final String BALANCE_ALREADY_EXIST = "BALANCE ALREADY EXIST";
     public static final String EXPENSE_NOT_FOUND = "EXPENSE NOT FOUND";
     public static final String BALANCE_NOT_ENOUGH_SUMMA = "BALANCE NOT ENOUGH SUMMA";
     public static final String MEAL_SCHEDULE_NOT_FOUND = "MEAL SCHEDULE NOT FOUND";

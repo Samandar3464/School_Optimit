@@ -34,7 +34,6 @@ public class LessonScheduleService implements BaseService<List<LessonScheduleDto
     @Override
     @ResponseStatus(HttpStatus.CREATED)
     public ApiResponse create(List<LessonScheduleDto> scheduleDtoList) {
-
         List<ErrorResponseSchedule> errorResponse = new ArrayList<>();
         int i = 0;
         for (LessonScheduleDto schd : scheduleDtoList) {
@@ -85,6 +84,8 @@ public class LessonScheduleService implements BaseService<List<LessonScheduleDto
     public ApiResponse update(List<LessonScheduleDto> scheduleDtoList) {
         return null;
     }
+
+
     @ResponseStatus(HttpStatus.OK)
     public ApiResponse update(LessonScheduleDto schd) {
         Optional<LessonSchedule> teacherBusy = lessonScheduleRepository.findFirstByBranchIdAndTeacherIdAndStartTimeAndActiveTrue(schd.getBranchId(), schd.getTeacherId(), schd.getStartTime());

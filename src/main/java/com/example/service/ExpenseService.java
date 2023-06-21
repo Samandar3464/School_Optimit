@@ -14,7 +14,9 @@ import com.example.repository.BranchRepository;
 import com.example.repository.ExpenseRepository;
 import com.example.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -31,6 +33,7 @@ public class ExpenseService implements BaseService<ExpenseRequestDto, Integer> {
     private final BranchRepository branchRepository;
     private final ExpenseRepository expenseRepository;
 
+    @ResponseStatus(HttpStatus.CREATED)
     @Override
     public ApiResponse create(ExpenseRequestDto dto) {
         Branch branch = branchRepository.findById(dto.getBranchId())
@@ -59,7 +62,7 @@ public class ExpenseService implements BaseService<ExpenseRequestDto, Integer> {
     public ApiResponse getById(Integer integer) {
         return null;
     }
-
+    @ResponseStatus(HttpStatus.OK)
     public ApiResponse getAllByBranchId(Integer branchId, LocalDateTime startTime, LocalDateTime endTime) {
         List<Expense> all = expenseRepository.findAllByBranchIdAndCreatedTimeBetweenOrderByCreatedTimeDesc(branchId, startTime, endTime);
         List<ExpenseResponse> expenseResponseList = new ArrayList<>();

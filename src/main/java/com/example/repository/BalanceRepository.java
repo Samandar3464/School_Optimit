@@ -8,4 +8,6 @@ import java.util.Optional;
 public interface BalanceRepository extends JpaRepository<Balance,Integer> {
 
     Optional<Balance> findByBranchId(Integer branchId);
+
+    boolean existsByBranchId(Integer branchId);
 }
