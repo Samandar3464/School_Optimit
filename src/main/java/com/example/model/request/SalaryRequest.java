@@ -21,8 +21,6 @@ public class SalaryRequest {
 
     private Integer userId;
 
-    private boolean anyWay;
-
     private double fix;
     //fix bu kelishilgan oylik
 
@@ -36,7 +34,7 @@ public class SalaryRequest {
     private double givenSalary;
     // bu berilgan summa
 
-    private double remainingSalary;
+    private double salary;
     // bu qolgan  summa yani 10mlndan 7mln qolgan bolsa shunisi
 
     private double cashAdvance;

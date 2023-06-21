@@ -38,13 +38,6 @@ public class StaffAttendanceService implements BaseService<StaffAttendanceReques
         return new ApiResponse(Constants.SUCCESSFULLY, true, toDto(staffAttendance));
     }
 
-    private void getByUserId(Integer userId,LocalDate date) {
-        if (attendanceRepository.findByUserIdAndDate(userId,date).isPresent()) {
-            throw new RecordAlreadyExistException(Constants.CAN_BE_ADDED_ONCE_A_DAY);
-        }
-    }
-
-
     @Override
     public ApiResponse getById(Integer integer) {
         return new ApiResponse(Constants.FOUND, true, checkById(integer));
@@ -69,7 +62,6 @@ public class StaffAttendanceService implements BaseService<StaffAttendanceReques
         return new ApiResponse(Constants.SUCCESSFULLY, true, toDto(staffAttendance));
     }
 
-
     @Override
     public ApiResponse delete(Integer integer) {
         StaffAttendance staffAttendance = checkById(integer);
@@ -77,11 +69,9 @@ public class StaffAttendanceService implements BaseService<StaffAttendanceReques
         return new ApiResponse(Constants.DELETED, true, staffAttendance);
     }
 
-
     public StaffAttendance checkById(Integer integer) {
         return attendanceRepository.findById(integer).orElseThrow(() -> new RecordNotFoundException(Constants.STAFF_ATTENDANCE_NOT_FOUND));
     }
-
 
     public StaffAttendanceResponse toDto(StaffAttendance staffAttendance) {
         return StaffAttendanceResponse
@@ -98,11 +88,22 @@ public class StaffAttendanceService implements BaseService<StaffAttendanceReques
         return attendanceRepository.findAllByUserAndDateBetweenAndCameToWorkTrue(user,fromDate1, toDate1);
     }
 
-    private LocalDate toLocalDate(String toDate) {
-        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        return LocalDate.parse(toDate,dateTimeFormatter);
+    private LocalDate toLocalDate(String date) {
+        try {
+            DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            return LocalDate.parse(date, dateTimeFormatter);
+        } catch (Exception e) {
+            throw new RecordNotFoundException(Constants.DATE_DO_NOT_MATCH + "  " + e);
+        }
     }
+
     private User getUser(Integer id) {
         return userRepository.findById(id).orElseThrow(() -> new UserNotFoundException(Constants.USER_NOT_FOUND));
+    }
+
+    private void getByUserId(Integer userId,LocalDate date) {
+        if (attendanceRepository.findByUserIdAndDate(userId,date).isPresent()) {
+            throw new RecordAlreadyExistException(Constants.CAN_BE_ADDED_ONCE_A_DAY);
+        }
     }
 }

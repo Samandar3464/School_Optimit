@@ -1,6 +1,8 @@
 package com.example.entity;
 
+import com.example.enums.Constants;
 import com.example.enums.Months;
+import com.example.exception.UserNotFoundException;
 import com.example.model.request.SalaryHoursRequest;
 import com.example.model.request.SalaryRequest;
 import jakarta.persistence.*;
@@ -44,7 +46,7 @@ public class Salary {
     private double givenSalary;
     // bu berilgan summa
 
-    private double remainingSalary;
+    private double salary;
     // bu qolgan  summa yani 10mlndan 7mln qolgan bolsa shunisi
 
     private double cashAdvance;
@@ -56,13 +58,26 @@ public class Salary {
 
     private double classLeaderSalary;
 
-    public static Salary toSalary(SalaryRequest salaryRequest){
+    public static Salary toSalary(SalaryRequest salaryRequest) {
         return Salary
                 .builder()
                 .fix(salaryRequest.getFix())
-                .remainingSalary(salaryRequest.getFix())
-                .month(salaryRequest.getMonth())
                 .active(true)
+                .month(salaryRequest.getMonth())
+                .givenSalary(salaryRequest.getGivenSalary())
+                .partlySalary(salaryRequest.getPartlySalary())
+                .salary(salaryRequest.getSalary())
+                .currentMonthSalary(salaryRequest.getCurrentMonthSalary())
+                .cashAdvance(salaryRequest.getCashAdvance())
+                .build();
+    }
+
+    public static Salary toSalaryCreate(SalaryRequest salaryRequest) {
+        return Salary
+                .builder()
+                .fix(salaryRequest.getFix())
+                .active(true)
+                .month(salaryRequest.getMonth())
                 .build();
     }
 

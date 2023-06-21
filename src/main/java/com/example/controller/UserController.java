@@ -23,13 +23,11 @@ public class UserController {
     public ApiResponse registerUser(@RequestBody UserRegisterDto userRegisterDto) {
         return userService.create(userRegisterDto);
     }
-
-
+    
     @PostMapping("/addSubjectToUser")
     public ApiResponse addSubjectToUser(@RequestBody UserRegisterDto userRegisterDto) {
         return userService.addSubjectToUser(userRegisterDto);
     }
-
 
     @PostMapping("/addDailyLessonToUser")
     public ApiResponse addDailyLessonToUser(@RequestBody UserRegisterDto userRegisterDto) {

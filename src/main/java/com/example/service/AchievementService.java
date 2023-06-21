@@ -36,7 +36,7 @@ public class AchievementService implements BaseService<AchievementDto, Integer> 
     }
 
     private void setUser(Achievement achievement, Integer userID) {
-        User user = userRepository.findById(userID).orElseThrow(() -> new UserNotFoundException(Constants.USER_NOT_FOUND));
+        User user = userRepository.findById(userID).orElseThrow(() -> new RecordNotFoundException(Constants.USER_NOT_FOUND));
         achievement.setUser(user);
     }
 
