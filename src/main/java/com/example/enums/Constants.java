@@ -1,11 +1,14 @@
 package com.example.enums;
 public class Constants {
 
-    public static final String USER_NOT_FOUND="USER NOT FOUND";
-    public static final String PERMISSION_NOT_FOUND="PERMISSION NOT FOUND";
-    public static final String NAME_NOT_FOUND="NAME NOT FOUND";
-    public static final String USER_ALREADY_EXIST="USER ALREADY EXIST";
-    public static final String TOKEN_TIME_OUT="TOKEN TIME OUT";
+    public static final String USER_NOT_FOUND = "USER NOT FOUND";
+    public static final String PERMISSION_NOT_FOUND = "PERMISSION NOT FOUND";
+    public static final String ID_NOT_FOUND = "ID NOT FOUND";
+    public static final String NAME_NOT_FOUND = "NAME NOT FOUND";
+    public static final String USER_ALREADY_EXIST = "USER ALREADY EXIST";
+    public static final String TOKEN_TIME_OUT = "TOKEN TIME OUT";
+    public static final String BLOCKED = "Sizni accountinggiz blocklandi .";
+    public static final String OPEN = "Sizni  accountinggiz blockdan ochildi.";
 
     public static final String SUCCESSFULLY="SUCCESSFULLY";
 
@@ -15,23 +18,26 @@ public class Constants {
     public static final String FILE_NAME_NULL="FILE NAME NULL";
     public static final String FILE_COULD_NOT_UPLOADED="FILE COULD NOT UPLOADED";
     public static final String FILE_NOT_FOUND="FILE NOT FOUND";
+    public static final String NOTIFICATION_NOT_FOUND="NOTIFICATION NOT FOUND";
     public static final String USER_VERIFIED_SUCCESSFULLY="USER VERIFIED SUCCESSFULLY";
-    public static final String FIREBASE_EXCEPTION="FIREBASE EXCEPTION";
-    public static final String BLOCKED="Sizni accountinggiz blocklandi .";
-    public static final String OPEN="Sizni  accountinggiz blockdan ochildi.";
-    public static final String REFRESH_TOKEN_TIME_OUT="REFRESH TOKEN TIME OUT";
-    public static final String AUTHORITIES="authorities";
-    public static final String AUTHORIZATION="Authorization";
+    public static final String YOU_ACCEPTED_REQUEST ="YOU ACCEPTED REQUEST";
 
-    public static final String ADMIN="ADMIN";
-    public static final String SUPER_ADMIN="SUPER_ADMIN";
-    public static final String CAN_NOT_SEND_SMS="CAN NOT SEND SMS";
-    public static final String CAN_NOT_TAKE_SMS_SENDING_SERVICE_TOKEN="CAN NOT TAKE SMS SENDING SERVICE TOKEN";
-    public static final String FILE_SIZE_MUST_BU_10MB_OR_LOWER="FILE SIZE MUST BU 10MB OR LOWER";
-    public static final String STUDENT_NOT_FOUND="STUDENT NOT FOUND";
-    public static final String CLASS_NOT_FOUND="CLASS NOT FOUND";
-    public static final String FAMILY_NOT_FOUND="FAMILY NOT FOUND";
-    public static final String PHONE_NUMBER_ALREADY_REGISTERED="PHONE_NUMBER_ALREADY_REGISTERED";
+    public static final String FIREBASE_EXCEPTION = "FIREBASE EXCEPTION";
+
+    public static final String REFRESH_TOKEN_TIME_OUT = "REFRESH TOKEN TIME OUT";
+    public static final String AUTHORITIES = "authorities";
+    public static final String AUTHORIZATION = "Authorization";
+    public static final String TEACHING_HOURS_ALREADY_EXIST_THIS_DATE = "TEACHING_HOURS_ALREADY_EXIST_THIS_DATE";
+
+    public static final String ADMIN = "ADMIN";
+    public static final String SUPER_ADMIN = "SUPER_ADMIN";
+    public static final String CAN_NOT_SEND_SMS = "CAN NOT SEND SMS";
+    public static final String CAN_NOT_TAKE_SMS_SENDING_SERVICE_TOKEN = "CAN NOT TAKE SMS SENDING SERVICE TOKEN";
+    public static final String FILE_SIZE_MUST_BU_10MB_OR_LOWER = "FILE SIZE MUST BU 10MB OR LOWER";
+    public static final String STUDENT_NOT_FOUND = "STUDENT NOT FOUND";
+    public static final String CLASS_NOT_FOUND = "CLASS NOT FOUND";
+    public static final String FAMILY_NOT_FOUND = "FAMILY NOT FOUND";
+    public static final String PHONE_NUMBER_ALREADY_REGISTERED = "PHONE_NUMBER_ALREADY_REGISTERED";
 
     public static final String ROLE_ALREADY_EXIST = "ROLE ALREADY EXIST!!!";
     public static final String ROLE_NOT_AVAILABLE = "ROLE NOT AVAILABLE";
@@ -73,6 +79,12 @@ public class Constants {
     public static final String SALARY_NOT_ENOUGH = "SALARY_NOT_ENOUGH";
     public static final String FIX_NOT_ENOUGH = "FIX_NOT_ENOUGH";
 
+    public static final String DATE_DO_NOT_MATCH = "DATE_DO_NOT_MATCH";
+    public static final String STAFF_ATTENDANCE_NOT_FOUND = "STAFF_ATTENDANCE_NOT_FOUND";
+    public static final String AMOUNT_NOT_ENOUGH = "AMOUNT_NOT_ENOUGH";
+    public static final String EXTRA_MONEY_WAS_ADDED = "extra money was added";
+
+    public static final String CAN_BE_ADDED_ONCE_A_DAY = "can be added once a day";
     public static final String REASON_NOT_FOUND = "REASON NOT FOUND";
     public static final String ACCOUNT_NOT_FOUND = "ACCOUNT NOT FOUND";
     public static final String ACCOUNT_ALREADY_EXIST = "ACCOUNT ALREADY EXIST";

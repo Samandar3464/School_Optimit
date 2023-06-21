@@ -3,12 +3,15 @@ package com.example.service;
 import com.example.entity.Branch;
 import com.example.entity.Room;
 import com.example.entity.StudentClass;
+import com.example.entity.User;
 import com.example.exception.RecordNotFoundException;
+import com.example.exception.UserNotFoundException;
 import com.example.model.common.ApiResponse;
 import com.example.model.request.StudentClassDto;
 import com.example.repository.BranchRepository;
 import com.example.repository.RoomRepository;
 import com.example.repository.StudentClassRepository;
+import com.example.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -26,6 +29,7 @@ public class StudentClassService implements BaseService<StudentClassDto, Integer
     private final StudentClassRepository studentClassRepository;
     private final BranchRepository branchRepository;
     private final RoomRepository roomRepository;
+    private final UserRepository userRepository;
 
     @Override
     @ResponseStatus(HttpStatus.CREATED)
@@ -35,9 +39,16 @@ public class StudentClassService implements BaseService<StudentClassDto, Integer
         Room room = roomRepository.findById(studentClass.getRoomId())
                 .orElseThrow(() -> new RecordNotFoundException(ROOM_NOT_FOUND));
         StudentClass from = StudentClass.from(studentClass, branch, room);
+        setUser(studentClass, from);
         studentClassRepository.save(from);
         return new ApiResponse(SUCCESSFULLY, true);
     }
+
+    private void setUser(StudentClassDto studentClass, StudentClass from) {
+        User user = userRepository.findById(studentClass.getClassLeaderId()).orElseThrow(() -> new UserNotFoundException(USER_NOT_FOUND));
+        from.setClassLeader(user);
+    }
+
 
     @Override
     @ResponseStatus(HttpStatus.OK)
@@ -58,6 +69,7 @@ public class StudentClassService implements BaseService<StudentClassDto, Integer
         studentClass.setClassName(studentClassDto.getClassName());
         studentClass.setStartDate(studentClassDto.getStartDate());
         studentClass.setEndDate(studentClassDto.getEndDate());
+        setUser(studentClassDto,studentClass);
         studentClassRepository.save(studentClass);
         return new ApiResponse(SUCCESSFULLY, true);
     }

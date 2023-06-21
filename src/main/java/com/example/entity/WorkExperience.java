@@ -27,7 +27,8 @@ public class WorkExperience {
 
     private LocalDate endDate;
 
-    private int employee;
+    @ManyToOne
+    private User employee;
 
     public static WorkExperience toWorkExperience(WorkExperienceDto workExperienceDto) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");

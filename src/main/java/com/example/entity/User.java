@@ -72,22 +72,22 @@ public class User implements UserDetails {
     @OneToOne(cascade = CascadeType.ALL)
     private Attachment profilePhoto;
 
-    @OneToOne
+    @OneToOne(mappedBy = "classLeader")
     private StudentClass studentClass;
 
     @ManyToOne
     private Branch branch;
 
-    @ManyToMany(cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL,mappedBy = "user")
     private List<Salary> salaries;
 
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL,mappedBy = "user")
     private List<Achievement> achievements;
 
     @ManyToMany(fetch = FetchType.EAGER)
     private List<Subject> subjects;
 
-    @ManyToMany(cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL,mappedBy = "employee")
     private List<WorkExperience> workExperiences;
 
     @ManyToMany(fetch = FetchType.EAGER)
@@ -96,7 +96,7 @@ public class User implements UserDetails {
     @ManyToMany(cascade = CascadeType.ALL)
     private List<DailyLessons> dailyLessons;
 
-    @ManyToMany(cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL,mappedBy = "teacher")
     private List<TeachingHours> teachingHours;
 
     @Override

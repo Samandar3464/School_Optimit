@@ -13,11 +13,10 @@ import com.example.repository.OverallReportRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class OverallReportService implements BaseService<OverallReportRequest,Integer>{
+public class OverallReportService implements BaseService<OverallReportRequest, Integer> {
 
     private final OverallReportRepository overallReportRepository;
     private final UserService userService;
@@ -26,21 +25,23 @@ public class OverallReportService implements BaseService<OverallReportRequest,In
     public ApiResponse create(OverallReportRequest overallReportRequest) {
         User user = userService.checkUserExistById(overallReportRequest.getUserId());
         OverallReport overallReport = getOverallReport(user);
+        setSalary(user, overallReport);
+        overallReport.setMonth(overallReportRequest.getMonth());
         overallReportRepository.save(overallReport);
-        return new ApiResponse(Constants.SUCCESSFULLY,true);
+        return new ApiResponse(Constants.SUCCESSFULLY, true);
     }
 
     @Override
     public ApiResponse getById(Integer integer) {
         OverallReport overallReport = checkById(integer);
         OverallReportResponse overallReportResponse = toOverallResponse(overallReport);
-        return new ApiResponse(Constants.SUCCESSFULLY,true,overallReportResponse);
+        return new ApiResponse(Constants.SUCCESSFULLY, true, overallReportResponse);
     }
 
     public ApiResponse getByIdAndMonth(Integer integer, Months months) {
-        OverallReport overallReport = checkById(integer);
+        OverallReport overallReport = overallReportRepository.findByIdAndMonth(integer, months);
         OverallReportResponse overallReportResponse = toOverallResponse(overallReport);
-        return new ApiResponse(Constants.SUCCESSFULLY,true,overallReportResponse);
+        return new ApiResponse(Constants.SUCCESSFULLY, true, overallReportResponse);
     }
 
     @Override
@@ -49,34 +50,37 @@ public class OverallReportService implements BaseService<OverallReportRequest,In
         User user = userService.checkUserExistById(overallReportRequest.getUserId());
         OverallReport overallReport = getOverallReport(user);
         overallReportRepository.save(overallReport);
-        return new ApiResponse(Constants.SUCCESSFULLY,true,toOverallResponse(overallReport));
+        return new ApiResponse(Constants.SUCCESSFULLY, true, toOverallResponse(overallReport));
     }
 
     @Override
     public ApiResponse delete(Integer integer) {
         OverallReport overallReport = checkById(integer);
         overallReportRepository.deleteById(integer);
-        return new ApiResponse(Constants.DELETED,true,toOverallResponse(overallReport));
+        return new ApiResponse(Constants.DELETED, true, toOverallResponse(overallReport));
     }
 
-    private OverallReport checkById(Integer integer) {
-        return  overallReportRepository.findById(integer).orElseThrow(()->new RecordNotFoundException(Constants.OVERALL_REPORT_NOT_FOUND));
-    }
-
-    private  OverallReport getOverallReport(User user) {
-        OverallReport overallReport = new OverallReport();
-        overallReport.setBranch(user.getBranch());
-        List<Salary> salaries = user.getSalaries();
-        for (Salary salary : salaries) {
-            if (salary.getMonth().equals(overallReport.getMonth())) {
+    private  void setSalary(User user, OverallReport overallReport) {
+        for (Salary salary : user.getSalaries()) {
+            if (salary.isActive()) {
                 overallReport.setSalary(salary);
             }
         }
-        overallReport.setUser(user);
-        overallReport.setPosition(user.getPosition());
-        overallReport.setClassLeadership(user.getStudentClass().getClassName());
-        overallReport.setTeachingHours(user.getTeachingHours());
-        return overallReport;
+    }
+
+    private OverallReport checkById(Integer integer) {
+        return overallReportRepository.findById(integer).orElseThrow(() -> new RecordNotFoundException(Constants.OVERALL_REPORT_NOT_FOUND));
+    }
+
+    private OverallReport getOverallReport(User user) {
+        return OverallReport
+                .builder()
+                .branch(user.getBranch())
+                .position(user.getPosition())
+                .classLeadership(user.getStudentClass().getClassName())
+                .user(user)
+                .teachingHours(user.getTeachingHours())
+                .build();
     }
 
     private OverallReportResponse toOverallResponse(OverallReport overallReport) {
@@ -84,6 +88,7 @@ public class OverallReportService implements BaseService<OverallReportRequest,In
                 .builder()
                 .id(overallReport.getId())
                 .classLeadership(overallReport.getClassLeadership())
+                .month(overallReport.getMonth())
                 .branch(overallReport.getBranch())
                 .teachingHours(overallReport.getTeachingHours())
                 .position(overallReport.getPosition())

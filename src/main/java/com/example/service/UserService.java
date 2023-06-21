@@ -3,11 +3,14 @@ package com.example.service;
 import com.example.config.jwtConfig.JwtGenerate;
 import com.example.entity.Attachment;
 import com.example.entity.User;
-import com.example.exception.UserAlreadyExistException;
+import com.example.exception.RecordAlreadyExistException;
 import com.example.exception.UserNotFoundException;
 import com.example.model.common.ApiResponse;
 import com.example.model.request.*;
-import com.example.model.response.*;
+import com.example.model.response.NotificationMessageResponse;
+import com.example.model.response.TokenResponse;
+import com.example.model.response.UserResponseDto;
+import com.example.model.response.UserResponseListForAdmin;
 import com.example.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -26,7 +29,10 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Random;
 
 import static com.example.enums.Constants.*;
 
@@ -37,15 +43,14 @@ public class UserService implements BaseService<UserRegisterDto, Integer> {
 
     private final UserRepository userRepository;
     private final AttachmentService attachmentService;
-    private final AchievementService achievementService;
     private final SubjectService subjectService;
     private final DailyLessonsService dailyLessonsService;
-    private final WorkExperienceService workExperienceService;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final SmsService service;
     private final FireBaseMessagingService fireBaseMessagingService;
     private final RoleService roleService;
+
 
     @ResponseStatus(HttpStatus.CREATED)
     @Transactional(rollbackFor = {Exception.class})
@@ -203,20 +208,29 @@ public class UserService implements BaseService<UserRegisterDto, Integer> {
         return (User) authentication.getPrincipal();
     }
 
+    public ApiResponse addSubjectToUser(UserRegisterDto userRegisterDto) {
+        User user = checkUserExistById(userRegisterDto.getId());
+        user.setSubjects(subjectService.checkAllById(userRegisterDto.getSubjectsIds()));
+        userRepository.save(user);
+        return new ApiResponse(SUCCESSFULLY, true, user.getSubjects());
+    }
+
+    public ApiResponse addDailyLessonToUser(UserRegisterDto userRegisterDto) {
+        User user = checkUserExistById(userRegisterDto.getId());
+        user.setDailyLessons(dailyLessonsService.checkAllById(userRegisterDto.getDailyLessonsIds()));
+        userRepository.save(user);
+        return new ApiResponse(SUCCESSFULLY, true, user.getDailyLessons());
+    }
+
 
     private User toUser(UserRegisterDto userRegisterDto, int verificationCode) {
         User user = User.from(userRegisterDto);
         user.setVerificationCode(verificationCode);
         user.setBirthDate(toLocalDate(userRegisterDto.getBirthDate()));
         user.setRoles(roleService.getAllByIds(userRegisterDto.getRolesIds()));
-        user.setAchievements(achievementService.findAllById(userRegisterDto.getAchievementsIds()));
-        user.setSubjects(subjectService.checkAllById(userRegisterDto.getSubjectsIds()));
-        user.setDailyLessons(dailyLessonsService.checkAllById(userRegisterDto.getDailyLessonsIds()));
-        user.setWorkExperiences(workExperienceService.checkAllById(userRegisterDto.getWorkExperiencesIds()));
         user.setPassword(passwordEncoder.encode(userRegisterDto.getPassword()));
         return user;
     }
-
 
     public UserResponseDto toUserResponse(User user) {
         UserResponseDto userResponseDto = UserResponseDto.from(user);
@@ -232,7 +246,6 @@ public class UserService implements BaseService<UserRegisterDto, Integer> {
         return photoLink;
     }
 
-
     @ResponseStatus(HttpStatus.OK)
     public ApiResponse reSendSms(String number) {
         sendSms(number, verificationCodeGenerator());
@@ -245,11 +258,9 @@ public class UserService implements BaseService<UserRegisterDto, Integer> {
         return random.nextInt(1000, 9999);
     }
 
-
     public User checkUserExistById(Integer id) {
         return userRepository.findById(id).orElseThrow(() -> new UserNotFoundException(USER_NOT_FOUND));
     }
-
 
     private User checkByNumber(String number) {
         return userRepository.findByPhoneNumber(number).orElseThrow(() -> new UserNotFoundException(USER_NOT_FOUND));
@@ -262,7 +273,7 @@ public class UserService implements BaseService<UserRegisterDto, Integer> {
     }
 
 
-    private LocalDate toLocalDate(String birthDate) {
+    public LocalDate toLocalDate(String birthDate) {
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         return LocalDate.parse(birthDate, dateTimeFormatter);
     }
@@ -279,7 +290,7 @@ public class UserService implements BaseService<UserRegisterDto, Integer> {
 
     private void checkUserExistByPhoneNumber(String phoneNumber) {
         if (userRepository.existsByPhoneNumber(phoneNumber)) {
-            throw new UserAlreadyExistException(USER_ALREADY_EXIST);
+            throw new RecordAlreadyExistException(USER_ALREADY_EXIST);
         }
     }
 }

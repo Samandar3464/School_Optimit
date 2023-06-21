@@ -24,6 +24,9 @@ public class Achievement {
     @OneToOne
     private Attachment photoCertificate;
 
+    @ManyToOne
+    private User user;
+
     public static Achievement toAchievement(AchievementDto achievement) {
         return Achievement
                 .builder()
