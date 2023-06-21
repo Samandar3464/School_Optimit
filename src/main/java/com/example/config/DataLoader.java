@@ -1,9 +1,8 @@
 package com.example.config;
 
 
-import com.example.entity.Branch;
-import com.example.entity.Business;
-import com.example.entity.Permission;
+import com.example.entity.*;
+import com.example.enums.Gender;
 import com.example.kitchen.entity.Measurement;
 import com.example.kitchen.entity.Product;
 import com.example.kitchen.repository.MeasurementRepository;
