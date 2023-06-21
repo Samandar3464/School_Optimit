@@ -1,20 +1,16 @@
 package com.example.service;
 
-import com.example.entity.Balance;
-import com.example.entity.Branch;
-import com.example.entity.Expense;
-import com.example.entity.User;
+import com.example.entity.*;
 import com.example.exception.RecordNotFoundException;
 import com.example.exception.UserNotFoundException;
 import com.example.model.common.ApiResponse;
 import com.example.model.request.ExpenseRequestDto;
 import com.example.model.response.ExpenseResponse;
-import com.example.repository.BalanceRepository;
-import com.example.repository.BranchRepository;
-import com.example.repository.ExpenseRepository;
-import com.example.repository.UserRepository;
+import com.example.repository.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -30,7 +26,10 @@ public class ExpenseService implements BaseService<ExpenseRequestDto, Integer> {
     private final UserRepository userRepository;
     private final BranchRepository branchRepository;
     private final ExpenseRepository expenseRepository;
+    private final PaymentTypeRepository paymentTypeRepository;
 
+
+    @ResponseStatus(HttpStatus.CREATED)
     @Override
     public ApiResponse create(ExpenseRequestDto dto) {
         Branch branch = branchRepository.findById(dto.getBranchId())
@@ -39,6 +38,8 @@ public class ExpenseService implements BaseService<ExpenseRequestDto, Integer> {
                 .orElseThrow(() -> new RecordNotFoundException(BALANCE_NOT_FOUND));
         User user = userRepository.findById(dto.getTakerId())
                 .orElseThrow(() -> new UserNotFoundException(USER_NOT_FOUND));
+        PaymentType paymentType = paymentTypeRepository.findById(dto.getPaymentTypeId())
+                .orElseThrow(() -> new UserNotFoundException(PAYMENT_TYPE_NOT_FOUND));
         if (balance.getBalance() < dto.getSumma()) {
             throw new RecordNotFoundException(BALANCE_NOT_ENOUGH_SUMMA);
         }
@@ -49,6 +50,7 @@ public class ExpenseService implements BaseService<ExpenseRequestDto, Integer> {
                 .createdTime(LocalDateTime.now())
                 .taker(user)
                 .branch(branch)
+                .paymentType(paymentType)
                 .build();
         expenseRepository.save(expense);
         balanceRepository.save(balance);
@@ -60,6 +62,7 @@ public class ExpenseService implements BaseService<ExpenseRequestDto, Integer> {
         return null;
     }
 
+    @ResponseStatus(HttpStatus.OK)
     public ApiResponse getAllByBranchId(Integer branchId, LocalDateTime startTime, LocalDateTime endTime) {
         List<Expense> all = expenseRepository.findAllByBranchIdAndCreatedTimeBetweenOrderByCreatedTimeDesc(branchId, startTime, endTime);
         List<ExpenseResponse> expenseResponseList = new ArrayList<>();

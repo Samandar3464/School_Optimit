@@ -1,5 +1,6 @@
 package com.example.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -18,6 +19,12 @@ public class Balance {
     @Column(nullable = false)
     private double balance;
 
+    private Long shotNumber;
+
+    @JsonIgnore
     @OneToOne
     private Branch branch;
+
+    @Transient
+    private Integer currentBranch;
 }

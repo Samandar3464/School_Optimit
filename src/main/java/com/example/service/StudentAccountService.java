@@ -2,7 +2,7 @@ package com.example.service;
 
 import com.example.entity.Branch;
 import com.example.entity.Student;
-import com.example.entity.StudentAccount;
+import com.example.entity.StudentBalance;
 import com.example.exception.RecordAlreadyExistException;
 import com.example.exception.RecordNotFoundException;
 import com.example.exception.UserNotFoundException;
@@ -36,51 +36,51 @@ public class StudentAccountService implements BaseService<StudentAccountDto, Int
     @Override
     @ResponseStatus(HttpStatus.CREATED)
     public ApiResponse create(StudentAccountDto dto) {
-        Optional<StudentAccount> byStudentId = repository.findByStudentId(dto.getStudentId());
+        Optional<StudentBalance> byStudentId = repository.findByStudentId(dto.getStudentId());
         if (byStudentId.isPresent()){
             throw  new RecordAlreadyExistException(ACCOUNT_ALREADY_EXIST);
         }
         Student student = studentRepository.findById(dto.getStudentId()).orElseThrow(() -> new UserNotFoundException(STUDENT_NOT_FOUND));
         Branch branch = branchRepository.findById(dto.getBranchId()).orElseThrow(() -> new RecordNotFoundException(BRANCH_NOT_FOUND));
-        StudentAccount studentAccount = StudentAccount.builder()
+        StudentBalance studentBalance = StudentBalance.builder()
                 .balance(dto.getBalance())
                 .createdDate(LocalDateTime.now())
                 .active(true)
                 .branch(branch)
                 .student(student)
                 .build();
-        repository.save(studentAccount);
+        repository.save(studentBalance);
         return new ApiResponse(SUCCESSFULLY, true);
     }
 
     @Override
     @ResponseStatus(HttpStatus.OK)
     public ApiResponse getById(Integer integer) {
-        StudentAccount studentAccount = repository.findById(integer).orElseThrow(() -> new RecordNotFoundException(ACCOUNT_NOT_FOUND));
-        return new ApiResponse(StudentAccountResponse.from(studentAccount), true);
+        StudentBalance studentBalance = repository.findById(integer).orElseThrow(() -> new RecordNotFoundException(ACCOUNT_NOT_FOUND));
+        return new ApiResponse(StudentAccountResponse.from(studentBalance), true);
     }
 
     @Override
     @ResponseStatus(HttpStatus.OK)
     public ApiResponse update(StudentAccountDto dto) {
-        StudentAccount studentAccount = repository.findById(dto.getId()).orElseThrow(() -> new RecordNotFoundException(ACCOUNT_NOT_FOUND));
-        studentAccount.setBalance(studentAccount.getBalance() + dto.getBalance());
-        studentAccount.setUpdatedDate(LocalDateTime.now());
-        repository.save(studentAccount);
+        StudentBalance studentBalance = repository.findById(dto.getId()).orElseThrow(() -> new RecordNotFoundException(ACCOUNT_NOT_FOUND));
+        studentBalance.setBalance(studentBalance.getBalance() + dto.getBalance());
+        studentBalance.setUpdatedDate(LocalDateTime.now());
+        repository.save(studentBalance);
         return new ApiResponse(SUCCESSFULLY, true);
     }
 
     @Override
     @ResponseStatus(HttpStatus.OK)
     public ApiResponse delete(Integer integer) {
-        StudentAccount studentAccount = repository.findById(integer).orElseThrow(() -> new RecordNotFoundException(ACCOUNT_NOT_FOUND));
-        studentAccount.setActive(false);
+        StudentBalance studentBalance = repository.findById(integer).orElseThrow(() -> new RecordNotFoundException(ACCOUNT_NOT_FOUND));
+        studentBalance.setActive(false);
         return new ApiResponse(DELETED, true);
     }
 
     @ResponseStatus(HttpStatus.OK)
     public ApiResponse getByBranchId(Integer integer) {
-        List<StudentAccount> reasonList = repository.findAllByBranchIdAndActiveTrueOrderByCreatedDateAsc(integer);
+        List<StudentBalance> reasonList = repository.findAllByBranchIdAndActiveTrueOrderByCreatedDateAsc(integer);
         List<StudentAccountResponse> reasonResponseList = new ArrayList<>();
         reasonList.forEach(account -> reasonResponseList.add(StudentAccountResponse.from(account)));
         return new ApiResponse(reasonResponseList, true);
@@ -88,7 +88,7 @@ public class StudentAccountService implements BaseService<StudentAccountDto, Int
 
     @ResponseStatus(HttpStatus.OK)
     public ApiResponse getByStudentId(Integer integer) {
-        StudentAccount account = repository.findByStudentIdAndActiveTrue(integer).orElseThrow(() -> new RecordNotFoundException(ACCOUNT_NOT_FOUND));;
+        StudentBalance account = repository.findByStudentIdAndActiveTrue(integer).orElseThrow(() -> new RecordNotFoundException(ACCOUNT_NOT_FOUND));;
         return new ApiResponse(StudentAccountResponse.from(account), true);
     }
 

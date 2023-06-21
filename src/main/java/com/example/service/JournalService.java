@@ -8,7 +8,9 @@ import com.example.model.request.JournalRequestDto;
 import com.example.model.response.JournalResponseDto;
 import com.example.repository.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,6 +28,8 @@ public class JournalService implements BaseService<JournalRequestDto, Integer> {
     private final ScoreRepository scoreRepository;
     private final SubjectRepository subjectRepository;
 
+
+    @ResponseStatus(HttpStatus.CREATED)
     @Override
     public ApiResponse create(JournalRequestDto dto) {
         if (journalRepository.existsByStudentClassIdAndActiveTrue(dto.getStudentClassId())) {
@@ -46,7 +50,7 @@ public class JournalService implements BaseService<JournalRequestDto, Integer> {
         journalRepository.save(journal);
         return new ApiResponse(SUCCESSFULLY, true);
     }
-
+    @ResponseStatus(HttpStatus.OK)
     @Override
     public ApiResponse getById(Integer integer) {
         Journal journal = journalRepository.findById(integer).orElseThrow(() -> new RecordNotFoundException(JOURNAL_NOT_FOUND));
@@ -59,13 +63,13 @@ public class JournalService implements BaseService<JournalRequestDto, Integer> {
                 .build();
         return new ApiResponse(journalResponseDto, true);
     }
-
+    @ResponseStatus(HttpStatus.OK)
     public ApiResponse getAllByIdBranchId(Integer integer) {
         List<Journal> journalList = journalRepository.findAllByBranchIdAndActiveTrue(integer);
         return new ApiResponse(journalList, true);
     }
 
-
+    @ResponseStatus(HttpStatus.OK)
     @Override
     public ApiResponse update(JournalRequestDto dto) {
         if (journalRepository.existsByStudentClassIdAndActiveTrue(dto.getStudentClassId())) {
@@ -80,7 +84,7 @@ public class JournalService implements BaseService<JournalRequestDto, Integer> {
         journalRepository.save(journal);
         return new ApiResponse(SUCCESSFULLY, true);
     }
-
+    @ResponseStatus(HttpStatus.OK)
     @Override
     public ApiResponse delete(Integer integer) {
         Journal journal = journalRepository.findById(integer).orElseThrow(() -> new RecordNotFoundException(JOURNAL_NOT_FOUND));

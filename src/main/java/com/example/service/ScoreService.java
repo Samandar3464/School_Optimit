@@ -35,7 +35,7 @@ public class ScoreService implements BaseService<ScoreRequestDto, UUID> {
     private final SubjectRepository subjectRepository;
     private final JournalRepository journalRepository;
 
-
+    @ResponseStatus(HttpStatus.CREATED)
     @Override
     public ApiResponse create(ScoreRequestDto dto) {
         Student student = studentRepository.findById(dto.getStudentId())
@@ -58,11 +58,14 @@ public class ScoreService implements BaseService<ScoreRequestDto, UUID> {
         return new ApiResponse(SUCCESSFULLY, true);
     }
 
+    @ResponseStatus(HttpStatus.OK)
     @Override
     public ApiResponse getById(UUID uuid) {
         return null;
     }
 
+
+    @ResponseStatus(HttpStatus.OK)
     @Override
     public ApiResponse update(ScoreRequestDto dto) {
         Score score = scoreRepository.findById(dto.getId())
@@ -72,6 +75,8 @@ public class ScoreService implements BaseService<ScoreRequestDto, UUID> {
         return new ApiResponse(SUCCESSFULLY, true);
     }
 
+
+    @ResponseStatus(HttpStatus.OK)
     @Override
     public ApiResponse delete(UUID id) {
         scoreRepository.findById(id)

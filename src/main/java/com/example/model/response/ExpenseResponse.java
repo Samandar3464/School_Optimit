@@ -26,6 +26,8 @@ public class ExpenseResponse {
 
     private String takerName;
 
+    private String paymentType;
+
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     private LocalDateTime createdTime;
 
@@ -37,6 +39,7 @@ public class ExpenseResponse {
                 .takerId(expense.getTaker().getId())
                 .takerName(expense.getTaker().getFullName())
                 .createdTime(expense.getCreatedTime())
+                .paymentType(expense.getPaymentType().getName())
                 .build();
     }
 }

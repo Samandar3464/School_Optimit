@@ -7,10 +7,7 @@ import com.example.kitchen.entity.Measurement;
 import com.example.kitchen.entity.Product;
 import com.example.kitchen.repository.MeasurementRepository;
 import com.example.kitchen.repository.ProductRepository;
-import com.example.repository.BranchRepository;
-import com.example.repository.BusinessRepository;
-import com.example.repository.RoleRepository;
-import com.example.repository.UserRepository;
+import com.example.repository.*;
 import com.example.service.PermissionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -35,7 +32,7 @@ public class DataLoader implements CommandLineRunner {
     private final BranchRepository branchRepository;
     private final MeasurementRepository measurementRepository;
     private final ProductRepository productRepository;
-
+    private final PaymentTypeRepository paymentTypeRepository;
     @Value("${spring.sql.init.mode}")
     private String initMode;
 
@@ -49,11 +46,11 @@ public class DataLoader implements CommandLineRunner {
         }
 
         if (initMode.equals("always")) {
-              Role supper_admin = new Role(1, "SUPER_ADMIN");
+            Role supper_admin = new Role(1, "SUPER_ADMIN");
             supper_admin.setPermissions(permissionService.getAll());
             Role role = new Role();
             if (roleRepository.findByName("SUPER_ADMIN").isEmpty()) {
-                 role = roleRepository.save(supper_admin);
+                role = roleRepository.save(supper_admin);
             }
             User admin = User.builder()
                     .fullName("ADMIN")
@@ -67,7 +64,7 @@ public class DataLoader implements CommandLineRunner {
                     .roles(List.of(role))
                     .build();
             Optional<User> phoneNumber = userRepository.findByPhoneNumber("907403767");
-            if (phoneNumber.isEmpty()){
+            if (phoneNumber.isEmpty()) {
                 userRepository.save(admin);
             }
             Business business = Business.builder()
@@ -118,6 +115,18 @@ public class DataLoader implements CommandLineRunner {
                     .active(true)
                     .build();
             productRepository.save(product1);
+
+            PaymentType xisobdanXisobga = PaymentType.builder().name("Xisobdan xisobga").build();
+            PaymentType karta = PaymentType.builder().name("Karta orqali").build();
+            PaymentType elektron = PaymentType.builder().name("Elektron to'lov").build();
+            PaymentType naqt = PaymentType.builder().name("Naqt").build();
+
+            paymentTypeRepository.saveAll(List.of(karta, elektron, xisobdanXisobga, naqt));
+
+
+
         }
+
+
     }
 }
