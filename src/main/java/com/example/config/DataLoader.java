@@ -119,7 +119,5 @@ public class DataLoader implements CommandLineRunner {
                     .build();
             productRepository.save(product1);
         }
-
-
     }
 }

@@ -3,7 +3,9 @@ package com.example.service;
 import com.example.config.jwtConfig.JwtGenerate;
 import com.example.entity.Attachment;
 import com.example.entity.User;
+import com.example.enums.Constants;
 import com.example.exception.RecordAlreadyExistException;
+import com.example.exception.RecordNotFoundException;
 import com.example.exception.UserNotFoundException;
 import com.example.model.common.ApiResponse;
 import com.example.model.request.*;
@@ -273,9 +275,13 @@ public class UserService implements BaseService<UserRegisterDto, Integer> {
     }
 
 
-    public LocalDate toLocalDate(String birthDate) {
-        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        return LocalDate.parse(birthDate, dateTimeFormatter);
+    private LocalDate toLocalDate(String date) {
+        try {
+            DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            return LocalDate.parse(date, dateTimeFormatter);
+        } catch (Exception e) {
+            throw new RecordNotFoundException(Constants.DATE_DO_NOT_MATCH + "  " + e);
+        }
     }
 
 
