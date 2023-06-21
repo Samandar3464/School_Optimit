@@ -27,6 +27,9 @@ public class Expense {
     @OneToOne
     private User taker;
 
+    @OneToOne
+    private PaymentType paymentType;
+
     @JsonIgnore
     @OneToOne
     private Branch branch;
