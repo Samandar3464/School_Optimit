@@ -34,13 +34,13 @@ public class OverallReportService implements BaseService<OverallReportRequest, I
     @Override
     public ApiResponse getById(Integer integer) {
         OverallReport overallReport = checkById(integer);
-        OverallReportResponse overallReportResponse = toOverallResponse(overallReport);
+        OverallReportResponse overallReportResponse = OverallReportResponse.toOverallResponse(overallReport);
         return new ApiResponse(Constants.SUCCESSFULLY, true, overallReportResponse);
     }
 
     public ApiResponse getByIdAndMonth(Integer integer, Months months) {
         OverallReport overallReport = overallReportRepository.findByIdAndMonth(integer, months);
-        OverallReportResponse overallReportResponse = toOverallResponse(overallReport);
+        OverallReportResponse overallReportResponse = OverallReportResponse.toOverallResponse(overallReport);
         return new ApiResponse(Constants.SUCCESSFULLY, true, overallReportResponse);
     }
 
@@ -50,14 +50,14 @@ public class OverallReportService implements BaseService<OverallReportRequest, I
         User user = userService.checkUserExistById(overallReportRequest.getUserId());
         OverallReport overallReport = getOverallReport(user);
         overallReportRepository.save(overallReport);
-        return new ApiResponse(Constants.SUCCESSFULLY, true, toOverallResponse(overallReport));
+        return new ApiResponse(Constants.SUCCESSFULLY, true, OverallReportResponse.toOverallResponse(overallReport));
     }
 
     @Override
     public ApiResponse delete(Integer integer) {
         OverallReport overallReport = checkById(integer);
         overallReportRepository.deleteById(integer);
-        return new ApiResponse(Constants.DELETED, true, toOverallResponse(overallReport));
+        return new ApiResponse(Constants.DELETED, true, OverallReportResponse.toOverallResponse(overallReport));
     }
 
     private  void setSalary(User user, OverallReport overallReport) {
@@ -83,17 +83,4 @@ public class OverallReportService implements BaseService<OverallReportRequest, I
                 .build();
     }
 
-    private OverallReportResponse toOverallResponse(OverallReport overallReport) {
-        return OverallReportResponse
-                .builder()
-                .id(overallReport.getId())
-                .classLeadership(overallReport.getClassLeadership())
-                .month(overallReport.getMonth())
-                .branch(overallReport.getBranch())
-                .teachingHours(overallReport.getTeachingHours())
-                .position(overallReport.getPosition())
-                .salary(overallReport.getSalary())
-                .fullName(overallReport.getUser().getFullName())
-                .build();
-    }
 }

@@ -8,7 +8,6 @@ import com.example.enums.Constants;
 import com.example.exception.RecordNotFoundException;
 import com.example.exception.UserNotFoundException;
 import com.example.model.common.ApiResponse;
-import com.example.model.request.SalaryHoursRequest;
 import com.example.model.request.SalaryRequest;
 import com.example.model.response.SalaryResponse;
 import com.example.repository.SalaryRepository;
@@ -37,57 +36,93 @@ public class SalaryService implements BaseService<SalaryRequest, Integer> {
         User user = checkByUserId(salaryRequest);
         Salary salary = Salary.toSalaryCreate(salaryRequest);
         set(salaryRequest, user, salary);
+        salaryRepository.findAllByUserId(user.getId()).forEach(salary1 -> salary.setAmountDebt(salary.getAmountDebt() + salary1.getAmountDebt()));
         salaryRepository.save(salary);
         return new ApiResponse(Constants.SUCCESSFULLY, true);
     }
 
-    public ApiResponse giveCashAdvance(SalaryRequest salaryRequest) {
-        Salary salary = checkById(salaryRequest.getId());
-        salary.setCashAdvance(salary.getCashAdvance() + salaryRequest.getCashAdvance());
-        salary.setGivenSalary(salary.getGivenSalary() + salaryRequest.getCashAdvance());
+    public ApiResponse takeDebitAmount(Integer salaryId, double debitAmount) {
+        Salary salary = checkById(salaryId);
+        salary.setSalary(salary.getSalary() - debitAmount);
+        salary.setAmountDebt(salary.getAmountDebt() - debitAmount);
+        if (salary.getSalary() < 0) {
+            throw new RecordNotFoundException(Constants.SALARY_NOT_ENOUGH);
+        }
         salaryRepository.save(salary);
         return new ApiResponse(Constants.SUCCESSFULLY, true, SalaryResponse.toResponse(salary));
     }
 
-    public ApiResponse givePartlySalary(SalaryRequest salaryRequest) {
-        Salary salary = checkById(salaryRequest.getId());
-        salary.setPartlySalary(salary.getPartlySalary() + salaryRequest.getPartlySalary());
-        salary.setGivenSalary(salary.getGivenSalary() + salaryRequest.getPartlySalary());
+    public ApiResponse giveCashAdvance(Integer salaryId, double cashSalary) {
+        Salary salary = checkById(salaryId);
+        salary.setCashAdvance(salary.getCashAdvance() + cashSalary);
+        salary.setGivenSalary(salary.getGivenSalary() + cashSalary);
+        return getApiResponse(cashSalary, salary);
+    }
+
+    private ApiResponse getApiResponse(double cashSalary, Salary salary) {
+        double v = salary.getSalary() - cashSalary;
+        if (v >= 0) {
+            salary.setSalary(v);
+        } else {
+            return new ApiResponse(Constants.SALARY_NOT_ENOUGH, true, SalaryResponse.toResponse(salary));
+        }
         salaryRepository.save(salary);
         return new ApiResponse(Constants.SUCCESSFULLY, true, SalaryResponse.toResponse(salary));
     }
 
-    public ApiResponse currentMonthSalary(String fromDate, String toDate, Integer id) {
+    public ApiResponse givePartlySalary(Integer salaryId, double partlySalary) {
+        Salary salary = checkById(salaryId);
+        salary.setPartlySalary(salary.getPartlySalary() + partlySalary);
+        salary.setGivenSalary(salary.getGivenSalary() + partlySalary);
+        return getApiResponse(partlySalary, salary);
+    }
+
+    public ApiResponse getCurrentMonthFixSalary(String fromDate, String toDate, Integer id) {
         Salary salary = checkById(id);
         double monthlyAmount = getMonthlyAmount(fromDate, toDate, salary, salary.getUser());
         salary.setCurrentMonthSalary(monthlyAmount);
+        setOylik(salary);
         salaryRepository.save(salary);
         return new ApiResponse(Constants.SUCCESSFULLY, true, SalaryResponse.toResponse(salary));
     }
 
-    public ApiResponse getTeachingHoursSalary(SalaryHoursRequest salaryHoursRequest) {
+    public ApiResponse getCurrentMonthTeachingHoursSalary(Integer salaryId) {
+        Salary salary = checkById(salaryId);
         double overall = 0;
-        Salary salary = checkById(salaryHoursRequest.getId());
-        List<TeachingHours> all = teachingHoursRepository.findAllByTeacherId(salaryHoursRequest.getUserId());
+        overall = getOverall(salary, overall);
+        salary.setCurrentMonthSalary(overall + salary.getClassLeaderSalary());
+        setOylik(salary);
+        salaryRepository.save(salary);
+        return new ApiResponse(Constants.SUCCESSFULLY, true, SalaryResponse.toResponse(salary));
+    }
+
+    private double getOverall(Salary salary, double overall) {
+        List<TeachingHours> all = teachingHoursRepository.findAllByTeacherId(salary.getUser().getId());
         for (TeachingHours teachingHours : all) {
             overall += teachingHours.getTypeOfWork().getPrice() * teachingHours.getLessonHours();
         }
-        salary.setCurrentMonthSalary(salary.getCurrentMonthSalary() + overall);
-        double oylik = overall - salary.getGivenSalary();
-        salary.setSalary(oylik);
+        return overall;
+    }
+
+    public ApiResponse giveSalary(Integer salaryId, double salaryAmount) {
+        Salary salary = checkById(salaryId);
+        if (salary.getSalary() == salaryAmount) {
+            salary.setGivenSalary(salary.getGivenSalary() + salaryAmount);
+            salary.setSalary(0);
+            salary.setActive(false);
+        } else {
+            throw new RecordNotFoundException(Constants.SALARY_NOT_CORRECT);
+        }
         salaryRepository.save(salary);
         return new ApiResponse(Constants.SUCCESSFULLY, true, SalaryResponse.toResponse(salary));
     }
 
-    public ApiResponse giveSalary(SalaryRequest salaryRequest) {
-        Salary salary = checkById(salaryRequest.getId());
-        double qolgan = salary.getCurrentMonthSalary() - salary.getGivenSalary();
-        qolgan = Math.round(qolgan * 100) / 100D;
-        set(salary, qolgan);
-        salaryRepository.save(salary);
-        return new ApiResponse(Constants.SUCCESSFULLY, true, qolgan);
+    public ApiResponse currentMonthSalaryAmount(Integer salaryId) {
+        Salary salary = checkById(salaryId);
+        double salaryAmountBeGiven = salary.getCurrentMonthSalary() - salary.getGivenSalary();
+        salaryAmountBeGiven = Math.round((salaryAmountBeGiven * 100) / 100D);
+        return new ApiResponse(Constants.SUCCESSFULLY, true, salaryAmountBeGiven);
     }
-
 
     @Override
     public ApiResponse getById(Integer integer) {
@@ -129,11 +164,13 @@ public class SalaryService implements BaseService<SalaryRequest, Integer> {
         }
     }
 
-    private void set(Salary salary, double qolgan) {
-        if (qolgan >= 0) {
-            salary.setGivenSalary(salary.getGivenSalary() + qolgan);
+    private static void setOylik(Salary salary) {
+        double oylik = Math.round((salary.getCurrentMonthSalary() - salary.getGivenSalary()) * 100) / 100D;
+        if (oylik >= 0) {
+            salary.setSalary(oylik);
         } else {
-            salary.setAmountDebt(Math.abs(qolgan));
+            salary.setAmountDebt(oylik);
+            salary.setActive(false);
         }
     }
 
@@ -143,22 +180,6 @@ public class SalaryService implements BaseService<SalaryRequest, Integer> {
         }
         return monthlyAmount;
     }
-
-//    private Salary getSalaryIfValidForPartly(SalaryRequest salaryRequest) {
-//        Salary salary = getSalaryByIdAndMonth(salaryRequest);
-//        if (salary.getRemainingSalary() < salaryRequest.getPartlySalary()) {
-//            throw new RecordNotFoundException(Constants.SALARY_NOT_ENOUGH);
-//        }
-//        return salary;
-//    }
-//
-//    private Salary getSalaryIfValidForCashAdvance(SalaryRequest salaryRequest) {
-//        Salary salary = getSalaryByIdAndMonth(salaryRequest);
-//        if (salary.getRemainingSalary() < salaryRequest.getCashAdvance()) {
-//            throw new RecordNotFoundException(Constants.SALARY_NOT_ENOUGH);
-//        }
-//        return salary;
-//    }
 
     private LocalDate toLocalDate(String date) {
         try {
@@ -171,10 +192,6 @@ public class SalaryService implements BaseService<SalaryRequest, Integer> {
 
     private Salary checkById(Integer integer) {
         return salaryRepository.findById(integer).orElseThrow(() -> new RecordNotFoundException(Constants.SALARY_NOT_FOUND));
-    }
-
-    private Salary getSalaryByIdAndMonth(SalaryRequest salaryRequest) {
-        return salaryRepository.findByIdAndMonthAndActiveTrue(salaryRequest.getId(), salaryRequest.getMonth()).orElseThrow(() -> new RecordNotFoundException(Constants.SALARY_NOT_FOUND));
     }
 
     private User checkByUserId(SalaryRequest salaryRequest) {
