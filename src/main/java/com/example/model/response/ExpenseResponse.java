@@ -1,6 +1,6 @@
 package com.example.model.response;
 
-import com.example.entity.Expense;
+import com.example.entity.AdditionalExpense;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import lombok.*;
@@ -31,15 +31,15 @@ public class ExpenseResponse {
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     private LocalDateTime createdTime;
 
-    public static ExpenseResponse from(Expense expense) {
+    public static ExpenseResponse from(AdditionalExpense additionalExpense) {
         return ExpenseResponse.builder()
-                .id(expense.getId())
-                .summa(expense.getSumma())
-                .reason(expense.getReason())
-                .takerId(expense.getTaker().getId())
-                .takerName(expense.getTaker().getFullName())
-                .createdTime(expense.getCreatedTime())
-                .paymentType(expense.getPaymentType().getName())
+                .id(additionalExpense.getId())
+                .summa(additionalExpense.getSumma())
+                .reason(additionalExpense.getReason())
+                .takerId(additionalExpense.getTaker().getId())
+                .takerName(additionalExpense.getTaker().getFullName())
+                .createdTime(additionalExpense.getCreatedTime())
+                .paymentType(additionalExpense.getPaymentType().getName())
                 .build();
     }
 }

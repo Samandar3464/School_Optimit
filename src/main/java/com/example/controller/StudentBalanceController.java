@@ -2,43 +2,43 @@ package com.example.controller;
 
 import com.example.model.common.ApiResponse;
 import com.example.model.request.StudentAccountDto;
-import com.example.service.StudentAccountService;
+import com.example.service.StudentBalanceService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/account")
 @RequiredArgsConstructor
-public class StudentAccountController {
+public class StudentBalanceController {
 
-    private final StudentAccountService studentAccountService;
+    private final StudentBalanceService studentBalanceService;
 
     @PostMapping("/create")
     public ApiResponse create(@RequestBody StudentAccountDto studentAccount) {
-        return studentAccountService.create(studentAccount);
+        return studentBalanceService.create(studentAccount);
     }
     @GetMapping("/getById/{id}")
     public ApiResponse getById(@PathVariable Integer id) {
-        return studentAccountService.getById(id);
+        return studentBalanceService.getById(id);
     }
 
     @PutMapping("/update")
     public ApiResponse update(@RequestBody StudentAccountDto studentAccount) {
-        return studentAccountService.update(studentAccount);
+        return studentBalanceService.update(studentAccount);
     }
 
     @DeleteMapping("/delete/{id}")
     public ApiResponse delete(@PathVariable Integer id) {
-        return studentAccountService.delete(id);
+        return studentBalanceService.delete(id);
     }
 
     @GetMapping("/getByBranchId/{id}")
     public ApiResponse getByBranchId(@PathVariable Integer id) {
-        return studentAccountService.getByBranchId(id);
+        return studentBalanceService.getByBranchId(id);
     }
 
     @GetMapping("/getByStudentId/{id}")
     public ApiResponse getByStudentId(@PathVariable Integer id) {
-        return studentAccountService.getByStudentId(id);
+        return studentBalanceService.getByStudentId(id);
     }
 }

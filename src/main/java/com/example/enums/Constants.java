@@ -86,7 +86,7 @@ public class Constants {
 
     public static final String CAN_BE_ADDED_ONCE_A_DAY = "can be added once a day";
     public static final String REASON_NOT_FOUND = "REASON NOT FOUND";
-    public static final String ACCOUNT_NOT_FOUND = "ACCOUNT NOT FOUND";
+    public static final String STUDENT_BALANCE_NOT_FOUND = "ACCOUNT NOT FOUND";
     public static final String ACCOUNT_ALREADY_EXIST = "ACCOUNT ALREADY EXIST";
     public static final String MEASUREMENT_NOT_FOUND = "MEASUREMENT NOT FOUND";
     public static final String MEASUREMENT_ALREADY_EXIST = "MEASUREMENT ALREADY EXIST";
@@ -105,4 +105,5 @@ public class Constants {
     public static final String BALANCE_NOT_ENOUGH_SUMMA = "BALANCE NOT ENOUGH SUMMA";
     public static final String MEAL_SCHEDULE_NOT_FOUND = "MEAL SCHEDULE NOT FOUND";
     public static final String PRODUCT_NOT_ENOUGH_QUANTITY = "PRODUCT NOT ENOUGH QUANTITY";
+    public static final String RETURN_MONEY_FOR_MEAL = "RETURN MONEY FOR MEAL";
 }
