@@ -19,4 +19,7 @@ public interface ScoreRepository extends JpaRepository<Score, UUID> {
     List<Score> findAllByStudentIdAndCreatedDateBetween(Integer studentId, LocalDateTime createdDate, LocalDateTime createdDate2);
 
     Page<Score> findAllByJournalIdAndSubjectIdAndStudentId(Integer journalId, Integer subjectId, Integer studentId, Pageable pageable);
+
+    List<Score> findAllByCreatedDateBetween(LocalDateTime createdDate, LocalDateTime createdDate2);
+
 }

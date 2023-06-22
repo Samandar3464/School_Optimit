@@ -1,5 +1,6 @@
 package com.example.entity;
 
+import com.example.model.request.ReasonRequestDto;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.OnDelete;
@@ -43,4 +44,18 @@ public class Reason {
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Branch branch;
+
+    public static Reason from(ReasonRequestDto dto, Branch branch, Student student, Attachment attachment){
+      return Reason.builder()
+                .branch(branch)
+                .student(student)
+                .image(attachment)
+                .reason(dto.getReason())
+                .days(dto.getDays())
+                .startDate(dto.getStartDate())
+                .endDate(dto.getEndDate())
+                .createDate(LocalDateTime.now())
+                .active(true)
+                .build();
+    }
 }

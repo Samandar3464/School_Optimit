@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 import java.util.Optional;
 
-public interface StudentAccountRepository extends JpaRepository<StudentBalance, Integer> {
+public interface StudentBalanceRepository extends JpaRepository<StudentBalance, Integer> {
 
 
     Optional<StudentBalance> findByStudentIdAndActiveTrue(Integer integer);

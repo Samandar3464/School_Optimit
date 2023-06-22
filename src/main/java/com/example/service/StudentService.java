@@ -46,7 +46,7 @@ public class StudentService implements BaseService<StudentDto, Integer> {
         }
         Branch branch = branchRepository.findById(studentDto.getBranchId()).orElseThrow(() -> new RecordNotFoundException(BRANCH_NOT_FOUND));
         Student save = studentRepository.save(from(studentDto, branch));
-        return new ApiResponse(StudentResponse.from(save), true);
+        return new ApiResponse(from(save), true);
     }
 
     @Override
@@ -127,6 +127,7 @@ public class StudentService implements BaseService<StudentDto, Integer> {
         student.getDocPhoto().forEach(obj -> docPhotoList.add(attachmentService.getUrl(obj)));
         from.setPhoto(attachmentService.getUrl(student.getPhoto()));
         from.setReference(attachmentService.getUrl(student.getReference()));
+        from.setMedDocPhoto(attachmentService.getUrl(student.getMedDocPhoto()));
         from.setDocPhoto(docPhotoList);
         return from;
     }

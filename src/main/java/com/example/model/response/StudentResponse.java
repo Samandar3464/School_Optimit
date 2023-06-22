@@ -54,7 +54,7 @@ public class StudentResponse {
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     private LocalDateTime addedTime;
 
-//    private Attachment medDocPhoto;
+    private String medDocPhoto;
 
     public static StudentResponse from(Student student){
         return StudentResponse.builder()

@@ -20,12 +20,12 @@ import static com.example.enums.Constants.*;
 
 @Service
 @RequiredArgsConstructor
-public class ExpenseService implements BaseService<ExpenseRequestDto, Integer> {
+public class ExpenseForStudentService implements BaseService<ExpenseRequestDto, Integer> {
 
     private final BalanceRepository balanceRepository;
-    private final UserRepository userRepository;
+    private final StudentRepository studentRepository;
     private final BranchRepository branchRepository;
-    private final ExpenseRepository expenseRepository;
+    private final ExpenseForStudentRepository expenseForStudentRepository;
     private final PaymentTypeRepository paymentTypeRepository;
 
 
@@ -36,7 +36,7 @@ public class ExpenseService implements BaseService<ExpenseRequestDto, Integer> {
                 .orElseThrow(() -> new RecordNotFoundException(BRANCH_NOT_FOUND));
         Balance balance = balanceRepository.findByBranchId(dto.getBranchId())
                 .orElseThrow(() -> new RecordNotFoundException(BALANCE_NOT_FOUND));
-        User user = userRepository.findById(dto.getTakerId())
+        Student student = studentRepository.findById(dto.getTakerId())
                 .orElseThrow(() -> new UserNotFoundException(USER_NOT_FOUND));
         PaymentType paymentType = paymentTypeRepository.findById(dto.getPaymentTypeId())
                 .orElseThrow(() -> new UserNotFoundException(PAYMENT_TYPE_NOT_FOUND));
@@ -44,15 +44,15 @@ public class ExpenseService implements BaseService<ExpenseRequestDto, Integer> {
             throw new RecordNotFoundException(BALANCE_NOT_ENOUGH_SUMMA);
         }
         balance.setBalance(balance.getBalance() - dto.getSumma());
-        Expense expense = Expense.builder()
+        ExpenseForStudent expenseForStudent = ExpenseForStudent.builder()
                 .summa(dto.getSumma())
                 .reason(dto.getReason())
                 .createdTime(LocalDateTime.now())
-                .taker(user)
+                .taker(student)
                 .branch(branch)
                 .paymentType(paymentType)
                 .build();
-        expenseRepository.save(expense);
+        expenseForStudentRepository.save(expenseForStudent);
         balanceRepository.save(balance);
         return new ApiResponse(SUCCESSFULLY, true);
     }
@@ -64,36 +64,36 @@ public class ExpenseService implements BaseService<ExpenseRequestDto, Integer> {
 
     @ResponseStatus(HttpStatus.OK)
     public ApiResponse getAllByBranchId(Integer branchId, LocalDateTime startTime, LocalDateTime endTime) {
-        List<Expense> all = expenseRepository.findAllByBranchIdAndCreatedTimeBetweenOrderByCreatedTimeDesc(branchId, startTime, endTime);
+        List<AdditionalExpense> all = expenseForStudentRepository.findAllByBranchIdAndCreatedTimeBetweenOrderByCreatedTimeDesc(branchId, startTime, endTime);
         List<ExpenseResponse> expenseResponseList = new ArrayList<>();
-        all.forEach(expense -> expenseResponseList.add(ExpenseResponse.from(expense)));
+        all.forEach(additionalExpense -> expenseResponseList.add(ExpenseResponse.from(additionalExpense)));
         return new ApiResponse(expenseResponseList, true);
     }
 
     @Override
     public ApiResponse update(ExpenseRequestDto dto) {
-        Expense expense = expenseRepository.findById(dto.getId()).orElseThrow(() -> new RecordNotFoundException(EXPENSE_NOT_FOUND));
+        ExpenseForStudent expenseForStudent = expenseForStudentRepository.findById(dto.getId()).orElseThrow(() -> new RecordNotFoundException(EXPENSE_NOT_FOUND));
         Balance balance = balanceRepository.findByBranchId(dto.getBranchId())
                 .orElseThrow(() -> new RecordNotFoundException(BALANCE_NOT_FOUND));
-        User user = userRepository.findById(dto.getTakerId())
+        Student student = studentRepository.findById(dto.getTakerId())
                 .orElseThrow(() -> new UserNotFoundException(USER_NOT_FOUND));
-        if (dto.getSumma() > expense.getSumma()) {
-            double v = dto.getSumma() - expense.getSumma();
+        if (dto.getSumma() > expenseForStudent.getSumma()) {
+            double v = dto.getSumma() - expenseForStudent.getSumma();
             if (balance.getBalance() >= v) {
                 balance.setBalance(balance.getBalance() - v);
                 balanceRepository.save(balance);
             } else {
                 throw new RecordNotFoundException(BALANCE_NOT_ENOUGH_SUMMA);
             }
-        } else if (dto.getSumma() < expense.getSumma()) {
-            double v = expense.getSumma() - dto.getSumma();
+        } else if (dto.getSumma() < expenseForStudent.getSumma()) {
+            double v = expenseForStudent.getSumma() - dto.getSumma();
             balance.setBalance(balance.getBalance() + v);
             balanceRepository.save(balance);
         }
-        expense.setTaker(user);
-        expense.setReason(dto.getReason());
-        expense.setSumma(dto.getSumma());
-        expenseRepository.save(expense);
+        expenseForStudent.setTaker(student);
+        expenseForStudent.setReason(dto.getReason());
+        expenseForStudent.setSumma(dto.getSumma());
+        expenseForStudentRepository.save(expenseForStudent);
         return new ApiResponse(SUCCESSFULLY, true);
     }
 
