@@ -1,11 +1,10 @@
 package com.example.model.request;
 
-import com.example.entity.Achievement;
-import com.example.entity.Attachment;
-import com.example.entity.Subject;
+import com.example.entity.*;
 import com.example.enums.Gender;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
+import com.example.enums.Position;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -53,5 +52,11 @@ public class UserRegisterDto {
 
     private List<Integer> dailyLessonsIds;
 
-    private List<Integer> teachingHours;
+    private Position position;
+
+    private String email;
+
+    private boolean married;
+
+    private Integer branchId;
 }

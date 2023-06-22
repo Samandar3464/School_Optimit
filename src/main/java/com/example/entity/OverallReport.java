@@ -35,8 +35,6 @@ public class OverallReport {
     @ManyToOne
     private User user;
 
-    @ManyToMany
-    private List<TeachingHours> teachingHours;
 
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)

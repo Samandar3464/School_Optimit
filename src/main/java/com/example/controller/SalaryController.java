@@ -18,10 +18,11 @@ public class SalaryController {
         return salaryService.create(salaryRequest);
     }
 
-    @GetMapping("giveCashAdvance/{salaryId}/{cashSalary}")
+    @GetMapping("giveCashAdvance/{salaryId}/{cashSalary}/{paymentTypeId}")
     public ApiResponse giveCashAdvance(@PathVariable Integer salaryId,
-                                       @PathVariable double cashSalary) {
-        return salaryService.giveCashAdvance(salaryId, cashSalary);
+                                       @PathVariable double cashSalary,
+                                       @PathVariable Integer paymentTypeId) {
+        return salaryService.giveCashAdvance(salaryId, cashSalary, paymentTypeId);
     }
 
     @GetMapping("takeDebitAmount/{salaryId}/{debitAmount}")
@@ -30,10 +31,11 @@ public class SalaryController {
         return salaryService.takeDebitAmount(salaryId, debitAmount);
     }
 
-    @GetMapping("givePartlySalary/{salaryId}/{partlySalary}")
+    @GetMapping("givePartlySalary/{salaryId}/{partlySalary}/{paymentTypeId}")
     public ApiResponse givePartlySalary(@PathVariable Integer salaryId,
-                                        @PathVariable double partlySalary) {
-        return salaryService.givePartlySalary(salaryId, partlySalary);
+                                        @PathVariable double partlySalary,
+                                        @PathVariable Integer paymentTypeId) {
+        return salaryService.givePartlySalary(salaryId, partlySalary, paymentTypeId);
     }
 
     @GetMapping("getCurrentMonthFixSalary/{fromDate}/{toDate}/{salaryId}")
@@ -49,10 +51,12 @@ public class SalaryController {
         return salaryService.currentMonthSalaryAmount(salaryId);
     }
 
-    @GetMapping("giveSalary/{salaryId}/{salary}")
+    @GetMapping("giveSalary/{salaryId}/{salary},/{withholdingOfDebtIfAny}/{paymentTypeId}")
     public ApiResponse giveSalary(@PathVariable Integer salaryId,
-                                  @PathVariable double salary) {
-        return salaryService.giveSalary(salaryId, salary);
+                                  @PathVariable double salary,
+                                  @PathVariable boolean withholdingOfDebtIfAny,
+                                  @PathVariable Integer paymentTypeId) {
+        return salaryService.giveSalary(salaryId, salary, withholdingOfDebtIfAny, paymentTypeId);
     }
 
     @GetMapping("getCurrentMonthTeachingHoursSalary/{salaryId}")

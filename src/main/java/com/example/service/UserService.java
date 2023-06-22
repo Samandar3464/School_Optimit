@@ -13,6 +13,7 @@ import com.example.model.response.NotificationMessageResponse;
 import com.example.model.response.TokenResponse;
 import com.example.model.response.UserResponseDto;
 import com.example.model.response.UserResponseListForAdmin;
+import com.example.repository.BranchRepository;
 import com.example.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -52,6 +53,7 @@ public class UserService implements BaseService<UserRegisterDto, Integer> {
     private final SmsService service;
     private final FireBaseMessagingService fireBaseMessagingService;
     private final RoleService roleService;
+    private final BranchRepository branchRepository;
 
 
     @ResponseStatus(HttpStatus.CREATED)
@@ -228,6 +230,7 @@ public class UserService implements BaseService<UserRegisterDto, Integer> {
     private User toUser(UserRegisterDto userRegisterDto, int verificationCode) {
         User user = User.from(userRegisterDto);
         user.setVerificationCode(verificationCode);
+        user.setBranch(branchRepository.findById(userRegisterDto.getBranchId()).orElseThrow(()->new RecordNotFoundException(BRANCH_NOT_FOUND)));
         user.setBirthDate(toLocalDate(userRegisterDto.getBirthDate()));
         user.setRoles(roleService.getAllByIds(userRegisterDto.getRolesIds()));
         user.setPassword(passwordEncoder.encode(userRegisterDto.getPassword()));

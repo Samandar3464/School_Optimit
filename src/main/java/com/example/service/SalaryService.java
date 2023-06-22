@@ -1,22 +1,19 @@
 package com.example.service;
 
-import com.example.entity.Salary;
-import com.example.entity.StaffAttendance;
-import com.example.entity.TeachingHours;
-import com.example.entity.User;
+import com.example.entity.*;
 import com.example.enums.Constants;
 import com.example.exception.RecordNotFoundException;
 import com.example.exception.UserNotFoundException;
 import com.example.model.common.ApiResponse;
+import com.example.model.request.ExpenseRequestDto;
 import com.example.model.request.SalaryRequest;
 import com.example.model.response.SalaryResponse;
-import com.example.repository.SalaryRepository;
-import com.example.repository.TeachingHoursRepository;
-import com.example.repository.UserRepository;
+import com.example.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
@@ -28,6 +25,8 @@ public class SalaryService implements BaseService<SalaryRequest, Integer> {
     private final TeachingHoursRepository teachingHoursRepository;
     private final StaffAttendanceService staffAttendanceService;
     private final UserRepository userRepository;
+    private final PaymentTypeRepository paymentTypeRepository;
+    private final ExpenseRepository expenseRepository;
     double workDays = 24;
     double classLeaderSalary = 500_000;
 
@@ -52,11 +51,28 @@ public class SalaryService implements BaseService<SalaryRequest, Integer> {
         return new ApiResponse(Constants.SUCCESSFULLY, true, SalaryResponse.toResponse(salary));
     }
 
-    public ApiResponse giveCashAdvance(Integer salaryId, double cashSalary) {
+    public ApiResponse giveCashAdvance(Integer salaryId, double cashSalary, Integer paymentTypeId) {
+        PaymentType paymentType = getPaymentType(paymentTypeId);
         Salary salary = checkById(salaryId);
         salary.setCashAdvance(salary.getCashAdvance() + cashSalary);
         salary.setGivenSalary(salary.getGivenSalary() + cashSalary);
+        addExpense("for cashSalary to teacher", cashSalary, salary, paymentType);
         return getApiResponse(cashSalary, salary);
+    }
+
+    private PaymentType getPaymentType(Integer paymentTypeId) {
+        return paymentTypeRepository.findById(paymentTypeId).orElseThrow(() -> new RecordNotFoundException(Constants.PAYMENT_TYPE_NOT_FOUND));
+    }
+
+    private void addExpense(String message, double cashSalary, Salary salary, PaymentType paymentType) {
+        Expense expense = new Expense();
+        expense.setSumma(cashSalary);
+        expense.setReason(message);
+        expense.setTaker(salary.getUser());
+        expense.setBranch(salary.getUser().getBranch());
+        expense.setCreatedTime(LocalDateTime.now());
+        expense.setPaymentType(paymentType);
+        expenseRepository.save(expense);
     }
 
     private ApiResponse getApiResponse(double cashSalary, Salary salary) {
@@ -70,10 +86,12 @@ public class SalaryService implements BaseService<SalaryRequest, Integer> {
         return new ApiResponse(Constants.SUCCESSFULLY, true, SalaryResponse.toResponse(salary));
     }
 
-    public ApiResponse givePartlySalary(Integer salaryId, double partlySalary) {
+    public ApiResponse givePartlySalary(Integer salaryId, double partlySalary, Integer paymentTypeId) {
         Salary salary = checkById(salaryId);
+        PaymentType paymentType = getPaymentType(paymentTypeId);
         salary.setPartlySalary(salary.getPartlySalary() + partlySalary);
         salary.setGivenSalary(salary.getGivenSalary() + partlySalary);
+        addExpense("for partlySalary to teacher", partlySalary, salary, paymentType);
         return getApiResponse(partlySalary, salary);
     }
 
@@ -104,10 +122,17 @@ public class SalaryService implements BaseService<SalaryRequest, Integer> {
         return overall;
     }
 
-    public ApiResponse giveSalary(Integer salaryId, double salaryAmount) {
+    public ApiResponse giveSalary(Integer salaryId, double salaryAmount, boolean getDebit, Integer paymentTypeId) {
+        PaymentType paymentType = getPaymentType(paymentTypeId);
         Salary salary = checkById(salaryId);
         if (salary.getSalary() == salaryAmount) {
-            salary.setGivenSalary(salary.getGivenSalary() + salaryAmount);
+            if (getDebit) {
+                double salaryWithoutDebit = salaryAmount - salary.getAmountDebt();
+                takeDebitAmount(salaryId, salary.getAmountDebt());
+                addExpense("for salary to teacher", salaryWithoutDebit, salary,paymentType  );
+                salary.setGivenSalary(salaryWithoutDebit + salary.getGivenSalary());
+            }
+            salary.setGivenSalary(salaryAmount + salary.getGivenSalary());
             salary.setSalary(0);
             salary.setActive(false);
         } else {
