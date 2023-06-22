@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 import static com.example.enums.Constants.*;
 
@@ -45,8 +46,8 @@ public class StudentClassService implements BaseService<StudentClassDto, Integer
     }
 
     private void setUser(StudentClassDto studentClass, StudentClass from) {
-        User user = userRepository.findById(studentClass.getClassLeaderId()).orElseThrow(() -> new UserNotFoundException(USER_NOT_FOUND));
-        from.setClassLeader(user);
+        Optional<User> optional = userRepository.findById(studentClass.getClassLeaderId());
+        optional.ifPresent(from::setClassLeader);
     }
 
 

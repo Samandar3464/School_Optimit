@@ -8,6 +8,7 @@ import jakarta.persistence.Enumerated;
 import lombok.Builder;
 import lombok.Data;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -24,11 +25,11 @@ public class OverallReportResponse {
 
     private String classLeadership;
 
-    private Salary salary;
+    private SalaryResponse salary;
 
     private String fullName;
 
-    private List<TeachingHours> teachingHours;
+    private List<TeachingHoursResponse> teachingHours;
 
     private Branch branch;
 
@@ -40,10 +41,18 @@ public class OverallReportResponse {
                 .classLeadership(overallReport.getClassLeadership())
                 .month(overallReport.getMonth())
                 .branch(overallReport.getBranch())
-                .teachingHours(overallReport.getTeachingHours())
+                .teachingHours(TeachingHoursResponse.toAllResponse(overallReport.getUser().getTeachingHours()))
                 .position(overallReport.getPosition())
-                .salary(overallReport.getSalary())
+                .salary(SalaryResponse.toResponse(overallReport.getSalary()))
                 .fullName(overallReport.getUser().getFullName())
                 .build();
+    }
+
+    public static List<OverallReportResponse> toAllOverallResponse(List<OverallReport> all) {
+        List<OverallReportResponse> overallReportResponses = new ArrayList<>();
+        all.forEach(overallReport -> {
+            overallReportResponses.add(toOverallResponse(overallReport));
+        });
+        return overallReportResponses;
     }
 }
