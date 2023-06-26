@@ -30,6 +30,12 @@ public class OverallReportController {
         return overallReportService.getByIdAndMonth(id,month);
     }
 
+    @GetMapping("/getAll")
+    public ApiResponse getAll(){
+        return overallReportService.getAll();
+    }
+
+
     @GetMapping("/update")
     public ApiResponse update(@RequestBody OverallReportRequest overallReportRequest){
         return overallReportService.update(overallReportRequest);

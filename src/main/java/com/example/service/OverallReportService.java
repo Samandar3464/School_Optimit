@@ -2,6 +2,7 @@ package com.example.service;
 
 import com.example.entity.OverallReport;
 import com.example.entity.Salary;
+import com.example.entity.StudentClass;
 import com.example.entity.User;
 import com.example.enums.Constants;
 import com.example.enums.Months;
@@ -12,6 +13,8 @@ import com.example.model.response.OverallReportResponse;
 import com.example.repository.OverallReportRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 
 @Service
@@ -28,7 +31,7 @@ public class OverallReportService implements BaseService<OverallReportRequest, I
         setSalary(user, overallReport);
         overallReport.setMonth(overallReportRequest.getMonth());
         overallReportRepository.save(overallReport);
-        return new ApiResponse(Constants.SUCCESSFULLY, true);
+        return new ApiResponse(Constants.SUCCESSFULLY, true, OverallReportResponse.toOverallResponse(overallReport));
     }
 
     @Override
@@ -36,6 +39,11 @@ public class OverallReportService implements BaseService<OverallReportRequest, I
         OverallReport overallReport = checkById(integer);
         OverallReportResponse overallReportResponse = OverallReportResponse.toOverallResponse(overallReport);
         return new ApiResponse(Constants.SUCCESSFULLY, true, overallReportResponse);
+    }
+
+    public ApiResponse getAll() {
+        List<OverallReportResponse> allOverallResponse = OverallReportResponse.toAllOverallResponse(overallReportRepository.findAll());
+        return new ApiResponse(Constants.SUCCESSFULLY, true, allOverallResponse);
     }
 
     public ApiResponse getByIdAndMonth(Integer integer, Months months) {
@@ -60,7 +68,7 @@ public class OverallReportService implements BaseService<OverallReportRequest, I
         return new ApiResponse(Constants.DELETED, true, OverallReportResponse.toOverallResponse(overallReport));
     }
 
-    private  void setSalary(User user, OverallReport overallReport) {
+    private void setSalary(User user, OverallReport overallReport) {
         for (Salary salary : user.getSalaries()) {
             if (salary.isActive()) {
                 overallReport.setSalary(salary);
@@ -73,14 +81,20 @@ public class OverallReportService implements BaseService<OverallReportRequest, I
     }
 
     private OverallReport getOverallReport(User user) {
-        return OverallReport
-                .builder()
-                .branch(user.getBranch())
-                .position(user.getPosition())
-                .classLeadership(user.getStudentClass().getClassName())
-                .user(user)
-                .teachingHours(user.getTeachingHours())
-                .build();
+        String name = " ";
+        if (user.getStudentClass() != null) {
+            name = user.getStudentClass().getClassName();
+        }
+        try {
+            return OverallReport
+                    .builder()
+                    .branch(user.getBranch())
+                    .position(user.getPosition())
+                    .classLeadership(name)
+                    .user(user)
+                    .build();
+        } catch (Exception e) {
+            throw new RecordNotFoundException(Constants.SOMETHING_IS_WRONG);
+        }
     }
-
 }

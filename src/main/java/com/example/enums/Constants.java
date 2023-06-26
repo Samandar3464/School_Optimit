@@ -110,4 +110,5 @@ public class Constants {
     public static final String CASH_ADDED_DEBIT_AMOUNT = "MABLAG YETARLIK EMASLIGI TUFAYLIK QARZDORLIK YOZILDI";
     public static final String DAILY_LESSON_ALREADY_EXIST = "DAILY_LESSON_ALREADY_EXIST";
     public static final String DAILY_LESSON_NOT_FOUND = "DAILY_LESSON_NOT_FOUND";
+    public static final String SOMETHING_IS_WRONG = "SOMETHING_IS_WRONG";
 }

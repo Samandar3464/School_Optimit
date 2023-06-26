@@ -142,7 +142,9 @@ public class User implements UserDetails {
                 .inps(userRegisterDto.getInps())
                 .biography(userRegisterDto.getBiography())
                 .registeredDate(LocalDateTime.now())
-                .isBlocked(true)
+                .email(userRegisterDto.getEmail())
+                .position(userRegisterDto.getPosition())
+                .married(userRegisterDto.isMarried())
                 .gender(userRegisterDto.getGender())
                 .isBlocked(true)
                 .build();
