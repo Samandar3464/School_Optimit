@@ -8,6 +8,8 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.*;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -76,6 +78,7 @@ public class User implements UserDetails {
     private StudentClass studentClass;
 
     @ManyToOne
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Branch branch;
 
     @OneToMany(cascade = CascadeType.ALL,mappedBy = "user")
