@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class StudentAccountResponse {
+public class StudentBalanceResponse {
 
     private Integer id;
 
@@ -30,8 +30,8 @@ public class StudentAccountResponse {
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     private LocalDateTime updatedDate;
 
-    public static StudentAccountResponse from(StudentBalance account){
-        return StudentAccountResponse.builder()
+    public static StudentBalanceResponse from(StudentBalance account){
+        return StudentBalanceResponse.builder()
                 .id(account.getId())
                 .balance(account.getBalance())
                 .student(StudentResponseDto.from(account.getStudent()))

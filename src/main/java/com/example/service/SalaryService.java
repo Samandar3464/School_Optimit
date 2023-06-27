@@ -26,7 +26,7 @@ public class SalaryService implements BaseService<SalaryRequest, Integer> {
     private final StaffAttendanceService staffAttendanceService;
     private final UserRepository userRepository;
     private final PaymentTypeRepository paymentTypeRepository;
-    private final ExpenseRepository expenseRepository;
+    private final AdditionalExpenseRepository expenseRepository;
     double workDays = 24;
     double classLeaderSalary = 500_000;
 
@@ -65,7 +65,7 @@ public class SalaryService implements BaseService<SalaryRequest, Integer> {
     }
 
     private void addExpense(String message, double cashSalary, Salary salary, PaymentType paymentType) {
-        Expense expense = new Expense();
+        AdditionalExpense expense = new AdditionalExpense();
         expense.setSumma(cashSalary);
         expense.setReason(message);
         expense.setTaker(salary.getUser());

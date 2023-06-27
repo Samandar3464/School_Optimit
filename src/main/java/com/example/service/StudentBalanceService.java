@@ -9,7 +9,7 @@ import com.example.exception.RecordNotFoundException;
 import com.example.exception.UserNotFoundException;
 import com.example.model.common.ApiResponse;
 import com.example.model.request.StudentAccountDto;
-import com.example.model.response.StudentAccountResponse;
+import com.example.model.response.StudentBalanceResponse;
 import com.example.repository.BalanceRepository;
 import com.example.repository.BranchRepository;
 import com.example.repository.StudentBalanceRepository;
@@ -65,7 +65,7 @@ public class StudentBalanceService implements BaseService<StudentAccountDto, Int
     @ResponseStatus(HttpStatus.OK)
     public ApiResponse getById(Integer integer) {
         StudentBalance studentBalance = studentBalanceRepository.findById(integer).orElseThrow(() -> new RecordNotFoundException(STUDENT_BALANCE_NOT_FOUND));
-        return new ApiResponse(StudentAccountResponse.from(studentBalance), true);
+        return new ApiResponse(StudentBalanceResponse.from(studentBalance), true);
     }
 
     @Override
@@ -92,8 +92,8 @@ public class StudentBalanceService implements BaseService<StudentAccountDto, Int
     @ResponseStatus(HttpStatus.OK)
     public ApiResponse getByBranchId(Integer integer) {
         List<StudentBalance> reasonList = studentBalanceRepository.findAllByBranchIdAndActiveTrueOrderByCreatedDateAsc(integer);
-        List<StudentAccountResponse> reasonResponseList = new ArrayList<>();
-        reasonList.forEach(account -> reasonResponseList.add(StudentAccountResponse.from(account)));
+        List<StudentBalanceResponse> reasonResponseList = new ArrayList<>();
+        reasonList.forEach(account -> reasonResponseList.add(StudentBalanceResponse.from(account)));
         return new ApiResponse(reasonResponseList, true);
     }
 
@@ -101,6 +101,6 @@ public class StudentBalanceService implements BaseService<StudentAccountDto, Int
     public ApiResponse getByStudentId(Integer integer) {
         StudentBalance account = studentBalanceRepository.findByStudentIdAndActiveTrue(integer)
                 .orElseThrow(() -> new RecordNotFoundException(STUDENT_BALANCE_NOT_FOUND));
-        return new ApiResponse(StudentAccountResponse.from(account), true);
+        return new ApiResponse(StudentBalanceResponse.from(account), true);
     }
 }
