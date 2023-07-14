@@ -16,7 +16,6 @@ import java.util.List;
 @Builder
 @Entity
 public class Role {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
