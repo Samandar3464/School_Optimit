@@ -93,8 +93,8 @@ public class User implements UserDetails {
     @OneToMany(cascade = CascadeType.ALL,mappedBy = "employee")
     private List<WorkExperience> workExperiences;
 
-    @ManyToMany(fetch = FetchType.EAGER)
-    private List<Role> roles;
+    @ManyToOne(fetch = FetchType.EAGER)
+    private Role role;
 
     @ManyToMany(cascade = CascadeType.ALL)
     private List<DailyLessons> dailyLessons;
@@ -105,10 +105,7 @@ public class User implements UserDetails {
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         List<SimpleGrantedAuthority> authorityList = new ArrayList<>();
-        for (Role role : roles) {
-            authorityList.add(new SimpleGrantedAuthority("ROLE_" + role.getName()));
-            role.getPermissions().forEach(permission -> authorityList.add(new SimpleGrantedAuthority(permission.getName())));
-        }
+        authorityList.add(new SimpleGrantedAuthority("ROLE_" + role.getName()));
         return authorityList;
     }
 

@@ -50,7 +50,7 @@ public class UserResponseDto {
 
     private List<Subject> subjects;
 
-    private List<Role> roles;
+    private Role role;
 
     private List<SalaryResponse> salaries;
 
@@ -73,7 +73,7 @@ public class UserResponseDto {
                 .inn(user.getInn())
                 .inps(user.getInps())
                 .subjects(user.getSubjects())
-                .roles(user.getRoles())
+                .role(user.getRole())
                 .phoneNumber(user.getPhoneNumber())
                 .birthDate(user.getBirthDate().toString())
                 .gender(user.getGender().toString())

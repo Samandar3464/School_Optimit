@@ -1,19 +1,14 @@
 package com.example.model.request;
 
-import com.example.entity.*;
 import com.example.enums.Gender;
 import com.example.enums.Position;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 @Data
 @AllArgsConstructor
@@ -46,7 +41,7 @@ public class UserRegisterDto {
 
     private MultipartFile profilePhoto;
 
-    private List<Integer> rolesIds;
+    private Integer roleId;
 
     private List<Integer> subjectsIds;
 
