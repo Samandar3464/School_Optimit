@@ -45,6 +45,7 @@ import static com.example.enums.Constants.*;
 @RequiredArgsConstructor
 public class UserService implements BaseService<UserRegisterDto, Integer> {
 
+
     private final UserRepository userRepository;
     private final AttachmentService attachmentService;
     private final SubjectService subjectService;
