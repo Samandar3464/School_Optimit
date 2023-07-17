@@ -2,19 +2,24 @@ package com.example.repository;
 
 
 import com.example.entity.User;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
-import java.util.UUID;
+
 
 public interface UserRepository extends JpaRepository<User, Integer> {
 
 
-    Optional<User> findByPhoneNumber(String phoneNumber);
+    Optional<User> findByPhoneNumberAndDeletedFalse(String phoneNumber);
 
-    Optional<User> findByPhoneNumberAndVerificationCode(String phoneNumber, Integer verificationCode);
+    Optional<User> findByPhoneNumberAndVerificationCodeAndDeletedFalse(String phoneNumber, Integer verificationCode);
 
-    boolean existsByPhoneNumber(String phoneNumber);
+    boolean existsByPhoneNumberAndDeletedFalse(String phoneNumber);
+
+    Page<User> findAllByBranchIdAndDeletedFalse(Integer branchId, Pageable pageable);
+
+    Optional<User> findByIdAndDeletedFalse(Integer id);
+
 }

@@ -42,9 +42,9 @@ public class OverallReportResponse {
                 .month(overallReport.getMonth())
                 .branch(overallReport.getBranch())
                 .teachingHours(TeachingHoursResponse.toAllResponse(overallReport.getUser().getTeachingHours()))
-                .position(overallReport.getPosition())
+//                .position(overallReport.getPosition())
                 .salary(SalaryResponse.toResponse(overallReport.getSalary()))
-                .fullName(overallReport.getUser().getFullName())
+//                .fullName(overallReport.getUser().getFullName())
                 .build();
     }
 

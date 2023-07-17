@@ -34,14 +34,17 @@ public class User implements UserDetails {
     private Integer id;
 
     @NotBlank
-    private String fullName;
+    private String name;
+
+    @NotBlank
+    private String surname;
+
+    @NotBlank
+    private String fatherName;
 
     @NotBlank
     @Size(min = 9, max = 9)
     private String phoneNumber;
-
-    @Enumerated(EnumType.STRING)
-    private Position position;
 
     @NotBlank
     @Size(min = 6)
@@ -54,6 +57,7 @@ public class User implements UserDetails {
 
     private int inps;
 
+    @Column(columnDefinition = "TEXT")
     private String biography;
 
     private boolean married;
@@ -74,33 +78,41 @@ public class User implements UserDetails {
     @OneToOne(cascade = CascadeType.ALL)
     private Attachment profilePhoto;
 
-    @OneToOne(mappedBy = "classLeader")
-    private StudentClass studentClass;
+    @ManyToOne(fetch = FetchType.EAGER)
+    private Role role;
 
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Branch branch;
 
-    @OneToMany(cascade = CascadeType.ALL,mappedBy = "user")
-    private List<Salary> salaries;
+    private boolean deleted;
 
-    @OneToMany(cascade = CascadeType.ALL,mappedBy = "user")
-    private List<Achievement> achievements;
+
+
+
+    @OneToOne(mappedBy = "classLeader")
+    private StudentClass studentClass;
 
     @ManyToMany(fetch = FetchType.EAGER)
     private List<Subject> subjects;
 
-    @OneToMany(cascade = CascadeType.ALL,mappedBy = "employee")
-    private List<WorkExperience> workExperiences;
-
-    @ManyToOne(fetch = FetchType.EAGER)
-    private Role role;
-
     @ManyToMany(cascade = CascadeType.ALL)
     private List<DailyLessons> dailyLessons;
 
-    @OneToMany(cascade = CascadeType.ALL,mappedBy = "teacher")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")
+    private List<Salary> salaries;
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")
+    private List<Achievement> achievements;
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "employee")
+    private List<WorkExperience> workExperiences;
+
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "teacher")
     private List<TeachingHours> teachingHours;
+
+
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -136,17 +148,20 @@ public class User implements UserDetails {
 
     public static User from(UserRegisterDto userRegisterDto) {
         return User.builder()
-                .fullName(userRegisterDto.getFullName())
+                .name(userRegisterDto.getName())
+                .surname(userRegisterDto.getSurname())
+                .fatherName(userRegisterDto.getFatherName())
                 .phoneNumber(userRegisterDto.getPhoneNumber())
-                .inn(userRegisterDto.getInn())
-                .inps(userRegisterDto.getInps())
-                .biography(userRegisterDto.getBiography())
                 .registeredDate(LocalDateTime.now())
-                .email(userRegisterDto.getEmail())
-                .position(userRegisterDto.getPosition())
-                .married(userRegisterDto.isMarried())
                 .gender(userRegisterDto.getGender())
+                .birthDate(userRegisterDto.getBirthDate())
                 .isBlocked(true)
+                .email(userRegisterDto.getEmail() == null ? null : userRegisterDto.getEmail())
+                .inn(userRegisterDto.getInn() == 0 ? 0 : userRegisterDto.getInn())
+                .inps(userRegisterDto.getInps() == 0 ? 0 : userRegisterDto.getInps())
+                .biography(userRegisterDto.getBiography() == null ? null : userRegisterDto.getBiography())
+                .married(userRegisterDto.isMarried())
+                .deleted(false)
                 .build();
     }
 }

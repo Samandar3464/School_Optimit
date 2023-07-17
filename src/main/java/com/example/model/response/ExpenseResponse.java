@@ -37,7 +37,7 @@ public class ExpenseResponse {
                 .summa(additionalExpense.getSumma())
                 .reason(additionalExpense.getReason())
                 .takerId(additionalExpense.getTaker().getId())
-                .takerName(additionalExpense.getTaker().getFullName())
+//                .takerName(additionalExpense.getTaker().getName())
                 .createdTime(additionalExpense.getCreatedTime())
                 .paymentType(additionalExpense.getPaymentType().getName())
                 .build();

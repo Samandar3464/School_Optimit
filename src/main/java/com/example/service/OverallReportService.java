@@ -7,14 +7,18 @@ import com.example.entity.User;
 import com.example.enums.Constants;
 import com.example.enums.Months;
 import com.example.exception.RecordNotFoundException;
+import com.example.exception.UserNotFoundException;
 import com.example.model.common.ApiResponse;
 import com.example.model.request.OverallReportRequest;
 import com.example.model.response.OverallReportResponse;
 import com.example.repository.OverallReportRepository;
+import com.example.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+
+import static com.example.enums.Constants.USER_NOT_FOUND;
 
 
 @Service
@@ -22,11 +26,11 @@ import java.util.List;
 public class OverallReportService implements BaseService<OverallReportRequest, Integer> {
 
     private final OverallReportRepository overallReportRepository;
-    private final UserService userService;
+    private final UserRepository userRepository;
 
     @Override
     public ApiResponse create(OverallReportRequest overallReportRequest) {
-        User user = userService.checkUserExistById(overallReportRequest.getUserId());
+        User user = userRepository.findById(overallReportRequest.getUserId()).orElseThrow(() -> new UserNotFoundException(USER_NOT_FOUND));
         OverallReport overallReport = getOverallReport(user);
         setSalary(user, overallReport);
         overallReport.setMonth(overallReportRequest.getMonth());
@@ -55,7 +59,7 @@ public class OverallReportService implements BaseService<OverallReportRequest, I
     @Override
     public ApiResponse update(OverallReportRequest overallReportRequest) {
         checkById(overallReportRequest.getId());
-        User user = userService.checkUserExistById(overallReportRequest.getUserId());
+        User user = userRepository.findById(overallReportRequest.getUserId()).orElseThrow(() -> new UserNotFoundException(USER_NOT_FOUND));
         OverallReport overallReport = getOverallReport(user);
         overallReportRepository.save(overallReport);
         return new ApiResponse(Constants.SUCCESSFULLY, true, OverallReportResponse.toOverallResponse(overallReport));
@@ -89,7 +93,7 @@ public class OverallReportService implements BaseService<OverallReportRequest, I
             return OverallReport
                     .builder()
                     .branch(user.getBranch())
-                    .position(user.getPosition())
+
                     .classLeadership(name)
                     .user(user)
                     .build();

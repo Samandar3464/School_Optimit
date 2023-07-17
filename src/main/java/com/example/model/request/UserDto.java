@@ -1,8 +1,5 @@
 package com.example.model.request;
 
-import com.example.enums.Gender;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;

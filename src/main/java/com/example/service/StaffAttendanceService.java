@@ -80,7 +80,7 @@ public class StaffAttendanceService implements BaseService<StaffAttendanceReques
                 .cameToWork(staffAttendance.isCameToWork())
                 .date(staffAttendance.getDate().toString())
                 .description(staffAttendance.getDescription())
-                .userResponseDto(UserResponseDto.from(staffAttendance.getUser()))
+//                .userResponseDto(UserResponseDto.from(staffAttendance.getUser()))
                 .build();
     }
 
