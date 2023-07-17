@@ -1,6 +1,5 @@
 package com.example.entity;
 
-import com.example.enums.SalaryType;
 import com.example.model.request.TypeOfWorkRequest;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
