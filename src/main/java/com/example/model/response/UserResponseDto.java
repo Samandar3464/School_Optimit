@@ -80,7 +80,7 @@ public class UserResponseDto {
                 .emailAddress(user.getEmail() == null ? null : user.getEmail())
 
                 .dailyLessons(user.getDailyLessons())
-                .workExperiences(WorkExperienceDto.toAllResponse(user.getWorkExperiences()))
+//                .workExperiences(WorkExperienceDto.toAllResponse(user.getWorkExperiences()))
                 .achievements(AchievementDto.toAllResponse(user.getAchievements()))
                 .teachingHoursResponses(TeachingHoursResponse.toAllResponse(user.getTeachingHours()))
                 .studentClass(StudentClassDto.toResponse(user.getStudentClass()))
