@@ -1,5 +1,6 @@
 package com.example.model.request;
 
+import com.example.enums.Lifetime;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -17,13 +18,11 @@ public class TariffDto {
 
     private int branchAmount;
 
-    private long productAmount;
+    private int productAmount;
 
     private int employeeAmount;
 
-    private long tradeAmount;
-
-    private String lifetime;
+    private Lifetime lifetime;
 
     private int testDay;
 

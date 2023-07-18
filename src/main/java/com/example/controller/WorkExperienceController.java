@@ -32,4 +32,10 @@ public class WorkExperienceController {
     public ApiResponse delete(@PathVariable Integer id) {
         return workExperienceService.delete(id);
     }
+
+    @GetMapping("getAllByUserId/{userId}")
+    public ApiResponse getAllByUserId(@PathVariable Integer userId) {
+        return workExperienceService.getAllByUserId(userId);
+    }
+
 }

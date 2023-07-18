@@ -45,7 +45,9 @@ public class DataLoader implements CommandLineRunner {
             roleRepository.save(supper_admin);
 
             User superAdmin = User.builder()
-                    .fullName("ADMIN")
+                    .name("Super Admin")
+                    .surname("Admin")
+                    .fatherName("Admin")
                     .phoneNumber("906163464")
                     .birthDate(LocalDate.parse("1998-05-13"))
                     .gender(Gender.ERKAK)
@@ -53,6 +55,7 @@ public class DataLoader implements CommandLineRunner {
                     .verificationCode(0)
                     .password(passwordEncoder.encode("111111"))
                     .isBlocked(true)
+                    .deleted(false)
                     .role(supper_admin)
                     .build();
             userRepository.save(superAdmin);

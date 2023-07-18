@@ -18,6 +18,6 @@ public class AuthService implements UserDetailsService {
     private final UserRepository userRepository;
     @Override
     public UserDetails loadUserByUsername(String phoneNumber) throws UsernameNotFoundException {
-        return userRepository.findByPhoneNumber(phoneNumber).orElseThrow(()->new UserNotFoundException(USER_NOT_FOUND));
+        return userRepository.findByPhoneNumberAndDeletedFalse(phoneNumber).orElseThrow(()->new UserNotFoundException(USER_NOT_FOUND));
     }
 }

@@ -6,8 +6,8 @@ public class Constants {
     public static final String NAME_NOT_FOUND = "NAME NOT FOUND";
     public static final String USER_ALREADY_EXIST = "USER ALREADY EXIST";
     public static final String TOKEN_TIME_OUT = "TOKEN TIME OUT";
-    public static final String BLOCKED = "Sizni accountinggiz blocklandi .";
-    public static final String OPEN = "Sizni  accountinggiz blockdan ochildi.";
+    public static final String BLOCKED = "BLOCKED";
+    public static final String OPEN = "OPEN";
 
     public static final String SUCCESSFULLY="SUCCESSFULLY";
 

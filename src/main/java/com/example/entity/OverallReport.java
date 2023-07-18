@@ -21,8 +21,8 @@ public class OverallReport {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Enumerated(EnumType.STRING)
-    private Position position;
+//    @Enumerated(EnumType.STRING)
+//    private Position position;
 
     @Enumerated(EnumType.STRING)
     private Months month;

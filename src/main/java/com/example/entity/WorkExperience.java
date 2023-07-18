@@ -3,6 +3,8 @@ package com.example.entity;
 import com.example.model.request.WorkExperienceDto;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -28,24 +30,17 @@ public class WorkExperience {
     private LocalDate endDate;
 
     @ManyToOne
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private User employee;
 
-    public static WorkExperience toWorkExperience(WorkExperienceDto workExperienceDto) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        LocalDate startDate = null;
-        LocalDate endDate = null;
-    try {
-         startDate = LocalDate.parse(workExperienceDto.getStartDate(), formatter);
-         endDate = LocalDate.parse(workExperienceDto.getEndDate(), formatter);
-    }catch (Exception e){
-        e.printStackTrace();
-    }
+    public static WorkExperience toWorkExperience(WorkExperienceDto workExperienceDto,User user) {
         return WorkExperience
                 .builder()
                 .placeOfWork(workExperienceDto.getPlaceOfWork())
                 .position(workExperienceDto.getPosition())
-                .startDate(startDate)
-                .endDate(endDate)
+                .startDate(workExperienceDto.getStartDate())
+                .endDate(workExperienceDto.getEndDate())
+                .employee(user)
                 .build();
     }
 }

@@ -1,9 +1,6 @@
 package com.example.entity;
 
-import com.example.enums.Constants;
 import com.example.enums.Months;
-import com.example.exception.UserNotFoundException;
-import com.example.model.request.SalaryHoursRequest;
 import com.example.model.request.SalaryRequest;
 import jakarta.persistence.*;
 import lombok.*;
