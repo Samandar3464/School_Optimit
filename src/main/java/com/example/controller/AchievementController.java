@@ -8,13 +8,13 @@ import org.springframework.web.bind.annotation.*;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/v1/achievement")
+@RequestMapping("/api/v1/achievement/")
 public class AchievementController {
 
     private final AchievementService achievementService;
 
     @PostMapping("save")
-    public ApiResponse save(@RequestBody AchievementDto achievementDto) {
+    public ApiResponse save(@ModelAttribute AchievementDto achievementDto) {
         return achievementService.create(achievementDto);
     }
 
@@ -25,7 +25,7 @@ public class AchievementController {
 
 
     @PutMapping("update")
-    public ApiResponse update(@RequestBody AchievementDto achievementDto) {
+    public ApiResponse update(@ModelAttribute AchievementDto achievementDto) {
         return achievementService.update(achievementDto);
     }
 
@@ -33,5 +33,11 @@ public class AchievementController {
     public ApiResponse delete(@PathVariable Integer id) {
         return achievementService.delete(id);
     }
+
+    @GetMapping("getByUserId/{userId}")
+    public ApiResponse getAllByUserId(@PathVariable Integer userId) {
+        return achievementService.getAllByUserId(userId);
+    }
+
 
 }
