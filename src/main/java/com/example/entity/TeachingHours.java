@@ -1,6 +1,6 @@
 package com.example.entity;
 
-import com.example.enums.Months;
+
 import com.example.model.request.TeachingHoursRequest;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;

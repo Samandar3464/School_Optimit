@@ -51,7 +51,7 @@ public class ReasonService implements BaseService<ReasonRequestDto, Integer> {
         LocalDateTime end = LocalDateTime.of(endDate.getYear(), endDate.getMonth(), endDate.getDayOfMonth(), 23, 59);
         List<Score> all = scoreRepository.findAllByStudentIdAndCreatedDateBetween(student.getId(), start, end);
 
-        all.forEach(score -> score.setScore('s'));
+        all.forEach(score -> score.setScoreOrAttendance('s'));
 
         StudentBalance studentBalance = studentBalanceRepository.findByStudentId(student.getId())
                 .orElseThrow(() -> new RecordNotFoundException(STUDENT_BALANCE_NOT_FOUND));

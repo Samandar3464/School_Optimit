@@ -1,10 +1,12 @@
 package com.example.controller;
 
 import com.example.model.common.ApiResponse;
-import com.example.model.request.StaffAttendanceRequest;
+import com.example.model.request.StaffAttendanceDto;
 import com.example.service.StaffAttendanceService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDateTime;
 
 @RestController
 @RequiredArgsConstructor
@@ -12,28 +14,40 @@ import org.springframework.web.bind.annotation.*;
 public class StaffAttendanceController {
 
     private final StaffAttendanceService service;
+
     @PostMapping("save")
-    public ApiResponse save(@RequestBody StaffAttendanceRequest staffAttendanceRequest){
-        return service.create(staffAttendanceRequest);
+    public ApiResponse save(@RequestBody StaffAttendanceDto staffAttendanceDto) {
+        return service.create(staffAttendanceDto);
     }
 
     @GetMapping("getById/{id}")
-    public ApiResponse getById(@PathVariable Integer id){
+    public ApiResponse getById(@PathVariable Integer id) {
         return service.getById(id);
     }
 
-    @GetMapping("getAll")
-    public ApiResponse getAll(){
-        return service.getAll();
+    @GetMapping("getAllByBranchId")
+    public ApiResponse getAllByBranchId(
+            @RequestParam("brachId") Integer branchId,
+            @RequestParam("startDate") LocalDateTime startDate,
+            @RequestParam("endDate") LocalDateTime endDate) {
+        return service.getAllBranchId(branchId, startDate, endDate);
+    }
+
+    @GetMapping("getAllByUserId")
+    public ApiResponse getAllByUserId(
+            @RequestParam("userId") Integer userId,
+            @RequestParam("startDate") LocalDateTime startDate,
+            @RequestParam("endDate") LocalDateTime endDate) {
+        return service.getAllByUserId(userId, startDate, endDate);
     }
 
     @PutMapping("update")
-    public ApiResponse update(@RequestBody StaffAttendanceRequest staffAttendanceRequest){
-        return service.update(staffAttendanceRequest);
+    public ApiResponse update(@RequestBody StaffAttendanceDto staffAttendanceDto) {
+        return service.update(staffAttendanceDto);
     }
 
     @GetMapping("delete/{id}")
-    public ApiResponse delete(@PathVariable Integer id){
+    public ApiResponse delete(@PathVariable Integer id) {
         return service.delete(id);
     }
 }

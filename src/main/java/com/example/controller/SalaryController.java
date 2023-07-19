@@ -38,12 +38,12 @@ public class SalaryController {
         return salaryService.givePartlySalary(salaryId, partlySalary, paymentTypeId);
     }
 
-    @GetMapping("getCurrentMonthFixSalary/{fromDate}/{toDate}/{salaryId}")
-    public ApiResponse getCurrentMonthFixSalary(@PathVariable String fromDate,
-                                                @PathVariable String toDate,
-                                                @PathVariable Integer salaryId) {
-        return salaryService.getCurrentMonthFixSalary(fromDate, toDate, salaryId);
-    }
+//    @GetMapping("getCurrentMonthFixSalary/{fromDate}/{toDate}/{salaryId}")
+//    public ApiResponse getCurrentMonthFixSalary(@PathVariable String fromDate,
+//                                                @PathVariable String toDate,
+//                                                @PathVariable Integer salaryId) {
+//        return salaryService.getCurrentMonthFixSalary(fromDate, toDate, salaryId);
+//    }
 
 
     @GetMapping("currentMonthSalaryAmount/{salaryId}")
