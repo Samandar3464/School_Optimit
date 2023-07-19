@@ -12,6 +12,7 @@ public class Constants {
     public static final String SUCCESSFULLY="SUCCESSFULLY";
 
     public static final String DELETED="DELETED";
+    public static final String CAN_NOT_DELETED="CON NOT DELETED";
     public static final String ACTIVATED="ACTIVATED";
     public static final String DEACTIVATED="DEACTIVATED";
     public static final String FILE_NAME_NULL="FILE NAME NULL";
@@ -57,7 +58,7 @@ public class Constants {
     public static final String TOPIC_NOT_FOUND = "TOPIC_NOT_FOUND";
     public static final String TEACHER_ALREADY_EXIST = "TEACHER_ALREADY_EXIST";
     public static final String TEACHER_NOT_FOUND = "TEACHER_NOT_FOUND";
-    public static final String TOPIC_ALREADY_EXIST = "TOPIC_ALREADY_EXIST";
+    public static final String TOPIC_ALREADY_EXIST = "Bu fan ichida huddu shunaqa majzu mavjud.";
 
     public static final String WORK_EXPERIENCE_ALREADY_EXIST = "WORK_EXPERIENCE_ALREADY_EXIST";
     public static final String WORK_EXPERIENCE_NOT_FOUND = "WORK_EXPERIENCE_NOT_FOUND";

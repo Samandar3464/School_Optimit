@@ -195,12 +195,14 @@ public class UserService implements BaseService<UserRegisterDto, Integer> {
         sendSms(number, verificationCodeGenerator());
         return new ApiResponse(SUCCESSFULLY, true);
     }
+//    ko'rib chiqish kk
     public ApiResponse addSubjectToUser(UserRegisterDto userRegisterDto) {
         User user = checkUserExistById(userRegisterDto.getId());
         user.setSubjects(subjectService.checkAllById(userRegisterDto.getSubjectsIds()));
         userRepository.save(user);
         return new ApiResponse(SUCCESSFULLY, true, user.getSubjects());
     }
+    //    ko'rib chiqish kk
 
     public ApiResponse addDailyLessonToUser(UserRegisterDto userRegisterDto) {
         User user = checkUserExistById(userRegisterDto.getId());

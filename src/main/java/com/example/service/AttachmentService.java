@@ -98,6 +98,22 @@ public class AttachmentService {
         }
     }
 
+    public List<String> getUrlList(List<Attachment> attachmentList) {
+        List<String> urlList = new ArrayList<>();
+        if (!attachmentList.isEmpty()) {
+            attachmentList.forEach(attachment ->{
+                if (attachment != null) {
+                    urlList.add(attachUploadFolder + attachment.getPath() + "/" + attachment.getNewName() + "." + attachment.getType());
+                }
+            });
+            return urlList;
+        }else {
+            return null;
+        }
+
+
+    }
+
     // Rasmni byte qilib beradi
     public byte[] open(String fileName) {
         try {
@@ -120,7 +136,7 @@ public class AttachmentService {
 
             Path file = Paths.get(attachUploadFolder + attachment.getPath() + "/" + attachment.getNewName() +"." +attachment.getType());
             Files.delete(file);
-            attachmentRepository.deleteById(attachment.getId());
+//            attachmentRepository.deleteById(attachment.getId());
             return true;
         } catch (IOException e) {
             throw new RecordNotFoundException(FILE_NOT_FOUND);

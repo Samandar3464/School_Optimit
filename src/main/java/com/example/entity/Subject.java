@@ -1,12 +1,8 @@
 package com.example.entity;
 
-import com.example.model.request.SubjectRequest;
+import com.example.model.request.SubjectRequestDto;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
-
-import java.util.List;
 
 @Getter
 @Setter
@@ -24,15 +20,14 @@ public class Subject {
 
     private int level;
 
-    @OneToMany(cascade = CascadeType.ALL)
-    private List<Topic> topicList;
+    private int teachingHours;
 
-
-    public static Subject toSubject(SubjectRequest subjectRequest) {
+    public static Subject from(SubjectRequestDto subjectRequestDto) {
         return Subject
                 .builder()
-                .name(subjectRequest.getName())
-                .level(subjectRequest.getLevel())
+                .name(subjectRequestDto.getName())
+                .level(subjectRequestDto.getLevel())
+                .teachingHours(subjectRequestDto.getTeachingHours())
                 .build();
     }
 }

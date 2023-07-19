@@ -1,8 +1,13 @@
 package com.example.entity;
 
-import com.example.model.request.TopicRequest;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.UUID;
 
 @Getter
 @Setter
@@ -12,15 +17,20 @@ import lombok.*;
 @Entity
 public class Topic {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private UUID id;
 
     private String name;
 
-    public static Topic toTopic(TopicRequest topicRequest) {
-        return Topic
-                .builder()
-                .name(topicRequest.getName())
-                .build();
-    }
+    @OneToMany
+    private List<Attachment> lessonFiles;
+
+    private String useFullLinks;
+
+    private LocalDateTime creationDate;
+
+    @ManyToOne
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    private Subject subject;
+
 }

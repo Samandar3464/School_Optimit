@@ -1,22 +1,28 @@
 package com.example.model.request;
 
-import com.example.entity.Topic;
-import jakarta.persistence.OneToMany;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import org.springframework.web.multipart.MultipartFile;
+
 import java.util.List;
+import java.util.UUID;
 
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class SubjectRequest {
+public class TopicRequestDto {
 
-    private Integer id;
+    private UUID id;
+
     private String name;
-    private int level;
-    private List<TopicRequest> topicList;
+
+    private List<MultipartFile> lessonFiles;
+
+    private List<String> useFullLinks;
+
+    private Integer subjectId;
 }
