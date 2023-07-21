@@ -1,6 +1,8 @@
 package com.example.controller;
 
+import com.example.enums.ExpenseType;
 import com.example.model.common.ApiResponse;
+import com.example.model.request.ExpenseDto;
 import com.example.model.request.ExpenseRequestDto;
 import com.example.service.AdditionalExpenseService;
 import lombok.RequiredArgsConstructor;
@@ -26,11 +28,7 @@ public class AdditionalExpenseController {
     }
 
     @GetMapping("/getAllByBranchId")
-    public ApiResponse getAllByBranchId(
-            @RequestParam(name = "id") Integer id,
-            @RequestParam(name = "startDate") LocalDateTime startDate,
-            @RequestParam(name = "endDate") LocalDateTime endDate
-    ) {
-        return additionalExpenseService.getAllByBranchId(id, startDate, endDate);
+    public ApiResponse getAllByBranchId(@RequestBody ExpenseDto expenseDto) {
+        return additionalExpenseService.getAllByBranchId(expenseDto);
     }
 }

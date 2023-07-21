@@ -1,9 +1,11 @@
 package com.example.service;
 
 import com.example.entity.*;
+import com.example.enums.ExpenseType;
 import com.example.exception.RecordNotFoundException;
 import com.example.exception.UserNotFoundException;
 import com.example.model.common.ApiResponse;
+import com.example.model.request.ExpenseDto;
 import com.example.model.request.ExpenseRequestDto;
 import com.example.model.response.ExpenseResponse;
 import com.example.repository.*;
@@ -50,6 +52,7 @@ public class AdditionalExpenseService implements BaseService<ExpenseRequestDto, 
                 .createdTime(LocalDateTime.now())
                 .taker(user)
                 .branch(branch)
+                .expenseType(dto.getExpenseType())
                 .paymentType(paymentType)
                 .build();
         additionalExpenseRepository.save(additionalExpense);
@@ -63,8 +66,8 @@ public class AdditionalExpenseService implements BaseService<ExpenseRequestDto, 
     }
 
     @ResponseStatus(HttpStatus.OK)
-    public ApiResponse getAllByBranchId(Integer branchId, LocalDateTime startTime, LocalDateTime endTime) {
-        List<AdditionalExpense> all = additionalExpenseRepository.findAllByBranchIdAndCreatedTimeBetweenOrderByCreatedTimeDesc(branchId, startTime, endTime);
+    public ApiResponse getAllByBranchId(ExpenseDto dto) {
+        List<AdditionalExpense> all = additionalExpenseRepository.findAllByBranchIdAndExpenseTypeAndCreatedTimeBetweenOrderByCreatedTimeDesc(dto.getId(), dto.getExpenseType(),dto.getStartDate(), dto.getEndDate());
         List<ExpenseResponse> expenseResponseList = new ArrayList<>();
         all.forEach(additionalExpense -> expenseResponseList.add(ExpenseResponse.from(additionalExpense)));
         return new ApiResponse(expenseResponseList, true);
@@ -90,6 +93,7 @@ public class AdditionalExpenseService implements BaseService<ExpenseRequestDto, 
             balance.setBalance(balance.getBalance() + v);
             balanceRepository.save(balance);
         }
+        additionalExpense.setExpenseType(dto.getExpenseType());
         additionalExpense.setTaker(user);
         additionalExpense.setReason(dto.getReason());
         additionalExpense.setSumma(dto.getSumma());

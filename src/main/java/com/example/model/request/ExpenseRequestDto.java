@@ -1,6 +1,9 @@
 package com.example.model.request;
 
+import com.example.enums.ExpenseType;
 import jakarta.persistence.Column;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import lombok.*;
 
 @Getter
@@ -28,4 +31,6 @@ public class ExpenseRequestDto {
 
     @Column(nullable = false)
     private Integer branchId;
+
+    private ExpenseType expenseType;
 }
