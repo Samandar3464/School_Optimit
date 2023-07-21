@@ -51,7 +51,7 @@ public class UserService implements BaseService<UserRegisterDto, Integer> {
     private final PasswordEncoder passwordEncoder;
     private final BranchRepository branchRepository;
     private final SubjectService subjectService;
-    private final DailyLessonsService dailyLessonsService;
+
 
     @ResponseStatus(HttpStatus.CREATED)
     @Transactional(rollbackFor = {Exception.class})
@@ -202,15 +202,6 @@ public class UserService implements BaseService<UserRegisterDto, Integer> {
         userRepository.save(user);
         return new ApiResponse(SUCCESSFULLY, true, user.getSubjects());
     }
-    //    ko'rib chiqish kk
-
-    public ApiResponse addDailyLessonToUser(UserRegisterDto userRegisterDto) {
-        User user = checkUserExistById(userRegisterDto.getId());
-        user.setDailyLessons(dailyLessonsService.checkAllById(userRegisterDto.getDailyLessonsIds()));
-        userRepository.save(user);
-        return new ApiResponse(SUCCESSFULLY, true, user.getDailyLessons());
-    }
-
 
 
     private Integer verificationCodeGenerator() {

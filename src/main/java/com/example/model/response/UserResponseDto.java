@@ -53,7 +53,7 @@ public class UserResponseDto {
 
     private List<WorkExperienceDto> workExperiences;
 
-    private List<DailyLessons> dailyLessons;
+//    private List<DailyLessons> dailyLessons;
 
     private List<Subject> subjects;
 
@@ -79,7 +79,7 @@ public class UserResponseDto {
                 .biography(user.getBiography() == null ? null : user.getEmail())
                 .emailAddress(user.getEmail() == null ? null : user.getEmail())
 
-                .dailyLessons(user.getDailyLessons())
+//                .dailyLessons(user.getDailyLessons())
 //                .workExperiences(WorkExperienceDto.toAllResponse(user.getWorkExperiences()))
                 .achievements(AchievementDto.toAllResponse(user.getAchievements()))
 //                .teachingHoursResponses(TeachingHoursResponse.toAllResponse(user.getTeachingHours()))

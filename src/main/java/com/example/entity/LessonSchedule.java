@@ -56,6 +56,9 @@ public class LessonSchedule {
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     private LocalDateTime endTime;
 
+    @OneToOne
+    private TypeOfWork typeOfWork;
+
     public static LessonSchedule from(LessonScheduleDto scheduleDto){
         return LessonSchedule.builder()
                 .durationLesson(scheduleDto.getDurationLesson())

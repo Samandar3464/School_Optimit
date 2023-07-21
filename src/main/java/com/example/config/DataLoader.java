@@ -47,6 +47,7 @@ public class DataLoader implements CommandLineRunner {
             Permission p3 = permissionRepository.save(new Permission(3, "read"));
 
             Role supper_admin = Role.builder().id(1).name("SUPER_ADMIN").permissions(List.of(p1, p2, p3)).active(true).build();
+            Role teacher1 = Role.builder().id(1).name("TEACHER").permissions(List.of(p1, p2, p3)).active(true).build();
             roleRepository.save(supper_admin);
 
             User superAdmin = User.builder()
@@ -64,6 +65,31 @@ public class DataLoader implements CommandLineRunner {
                     .role(supper_admin)
                     .build();
             userRepository.save(superAdmin);
+
+            PaymentType xisobdanXisobga = PaymentType.builder().name("Xisobdan xisobga").build();
+            PaymentType karta = PaymentType.builder().name("Karta orqali").build();
+            PaymentType elektron = PaymentType.builder().name("Elektron to'lov").build();
+            PaymentType naqt = PaymentType.builder().name("Naqt").build();
+
+            paymentTypeRepository.saveAll(List.of(karta, elektron, xisobdanXisobga, naqt));
+
+
+            User teacher = User.builder()
+                    .name(" teacher")
+                    .surname("teacher")
+                    .fatherName("teacher")
+                    .phoneNumber("111111111")
+                    .birthDate(LocalDate.parse("1998-05-13"))
+                    .gender(Gender.ERKAK)
+                    .registeredDate(LocalDateTime.now())
+                    .verificationCode(0)
+                    .password(passwordEncoder.encode("111111"))
+                    .isBlocked(true)
+                    .deleted(false)
+                    .role(teacher1)
+                    .build();
+            User savedTeacher = userRepository.save(teacher);
+
 
             Business business = Business.builder()
                     .name("Demo business")
@@ -97,14 +123,6 @@ public class DataLoader implements CommandLineRunner {
             measurementRepository.save(measurement1);
 
 
-            PaymentType xisobdanXisobga = PaymentType.builder().name("Xisobdan xisobga").build();
-            PaymentType karta = PaymentType.builder().name("Karta orqali").build();
-            PaymentType elektron = PaymentType.builder().name("Elektron to'lov").build();
-            PaymentType naqt = PaymentType.builder().name("Naqt").build();
-
-            paymentTypeRepository.saveAll(List.of(karta, elektron, xisobdanXisobga, naqt));
-
-
             RoomType roomType = RoomType.builder()
                     .name("O'quv xona")
                     .active(true)
@@ -129,6 +147,7 @@ public class DataLoader implements CommandLineRunner {
                     .room(room1)
                     .createdDate(LocalDateTime.now())
                     .branch(branch1)
+                    .classLeader(savedTeacher)
                     .build();
 
             studentClassRepository.save(studentClass);

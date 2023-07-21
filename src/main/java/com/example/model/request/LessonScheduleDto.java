@@ -27,6 +27,8 @@ public class LessonScheduleDto {
 
     private Integer roomId;
 
+    private Integer typeOfWorkId;
+
     private int durationLesson;
 
     @JsonSerialize(using = LocalDateTimeSerializer.class)
