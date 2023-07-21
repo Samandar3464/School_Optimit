@@ -4,8 +4,8 @@ import com.example.model.request.TypeOfWorkRequest;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
-
-import java.util.List;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 
 @Getter
@@ -22,17 +22,21 @@ public class TypeOfWork {
 
     private String name;// asosiy | to'garaklar | vazifa darslar
 
-    private double price;
+    private double priceForPerHour;
 
-    @OneToMany(mappedBy = "typeOfWork")
+    private boolean active;
+
+    @ManyToOne
+    @OnDelete(action = OnDeleteAction.CASCADE)
     @JsonIgnore
-    private List<TeachingHours> teachingHoursList;
-
-    public static TypeOfWork toTypeOfWork(TypeOfWorkRequest typeOfWorkRequest) {
+    private Branch branch;
+    public static TypeOfWork toTypeOfWork(TypeOfWorkRequest typeOfWorkRequest,Branch branch) {
         return TypeOfWork
                 .builder()
+                .branch(branch)
                 .name(typeOfWorkRequest.getName())
-                .price(typeOfWorkRequest.getPrice())
+                .priceForPerHour(typeOfWorkRequest.getPriceForPerHour())
+                .active(true)
                 .build();
     }
 }

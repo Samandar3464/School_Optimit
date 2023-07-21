@@ -1,13 +1,18 @@
 package com.example.entity;
 
-import com.example.enums.Months;
-import com.example.model.request.TeachingHoursRequest;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import java.time.LocalDate;
-import java.util.List;
+import java.util.UUID;
+
 
 @Getter
 @Setter
@@ -18,27 +23,27 @@ import java.util.List;
 public class TeachingHours {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private UUID id;
 
-    private int lessonHours;
+    private Integer lessonHours;
 
-    private LocalDate date;
+    @JsonSerialize(using = LocalDateSerializer.class)
+    @JsonDeserialize(using = LocalDateDeserializer.class)
+    private LocalDate passedDate;
 
     @ManyToOne
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private TypeOfWork typeOfWork;
 
     @ManyToOne
     @JsonIgnore
     private User teacher;
 
-    @ElementCollection
-    private List<Integer> classIds;
+    @ManyToOne
+    @JsonIgnore
+    private StudentClass studentClass;
 
-    public static TeachingHours toTeachingHours(TeachingHoursRequest teachingHoursRequest){
-        return TeachingHours
-                .builder()
-                .lessonHours(teachingHoursRequest.getLessonHours())
-                .build();
-    }
+    private boolean active;
+
 }

@@ -28,6 +28,11 @@ public class DataLoader implements CommandLineRunner {
     private final BranchRepository branchRepository;
     private final MeasurementRepository measurementRepository;
     private final PaymentTypeRepository paymentTypeRepository;
+    private final RoomTypeRepository roomTypeRepository;
+    private final RoomRepository roomRepository;
+    private final StudentClassRepository studentClassRepository;
+
+
     @Value("${spring.sql.init.mode}")
     private String initMode;
 
@@ -75,21 +80,21 @@ public class DataLoader implements CommandLineRunner {
                     .business(save)
                     .delete(false)
                     .build();
-            Branch save1 = branchRepository.save(branch);
+            Branch branch1 = branchRepository.save(branch);
 
             Measurement measurement = Measurement.builder()
                     .name("KG")
-                    .branch(save1)
+                    .branch(branch1)
                     .active(true)
                     .build();
-            Measurement save2 = measurementRepository.save(measurement);
+             measurementRepository.save(measurement);
 
             Measurement measurement1 = Measurement.builder()
                     .name("Liter")
-                    .branch(save1)
+                    .branch(branch1)
                     .active(true)
                     .build();
-            Measurement save3 = measurementRepository.save(measurement1);
+            measurementRepository.save(measurement1);
 
 
             PaymentType xisobdanXisobga = PaymentType.builder().name("Xisobdan xisobga").build();
@@ -100,6 +105,33 @@ public class DataLoader implements CommandLineRunner {
             paymentTypeRepository.saveAll(List.of(karta, elektron, xisobdanXisobga, naqt));
 
 
+            RoomType roomType = RoomType.builder()
+                    .name("O'quv xona")
+                    .active(true)
+                    .branch(branch1)
+                    .build();
+
+            RoomType roomType1 = roomTypeRepository.save(roomType);
+
+            Room room = Room.builder()
+                    .active(true)
+                    .roomNumber(1)
+                    .branch(branch1)
+                    .roomType(roomType1)
+                    .build();
+            Room room1 = roomRepository.save(room);
+
+            StudentClass studentClass = StudentClass.builder()
+                    .className("1-A sinf")
+                    .startDate(LocalDate.parse("2023-05-05"))
+                    .endDate(LocalDate.parse("2024-05-05"))
+                    .active(true)
+                    .room(room1)
+                    .createdDate(LocalDateTime.now())
+                    .branch(branch1)
+                    .build();
+
+            studentClassRepository.save(studentClass);
         }
 
 

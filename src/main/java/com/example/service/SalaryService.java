@@ -5,7 +5,6 @@ import com.example.enums.Constants;
 import com.example.exception.RecordNotFoundException;
 import com.example.exception.UserNotFoundException;
 import com.example.model.common.ApiResponse;
-import com.example.model.request.ExpenseRequestDto;
 import com.example.model.request.SalaryRequest;
 import com.example.model.response.SalaryResponse;
 import com.example.repository.*;
@@ -95,14 +94,14 @@ public class SalaryService implements BaseService<SalaryRequest, Integer> {
         return getApiResponse(partlySalary, salary);
     }
 
-    public ApiResponse getCurrentMonthFixSalary(String fromDate, String toDate, Integer id) {
-        Salary salary = checkById(id);
-        double monthlyAmount = getMonthlyAmount(fromDate, toDate, salary, salary.getUser());
-        salary.setCurrentMonthSalary(monthlyAmount);
-        setOylik(salary);
-        salaryRepository.save(salary);
-        return new ApiResponse(Constants.SUCCESSFULLY, true, SalaryResponse.toResponse(salary));
-    }
+//    public ApiResponse getCurrentMonthFixSalary(String fromDate, String toDate, Integer id) {
+//        Salary salary = checkById(id);
+//        double monthlyAmount = getMonthlyAmount(fromDate, toDate, salary, salary.getUser());
+//        salary.setCurrentMonthSalary(monthlyAmount);
+//        setOylik(salary);
+//        salaryRepository.save(salary);
+//        return new ApiResponse(Constants.SUCCESSFULLY, true, SalaryResponse.toResponse(salary));
+//    }
 
     public ApiResponse getCurrentMonthTeachingHoursSalary(Integer salaryId) {
         Salary salary = checkById(salaryId);
@@ -115,9 +114,9 @@ public class SalaryService implements BaseService<SalaryRequest, Integer> {
     }
 
     private double getOverall(Salary salary, double overall) {
-        List<TeachingHours> all = teachingHoursRepository.findAllByTeacherId(salary.getUser().getId());
+        List<TeachingHours> all = teachingHoursRepository.findAllByTeacherIdAndActiveTrue(salary.getUser().getId());
         for (TeachingHours teachingHours : all) {
-            overall += teachingHours.getTypeOfWork().getPrice() * teachingHours.getLessonHours();
+            overall += teachingHours.getTypeOfWork().getPriceForPerHour() * teachingHours.getLessonHours();
         }
         return overall;
     }
@@ -173,13 +172,13 @@ public class SalaryService implements BaseService<SalaryRequest, Integer> {
         return new ApiResponse(Constants.DELETED, true, SalaryResponse.toResponse(salary));
     }
 
-    private double getMonthlyAmount(String fromDate, String toDate, Salary salary, User user) {
-        List<StaffAttendance> workingDays = staffAttendanceService.findAllByUserAndDateBetween(toLocalDate(fromDate), toLocalDate(toDate), user);
-        double dailyAmount = salary.getFix() / workDays;
-        double monthlyAmount = workingDays.size() * dailyAmount;
-        monthlyAmount = checkIsClassLeader(user, monthlyAmount);
-        return Math.round(monthlyAmount * 100) / 100D;
-    }
+//    private double getMonthlyAmount(String fromDate, String toDate, Salary salary, User user) {
+//        List<StaffAttendance> workingDays = staffAttendanceService.findAllByUserAndDateBetween(toLocalDate(fromDate), toLocalDate(toDate), user);
+//        double dailyAmount = salary.getFix() / workDays;
+//        double monthlyAmount = workingDays.size() * dailyAmount;
+//        monthlyAmount = checkIsClassLeader(user, monthlyAmount);
+//        return Math.round(monthlyAmount * 100) / 100D;
+//    }
 
     private void set(SalaryRequest salaryRequest, User user, Salary salary) {
         salary.setUser(user);

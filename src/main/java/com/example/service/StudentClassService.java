@@ -39,15 +39,14 @@ public class StudentClassService implements BaseService<StudentClassDto, Integer
                 .orElseThrow(() -> new RecordNotFoundException(BRANCH_NOT_FOUND));
         Room room = roomRepository.findById(studentClass.getRoomId())
                 .orElseThrow(() -> new RecordNotFoundException(ROOM_NOT_FOUND));
-        StudentClass from = StudentClass.from(studentClass, branch, room);
-        setUser(studentClass, from);
+        User teacher = userRepository.findById(studentClass.getClassLeaderId())
+                .orElseThrow(()-> new UserNotFoundException(USER_NOT_FOUND));
+        StudentClass from = StudentClass.from(studentClass);
+        from.setBranch(branch);
+        from.setRoom(room);
+        from.setClassLeader(teacher);
         studentClassRepository.save(from);
         return new ApiResponse(SUCCESSFULLY, true);
-    }
-
-    private void setUser(StudentClassDto studentClass, StudentClass from) {
-        Optional<User> optional = userRepository.findById(studentClass.getClassLeaderId());
-        optional.ifPresent(from::setClassLeader);
     }
 
 
@@ -63,14 +62,19 @@ public class StudentClassService implements BaseService<StudentClassDto, Integer
     public ApiResponse update(StudentClassDto studentClassDto) {
         StudentClass studentClass = studentClassRepository.findById(studentClassDto.getId())
                 .orElseThrow(() -> new RecordNotFoundException(CLASS_NOT_FOUND));
-        Room room = roomRepository.findById(studentClassDto.getRoomId())
-                .orElseThrow(() -> new RecordNotFoundException(ROOM_NOT_FOUND));
-
-        studentClass.setRoom(room);
+        if (studentClassDto.getRoomId()!=null){
+            Room room = roomRepository.findById(studentClassDto.getRoomId())
+                    .orElseThrow(() -> new RecordNotFoundException(ROOM_NOT_FOUND));
+            studentClass.setRoom(room);
+        }
+        if (studentClassDto.getClassLeaderId()!=null){
+            User teacher = userRepository.findById(studentClassDto.getClassLeaderId())
+                    .orElseThrow(()-> new UserNotFoundException(USER_NOT_FOUND));
+            studentClass.setClassLeader(teacher);
+        }
         studentClass.setClassName(studentClassDto.getClassName());
         studentClass.setStartDate(studentClassDto.getStartDate());
         studentClass.setEndDate(studentClassDto.getEndDate());
-        setUser(studentClassDto,studentClass);
         studentClassRepository.save(studentClass);
         return new ApiResponse(SUCCESSFULLY, true);
     }
