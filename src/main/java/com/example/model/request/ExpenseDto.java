@@ -1,41 +1,30 @@
 package com.example.model.request;
 
+import com.example.enums.ExpenseType;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
-@Getter
-@Setter
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
-public class LessonScheduleDto {
+public class ExpenseDto {
 
     private Integer id;
 
-    private Integer subjectId;
-
-    private Integer teacherId;
-
-    private Integer branchId;
-
-    private Integer studentClassId;
-
-    private Integer roomId;
-
-    private Integer typeOfWorkId;
-
-    private int durationLesson;
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
+    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
+    private LocalDateTime startDate;
 
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
-    private LocalDateTime startTime;
+    private LocalDateTime endDate;
 
-    @JsonSerialize(using = LocalDateTimeSerializer.class)
-    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
-    private LocalDateTime endTime;
+    private ExpenseType expenseType;
 }

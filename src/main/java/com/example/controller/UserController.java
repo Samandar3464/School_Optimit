@@ -98,9 +98,9 @@ public class UserController {
         return userService.addSubjectToUser(userRegisterDto);
     }
 
-    @PostMapping("/addDailyLessonToUser")
-    public ApiResponse addDailyLessonToUser(@RequestBody @Valid UserRegisterDto userRegisterDto) {
-        return userService.addDailyLessonToUser(userRegisterDto);
-    }
+//    @PostMapping("/addDailyLessonToUser")
+//    public ApiResponse addDailyLessonToUser(@RequestBody @Valid UserRegisterDto userRegisterDto) {
+//        return userService.addDailyLessonToUser(userRegisterDto);
+//    }
 
 }

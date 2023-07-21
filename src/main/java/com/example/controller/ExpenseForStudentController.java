@@ -1,8 +1,9 @@
 package com.example.controller;
 
 import com.example.model.common.ApiResponse;
+import com.example.model.request.ExpenseDto;
 import com.example.model.request.ExpenseRequestDto;
-import com.example.service.AdditionalExpenseService;
+import com.example.service.ExpenseForStudentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,24 +14,20 @@ import java.time.LocalDateTime;
 @RequestMapping("/api/v1/expenseForStudent")
 public class ExpenseForStudentController {
 
-    private final AdditionalExpenseService additionalExpenseService;
+    private final ExpenseForStudentService expenseForStudentService;
 
     @PostMapping("/create")
     public ApiResponse create(@RequestBody ExpenseRequestDto dto) {
-        return additionalExpenseService.create(dto);
+        return expenseForStudentService.create(dto);
     }
 
     @PutMapping("/update")
     public ApiResponse update(@RequestBody ExpenseRequestDto dto) {
-        return additionalExpenseService.update(dto);
+        return expenseForStudentService.update(dto);
     }
 
     @GetMapping("/getAllByBranchId")
-    public ApiResponse getAllByBranchId(
-            @RequestParam(name = "id") Integer id,
-            @RequestParam(name = "startDate") LocalDateTime startDate,
-            @RequestParam(name = "endDate") LocalDateTime endDate
-    ) {
-        return additionalExpenseService.getAllByBranchId(id, startDate, endDate);
+    public ApiResponse getAllByBranchId(@RequestBody ExpenseDto expenseDto) {
+        return expenseForStudentService.getAllByBranchId(expenseDto);
     }
 }

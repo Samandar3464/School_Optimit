@@ -1,8 +1,11 @@
 package com.example.model.response;
 
 import com.example.entity.AdditionalExpense;
+import com.example.enums.ExpenseType;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -28,6 +31,8 @@ public class ExpenseResponse {
 
     private String paymentType;
 
+    private ExpenseType expenseType;
+
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     private LocalDateTime createdTime;
 
@@ -40,6 +45,7 @@ public class ExpenseResponse {
 //                .takerName(additionalExpense.getTaker().getName())
                 .createdTime(additionalExpense.getCreatedTime())
                 .paymentType(additionalExpense.getPaymentType().getName())
+                .expenseType(additionalExpense.getExpenseType())
                 .build();
     }
 }

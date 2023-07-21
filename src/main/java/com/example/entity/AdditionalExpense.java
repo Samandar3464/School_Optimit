@@ -1,5 +1,6 @@
 package com.example.entity;
 
+import com.example.enums.ExpenseType;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
@@ -23,6 +24,9 @@ public class AdditionalExpense {
 
     @Column(nullable = false)
     private String reason;
+
+    @Enumerated(EnumType.STRING)
+    private ExpenseType expenseType;
 
     @OneToOne
     private User taker;

@@ -96,8 +96,8 @@ public class User implements UserDetails {
     @ManyToMany(fetch = FetchType.EAGER)
     private List<Subject> subjects;
 
-    @ManyToMany(cascade = CascadeType.ALL)
-    private List<DailyLessons> dailyLessons;
+//    @ManyToMany(cascade = CascadeType.ALL)
+//    private List<DailyLessons> dailyLessons;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")
     private List<Salary> salaries;
