@@ -1,8 +1,13 @@
 package com.example.model.request;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import lombok.*;
 
-import java.util.List;
+import java.time.LocalDate;
+import java.util.UUID;
 
 @Getter
 @Setter
@@ -11,16 +16,17 @@ import java.util.List;
 @Builder
 public class TeachingHoursRequest {
 
-    private Integer id;
-
-    private Integer typeOfWorkId;
+    private UUID id;
 
     private int lessonHours;
 
-    private String date;
+    private Integer typeOfWorkId;
 
     private Integer teacherId;
 
     private Integer classId;
-    private List<Integer> classesIds;
+
+    @JsonSerialize(using = LocalDateSerializer.class)
+    @JsonDeserialize(using = LocalDateDeserializer.class)
+    private LocalDate passedDate;
 }

@@ -5,7 +5,6 @@ import com.example.enums.Constants;
 import com.example.exception.RecordNotFoundException;
 import com.example.exception.UserNotFoundException;
 import com.example.model.common.ApiResponse;
-import com.example.model.request.ExpenseRequestDto;
 import com.example.model.request.SalaryRequest;
 import com.example.model.response.SalaryResponse;
 import com.example.repository.*;
@@ -115,9 +114,9 @@ public class SalaryService implements BaseService<SalaryRequest, Integer> {
     }
 
     private double getOverall(Salary salary, double overall) {
-        List<TeachingHours> all = teachingHoursRepository.findAllByTeacherId(salary.getUser().getId());
+        List<TeachingHours> all = teachingHoursRepository.findAllByTeacherIdAndActiveTrue(salary.getUser().getId());
         for (TeachingHours teachingHours : all) {
-            overall += teachingHours.getTypeOfWork().getPrice() * teachingHours.getLessonHours();
+            overall += teachingHours.getTypeOfWork().getPriceForPerHour() * teachingHours.getLessonHours();
         }
         return overall;
     }

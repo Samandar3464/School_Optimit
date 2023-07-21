@@ -61,14 +61,12 @@ public class StudentClass {
     private User classLeader;
 
 
-    public static StudentClass from(StudentClassDto studentClass, Branch branch, Room room) {
+    public static StudentClass from(StudentClassDto studentClass) {
         return StudentClass.builder()
                 .className(studentClass.getClassName())
                 .createdDate(LocalDateTime.now())
                 .startDate(studentClass.getStartDate())
                 .endDate(studentClass.getEndDate())
-                .branch(branch)
-                .room(room)
                 .active(true)
                 .build();
     }

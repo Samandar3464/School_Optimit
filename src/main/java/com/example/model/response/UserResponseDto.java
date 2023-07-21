@@ -59,7 +59,7 @@ public class UserResponseDto {
 
     private List<SalaryResponse> salaries;
 
-    private List<TeachingHoursResponse> teachingHoursResponses;
+//    private List<TeachingHoursResponse> teachingHoursResponses;
 
 
     public static UserResponseDto from(User user, String photoUrl) {
@@ -82,7 +82,7 @@ public class UserResponseDto {
                 .dailyLessons(user.getDailyLessons())
 //                .workExperiences(WorkExperienceDto.toAllResponse(user.getWorkExperiences()))
                 .achievements(AchievementDto.toAllResponse(user.getAchievements()))
-                .teachingHoursResponses(TeachingHoursResponse.toAllResponse(user.getTeachingHours()))
+//                .teachingHoursResponses(TeachingHoursResponse.toAllResponse(user.getTeachingHours()))
                 .studentClass(StudentClassDto.toResponse(user.getStudentClass()))
                 .salaries(SalaryResponse.toAllResponse(user.getSalaries()))
                 .subjects(user.getSubjects())

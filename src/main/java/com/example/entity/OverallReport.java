@@ -1,13 +1,10 @@
 package com.example.entity;
 
 import com.example.enums.Months;
-import com.example.enums.Position;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
-
-import java.util.List;
 
 @Getter
 @Setter

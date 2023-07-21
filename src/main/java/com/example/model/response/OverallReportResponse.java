@@ -29,7 +29,7 @@ public class OverallReportResponse {
 
     private String fullName;
 
-    private List<TeachingHoursResponse> teachingHours;
+//    private List<TeachingHoursResponse> teachingHours;
 
     private Branch branch;
 
@@ -41,7 +41,7 @@ public class OverallReportResponse {
                 .classLeadership(overallReport.getClassLeadership())
                 .month(overallReport.getMonth())
                 .branch(overallReport.getBranch())
-                .teachingHours(TeachingHoursResponse.toAllResponse(overallReport.getUser().getTeachingHours()))
+//                .teachingHours(TeachingHoursResponse.toAllResponse(overallReport.getUser().getTeachingHours()))
 //                .position(overallReport.getPosition())
                 .salary(SalaryResponse.toResponse(overallReport.getSalary()))
 //                .fullName(overallReport.getUser().getFullName())
