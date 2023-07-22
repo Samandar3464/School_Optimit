@@ -1,6 +1,7 @@
 package com.example.entity;
 
 import com.example.model.request.SubjectRequestDto;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.OnDelete;
@@ -23,6 +24,7 @@ public class Subject {
     private boolean active;
 
     @ManyToOne
+    @JsonIgnore
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Branch branch;
 

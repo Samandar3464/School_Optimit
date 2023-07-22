@@ -31,6 +31,7 @@ public class Salary {
 //    private LocalDate salaryDate;
 
     private Month months;
+
     private Integer year;
 
     private boolean active;

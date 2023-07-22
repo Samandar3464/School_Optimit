@@ -71,4 +71,8 @@ public class SubjectLevelService implements BaseService<SubjectLevelDto, Integer
     public ApiResponse getAllByBranchId(Integer branchId) {
         return new ApiResponse(subjectLevelRepository.findAllByBranchId(branchId), true);
     }
+
+    public SubjectLevel getBySubjectIdAndLevelId(Integer subjectId, Integer levelId) {
+        return subjectLevelRepository.findBySubjectIdAndLevelId(subjectId, levelId).orElseThrow(() -> new RecordNotFoundException(SUBJECT_LEVEL_NOT_FOUND));
+    }
 }

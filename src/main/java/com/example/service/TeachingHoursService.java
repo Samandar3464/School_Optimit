@@ -97,12 +97,6 @@ public class TeachingHoursService implements BaseService<TeachingHoursRequest, U
         return new ApiResponse(allByTeacherId, true);
     }
 
-//    @ResponseStatus(HttpStatus.OK)
-//    public ApiResponse getAllByTypeOfWorkId(Integer typeOfWorkId, LocalDate startDate, LocalDate endDate) {
-//        List<TeachingHours> allByTeacherId = teachingHoursRepository.findAllByTypeOfWorkIdAndActiveTrueAndPassedDateBetween(typeOfWorkId, startDate, endDate);
-//        return new ApiResponse(allByTeacherId, true);
-//    }
-
     private TeachingHours checkById(UUID integer) {
         return teachingHoursRepository.findById(integer).orElseThrow(() -> new RecordNotFoundException(Constants.TEACHING_HOURS_NOT_FOUND));
     }

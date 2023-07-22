@@ -64,10 +64,6 @@ public class UserRegisterDto {
 
     private Integer branchId;
 
-
-    private List<Integer> subjectsIds;
-
-    private List<Integer> dailyLessonsIds;
-
+    private List<Integer> subjectsIdList;
 
 }

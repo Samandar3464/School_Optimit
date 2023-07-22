@@ -25,8 +25,6 @@ public class DataLoaderTest implements CommandLineRunner {
     private final BusinessRepository businessRepository;
     private final BranchRepository branchRepository;
     private final RoleRepository roleRepository;
-    private final MeasurementRepository measurementRepository;
-    private final PaymentTypeRepository paymentTypeRepository;
     private final RoomTypeRepository roomTypeRepository;
     private final RoomRepository roomRepository;
     private final StudentClassRepository studentClassRepository;

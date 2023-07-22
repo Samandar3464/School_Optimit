@@ -2,6 +2,7 @@ package com.example.service;
 
 import com.example.config.jwtConfig.JwtGenerate;
 import com.example.entity.Attachment;
+import com.example.entity.Subject;
 import com.example.entity.User;
 import com.example.exception.RecordAlreadyExistException;
 import com.example.exception.RecordNotFoundException;
@@ -14,6 +15,7 @@ import com.example.model.response.UserResponseDto;
 import com.example.model.response.UserResponseListForAdmin;
 import com.example.repository.BranchRepository;
 import com.example.repository.RoleRepository;
+import com.example.repository.SubjectRepository;
 import com.example.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -50,7 +52,7 @@ public class UserService implements BaseService<UserRegisterDto, Integer> {
     private final FireBaseMessagingService fireBaseMessagingService;
     private final PasswordEncoder passwordEncoder;
     private final BranchRepository branchRepository;
-    private final SubjectService subjectService;
+    private final SubjectRepository subjectRepository;
 
 
     @ResponseStatus(HttpStatus.CREATED)
@@ -61,10 +63,16 @@ public class UserService implements BaseService<UserRegisterDto, Integer> {
             throw new RecordAlreadyExistException(USER_ALREADY_EXIST);
         }
         User user = User.from(dto);
-        user.setProfilePhoto(dto.getProfilePhoto()==null ?  null :attachmentService.saveToSystem(dto.getProfilePhoto()));
+        user.setProfilePhoto(dto.getProfilePhoto() == null ? null : attachmentService.saveToSystem(dto.getProfilePhoto()));
         user.setPassword(passwordEncoder.encode(dto.getPassword()));
         user.setBranch(branchRepository.findById(dto.getBranchId()).orElseThrow(() -> new RecordNotFoundException(BRANCH_NOT_FOUND)));
         user.setRole(roleRepository.findById(dto.getRoleId()).orElseThrow(() -> new RecordNotFoundException(ROLE_NOT_FOUND)));
+        if (dto.getSubjectsIdList() != null) {
+            List<Subject> subjects = new ArrayList<>();
+            dto.getSubjectsIdList().forEach(id -> subjects.add(subjectRepository.findByIdAndActiveTrue(id)
+                    .orElseThrow(() -> new RecordNotFoundException(SUBJECT_NOT_FOUND))));
+            user.setSubjects(subjects);
+        }
         userRepository.save(user);
         return new ApiResponse(SUCCESSFULLY, true);
     }
@@ -172,7 +180,7 @@ public class UserService implements BaseService<UserRegisterDto, Integer> {
 
     @ResponseStatus(HttpStatus.OK)
     public ApiResponse getUserList(Integer page, Integer size, Integer branchId) {
-        Page<User> all = userRepository.findAllByBranchIdAndDeletedFalse(branchId,PageRequest.of(page, size));
+        Page<User> all = userRepository.findAllByBranchIdAndDeletedFalse(branchId, PageRequest.of(page, size));
         List<UserResponseDto> userResponseDtoList = new ArrayList<>();
         all.getContent().forEach(user -> userResponseDtoList.add(UserResponseDto.from(user, attachmentService.getUrl(user.getProfilePhoto()))));
         return new ApiResponse(new UserResponseListForAdmin(userResponseDtoList, all.getTotalElements(), all.getTotalPages(), all.getNumber()), true);
@@ -195,12 +203,15 @@ public class UserService implements BaseService<UserRegisterDto, Integer> {
         sendSms(number, verificationCodeGenerator());
         return new ApiResponse(SUCCESSFULLY, true);
     }
-//    ko'rib chiqish kk
-    public ApiResponse addSubjectToUser(UserRegisterDto userRegisterDto) {
-        User user = checkUserExistById(userRegisterDto.getId());
-        user.setSubjects(subjectService.checkAllById(userRegisterDto.getSubjectsIds()));
+
+    public ApiResponse addSubjectToUser(UserRegisterDto dto) {
+        User user = checkUserExistById(dto.getId());
+        List<Subject> subjects = new ArrayList<>();
+        dto.getSubjectsIdList().forEach(id -> subjects.add(subjectRepository.findByIdAndActiveTrue(id)
+                .orElseThrow(() -> new RecordNotFoundException(SUBJECT_NOT_FOUND))));
+        user.setSubjects(subjects);
         userRepository.save(user);
-        return new ApiResponse(SUCCESSFULLY, true, user.getSubjects());
+        return new ApiResponse(SUCCESSFULLY, true);
     }
 
 

@@ -61,7 +61,7 @@ public class DataLoader implements CommandLineRunner {
             Level level5 = new Level(5, 5);
             Level level6 = new Level(6, 6);
             Level level7 = new Level(7, 7);
-            Level level8 = new Level(7, 8);
+            Level level8 = new Level(8, 8);
             Level level9 = new Level(9, 9);
             Level level10 = new Level(10, 10);
             Level level11 = new Level(11, 11);

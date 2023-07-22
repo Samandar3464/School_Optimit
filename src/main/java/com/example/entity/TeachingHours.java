@@ -38,6 +38,7 @@ public class TeachingHours {
 
     @ManyToOne
     @JsonIgnore
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private User teacher;
 
     @ManyToOne
