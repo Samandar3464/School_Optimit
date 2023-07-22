@@ -1,5 +1,6 @@
 package com.example.service;
 
+import com.example.entity.Branch;
 import com.example.entity.Subject;
 import com.example.exception.RecordAlreadyExistException;
 import com.example.exception.RecordNotFoundException;
@@ -7,6 +8,7 @@ import com.example.model.common.ApiResponse;
 import com.example.model.request.SubjectRequestDto;
 import com.example.model.response.SubjectResponse;
 import com.example.model.response.TopicResponseDto;
+import com.example.repository.BranchRepository;
 import com.example.repository.SubjectRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -22,43 +24,47 @@ public class SubjectService implements BaseService<SubjectRequestDto, Integer> {
 
     private final SubjectRepository subjectRepository;
     private final TopicService topicService;
+    private final BranchRepository branchRepository;
 
     @Override
     public ApiResponse create(SubjectRequestDto dto) {
-        if (subjectRepository.findByNameAndLevel(dto.getName(), dto.getLevel()).isPresent()) {
+        if (subjectRepository.findByName(dto.getName()).isPresent()) {
             throw new RecordAlreadyExistException(SUBJECT_ALREADY_EXIST);
         }
-        Subject subject = Subject.from(dto);
-        subjectRepository.save(subject);
+        Branch branch = branchRepository.findById(dto.getBranchId()).orElseThrow(() -> new RecordNotFoundException(BRANCH_NOT_FOUND));
+        subjectRepository.save(Subject.from(dto, branch));
         return new ApiResponse(SUCCESSFULLY, true);
     }
 
     @Override
-    public ApiResponse getById(Integer id) {
-        Subject subject = checkById(id);
-        List<TopicResponseDto> allBySubjectId = topicService.findALLBySubjectId(subject.getId());
+    public ApiResponse getById(Integer subjectId) {
+        return null;
+    }
+
+    public ApiResponse getById(Integer subjectId, Integer levelId) {
+        Subject subject = checkById(subjectId);
+        List<TopicResponseDto> allBySubjectId = topicService.findALLBySubjectId(subject.getId(), levelId);
         return new ApiResponse(new SubjectResponse(subject, allBySubjectId), true);
     }
 
     @Override
     public ApiResponse update(SubjectRequestDto subjectRequestDto) {
-        checkById(subjectRequestDto.getId());
-        Subject subject = Subject.from(subjectRequestDto);
-        subject.setId(subjectRequestDto.getId());
+        Subject subject = checkById(subjectRequestDto.getId());
+        subject.setName(subjectRequestDto.getName());
         subjectRepository.save(subject);
         return new ApiResponse(SUCCESSFULLY, true);
     }
 
     @Override
-    @Transactional(rollbackFor = {Exception.class})
     public ApiResponse delete(Integer id) {
         Subject subject = checkById(id);
-        if (topicService.deleteALLBySubjectId(subject.getId())) {
-            subjectRepository.deleteById(id);
-            return new ApiResponse(DELETED, true);
-        } else {
-            return new ApiResponse(CAN_NOT_DELETED, false);
-        }
+        subject.setActive(false);
+        subjectRepository.save(subject);
+        return new ApiResponse(DELETED, true);
+    }
+
+    public ApiResponse getAllSubjectByBranchId(Integer branchId) {
+        return new ApiResponse(subjectRepository.findAllByBranchId(branchId), true);
     }
 
     public Subject checkById(Integer id) {

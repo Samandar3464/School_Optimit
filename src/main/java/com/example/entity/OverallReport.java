@@ -26,8 +26,8 @@ public class OverallReport {
 
     private String classLeadership;
 
-    @ManyToOne
-    private Salary salary;
+//    @ManyToOne
+//    private Salary salary;
 
     @ManyToOne
     private User user;

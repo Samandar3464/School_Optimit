@@ -12,5 +12,5 @@ import java.util.UUID;
 public interface TeachingHoursRepository extends JpaRepository<TeachingHours, UUID> {
     List<TeachingHours> findAllByTeacherIdAndActiveTrueAndPassedDateBetween(Integer teacherId, LocalDate startDate, LocalDate endDate);
     List<TeachingHours> findAllByTeacherIdAndActiveTrue(Integer teacherId);
-    List<TeachingHours> findAllByTypeOfWorkIdAndActiveTrueAndPassedDateBetween(Integer typeOfWorkId, LocalDate startDate, LocalDate endDate);
+//    List<TeachingHours> findAllByTypeOfWorkIdAndActiveTrueAndPassedDateBetween(Integer typeOfWorkId, LocalDate startDate, LocalDate endDate);
 }

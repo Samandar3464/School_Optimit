@@ -57,7 +57,7 @@ public class UserResponseDto {
 
     private List<Subject> subjects;
 
-    private List<SalaryResponse> salaries;
+//    private List<SalaryResponse> salaries;
 
 //    private List<TeachingHoursResponse> teachingHoursResponses;
 
@@ -84,7 +84,7 @@ public class UserResponseDto {
                 .achievements(AchievementDto.toAllResponse(user.getAchievements()))
 //                .teachingHoursResponses(TeachingHoursResponse.toAllResponse(user.getTeachingHours()))
                 .studentClass(StudentClassDto.toResponse(user.getStudentClass()))
-                .salaries(SalaryResponse.toAllResponse(user.getSalaries()))
+//                .salaries(SalaryResponse.toAllResponse(user.getSalaries()))
                 .subjects(user.getSubjects())
                 .build();
     }

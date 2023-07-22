@@ -1,10 +1,16 @@
 package com.example.model.request;
 
 import com.example.enums.ExpenseType;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import jakarta.persistence.Column;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import lombok.*;
+
+import java.time.LocalDate;
 
 @Getter
 @Setter
@@ -33,4 +39,8 @@ public class ExpenseRequestDto {
     private Integer branchId;
 
     private ExpenseType expenseType;
+
+    @JsonSerialize(using = LocalDateSerializer.class)
+    @JsonDeserialize(using = LocalDateDeserializer.class)
+    private LocalDate givenDate;
 }

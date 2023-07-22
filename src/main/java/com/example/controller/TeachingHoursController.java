@@ -44,11 +44,11 @@ public class TeachingHoursController {
     }
 
 
-    @GetMapping("/getAllWorkTypeId")
-    public ApiResponse getAllWorkTypeId(@RequestParam Integer id,
-                                        @RequestParam LocalDate startDate,
-                                        @RequestParam LocalDate endDate) {
-        return teachingHoursService.getAllByTypeOfWorkId(id, startDate, endDate);
-    }
+//    @GetMapping("/getAllWorkTypeId")
+//    public ApiResponse getAllWorkTypeId(@RequestParam Integer id,
+//                                        @RequestParam LocalDate startDate,
+//                                        @RequestParam LocalDate endDate) {
+//        return teachingHoursService.getAllByTypeOfWorkId(id, startDate, endDate);
+//    }
 
 }

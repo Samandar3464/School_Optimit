@@ -25,7 +25,7 @@ public class OverallReportResponse {
 
     private String classLeadership;
 
-    private SalaryResponse salary;
+//    private SalaryResponse salary;
 
     private String fullName;
 
@@ -43,7 +43,7 @@ public class OverallReportResponse {
                 .branch(overallReport.getBranch())
 //                .teachingHours(TeachingHoursResponse.toAllResponse(overallReport.getUser().getTeachingHours()))
 //                .position(overallReport.getPosition())
-                .salary(SalaryResponse.toResponse(overallReport.getSalary()))
+//                .salary(SalaryResponse.toResponse(overallReport.getSalary()))
 //                .fullName(overallReport.getUser().getFullName())
                 .build();
     }

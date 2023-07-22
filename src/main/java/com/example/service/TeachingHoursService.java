@@ -1,18 +1,12 @@
 package com.example.service;
 
-import com.example.entity.StudentClass;
-import com.example.entity.TeachingHours;
-import com.example.entity.TypeOfWork;
-import com.example.entity.User;
+import com.example.entity.*;
 import com.example.enums.Constants;
 import com.example.exception.RecordNotFoundException;
 import com.example.exception.UserNotFoundException;
 import com.example.model.common.ApiResponse;
 import com.example.model.request.TeachingHoursRequest;
-import com.example.repository.StudentClassRepository;
-import com.example.repository.TeachingHoursRepository;
-import com.example.repository.TypeOfWorkRepository;
-import com.example.repository.UserRepository;
+import com.example.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -29,19 +23,22 @@ import static com.example.enums.Constants.*;
 public class TeachingHoursService implements BaseService<TeachingHoursRequest, UUID> {
 
     private final TeachingHoursRepository teachingHoursRepository;
-    private final TypeOfWorkRepository typeOfWorkRepository;
+    //    private final TypeOfWorkRepository typeOfWorkRepository;
+    private final SubjectRepository subjectRepository;
     private final StudentClassRepository studentClassRepository;
     private final UserRepository userRepository;
 
     @Override
     @ResponseStatus(HttpStatus.CREATED)
     public ApiResponse create(TeachingHoursRequest dto) {
-        TypeOfWork typeOfWork = typeOfWorkRepository.findById(dto.getTypeOfWorkId()).orElseThrow(() -> new RecordNotFoundException(TYPE_OF_WORK_NOT_FOUND));
+//        TypeOfWork typeOfWork = typeOfWorkRepository.findById(dto.getTypeOfWorkId()).orElseThrow(() -> new RecordNotFoundException(TYPE_OF_WORK_NOT_FOUND));
+        Subject subject = subjectRepository.findById(dto.getSubjectId()).orElseThrow(() -> new RecordNotFoundException(SUBJECT_NOT_FOUND));
         User teacher = userRepository.findById(dto.getTeacherId()).orElseThrow(() -> new UserNotFoundException(USER_NOT_FOUND));
         StudentClass studentClass = studentClassRepository.findById(dto.getClassId()).orElseThrow(() -> new RecordNotFoundException(CLASS_NOT_FOUND));
         TeachingHours teachingHours = TeachingHours
                 .builder()
-                .typeOfWork(typeOfWork)
+//                .typeOfWork(typeOfWork)
+                .subject(subject)
                 .teacher(teacher)
                 .studentClass(studentClass)
                 .lessonHours(dto.getLessonHours())
@@ -69,9 +66,13 @@ public class TeachingHoursService implements BaseService<TeachingHoursRequest, U
             User teacher = userRepository.findById(dto.getTeacherId()).orElseThrow(() -> new UserNotFoundException(USER_NOT_FOUND));
             teachingHours.setTeacher(teacher);
         }
-        if (dto.getTypeOfWorkId() != null) {
-            TypeOfWork typeOfWork = typeOfWorkRepository.findById(dto.getTypeOfWorkId()).orElseThrow(() -> new RecordNotFoundException(TYPE_OF_WORK_NOT_FOUND));
-            teachingHours.setTypeOfWork(typeOfWork);
+//        if (dto.getTypeOfWorkId() != null) {
+//            TypeOfWork typeOfWork = typeOfWorkRepository.findById(dto.getTypeOfWorkId()).orElseThrow(() -> new RecordNotFoundException(TYPE_OF_WORK_NOT_FOUND));
+//            teachingHours.setTypeOfWork(typeOfWork);
+//        }
+        if (dto.getSubjectId() != null) {
+            Subject subject = subjectRepository.findById(dto.getSubjectId()).orElseThrow(() -> new RecordNotFoundException(SUBJECT_NOT_FOUND));
+            teachingHours.setSubject(subject);
         }
         if (dto.getClassId() != null) {
             StudentClass studentClass = studentClassRepository.findById(dto.getClassId()).orElseThrow(() -> new RecordNotFoundException(CLASS_NOT_FOUND));
@@ -91,19 +92,20 @@ public class TeachingHoursService implements BaseService<TeachingHoursRequest, U
     }
 
     @ResponseStatus(HttpStatus.OK)
-    public ApiResponse getAllByTeacherId(Integer teacherId, LocalDate startDate , LocalDate endDate){
+    public ApiResponse getAllByTeacherId(Integer teacherId, LocalDate startDate, LocalDate endDate) {
         List<TeachingHours> allByTeacherId = teachingHoursRepository.findAllByTeacherIdAndActiveTrueAndPassedDateBetween(teacherId, startDate, endDate);
-        return new ApiResponse(allByTeacherId,true);
+        return new ApiResponse(allByTeacherId, true);
     }
-    @ResponseStatus(HttpStatus.OK)
-    public ApiResponse getAllByTypeOfWorkId(Integer typeOfWorkId, LocalDate startDate , LocalDate endDate){
-        List<TeachingHours> allByTeacherId = teachingHoursRepository.findAllByTypeOfWorkIdAndActiveTrueAndPassedDateBetween(typeOfWorkId ,startDate,endDate);
-        return new ApiResponse(allByTeacherId,true);
-    }
+
+//    @ResponseStatus(HttpStatus.OK)
+//    public ApiResponse getAllByTypeOfWorkId(Integer typeOfWorkId, LocalDate startDate, LocalDate endDate) {
+//        List<TeachingHours> allByTeacherId = teachingHoursRepository.findAllByTypeOfWorkIdAndActiveTrueAndPassedDateBetween(typeOfWorkId, startDate, endDate);
+//        return new ApiResponse(allByTeacherId, true);
+//    }
 
     private TeachingHours checkById(UUID integer) {
         return teachingHoursRepository.findById(integer).orElseThrow(() -> new RecordNotFoundException(Constants.TEACHING_HOURS_NOT_FOUND));
     }
 
-    
+
 }

@@ -54,6 +54,7 @@ public class AdditionalExpenseService implements BaseService<ExpenseRequestDto, 
                 .branch(branch)
                 .expenseType(dto.getExpenseType())
                 .paymentType(paymentType)
+                .givenDate(dto.getGivenDate())
                 .build();
         additionalExpenseRepository.save(additionalExpense);
         balanceRepository.save(balance);

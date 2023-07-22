@@ -2,6 +2,7 @@ package com.example.enums;
 public class Constants {
 
     public static final String USER_NOT_FOUND = "USER NOT FOUND";
+    public static final String LEVEL_NOT_FOUND = "LEVEL NOT FOUND";
     public static final String PERMISSION_NOT_FOUND = "PERMISSION NOT FOUND";
     public static final String NAME_NOT_FOUND = "NAME NOT FOUND";
     public static final String USER_ALREADY_EXIST = "USER ALREADY EXIST";
@@ -49,6 +50,7 @@ public class Constants {
     public static final String ROOM_NOT_FOUND = "ROOM NOT FOUND";
     public static final String ROOM_NUMBER_ALREADY_EXIST = "ROOM NUMBER ALREADY EXIST";
     public static final String SUBJECT_NOT_FOUND = "SUBJECT NOT FOUND";
+    public static final String SUBJECT_LEVEL_NOT_FOUND = "SUBJECT LEVEL NOT FOUND";
     public static final String LESSON_SCHEDULE_NOT_FOUND = "LESSON SCHEDULE NOT FOUND";
 
     public static final String LIFE_TIME_DONT_MATCH = "LIFE TIME DONT MATCH !! PLEASE ENTER CORRECT DATA";

@@ -14,6 +14,5 @@ public class SubjectRequestDto {
 
     private Integer id;
     private String name;
-    private int level;
-    private int teachingHours;
+    private int branchId;
 }

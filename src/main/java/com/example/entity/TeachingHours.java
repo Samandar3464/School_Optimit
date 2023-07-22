@@ -34,7 +34,7 @@ public class TeachingHours {
 
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
-    private TypeOfWork typeOfWork;
+    private Subject subject;
 
     @ManyToOne
     @JsonIgnore

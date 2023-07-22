@@ -18,9 +18,17 @@ public class SubjectController {
         return subjectService.create(subjectRequestDto);
     }
 
-    @GetMapping("getById/{id}")
-    public ApiResponse getById(@PathVariable Integer id) {
-        return subjectService.getById(id);
+    @GetMapping("getById")
+    public ApiResponse getById(
+            @RequestParam(name = "subjectId") Integer subjectId,
+            @RequestParam(name = "levelId") Integer levelId) {
+        return subjectService.getById(subjectId, levelId);
+    }
+
+
+    @GetMapping("getAllByBranchId/{id}")
+    public ApiResponse getAllByBranchId(@PathVariable Integer id) {
+        return subjectService.getAllSubjectByBranchId(id);
     }
 
 

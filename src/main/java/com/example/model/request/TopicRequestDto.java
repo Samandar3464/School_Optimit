@@ -25,4 +25,8 @@ public class TopicRequestDto {
     private List<String> useFullLinks;
 
     private Integer subjectId;
+
+    private Integer levelId;
+
+
 }

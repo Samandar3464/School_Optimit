@@ -20,7 +20,8 @@ public class TeachingHoursRequest {
 
     private int lessonHours;
 
-    private Integer typeOfWorkId;
+//    private Integer typeOfWorkId;
+    private Integer subjectId;
 
     private Integer teacherId;
 

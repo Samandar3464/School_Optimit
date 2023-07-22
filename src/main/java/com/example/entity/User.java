@@ -99,8 +99,8 @@ public class User implements UserDetails {
 //    @ManyToMany(cascade = CascadeType.ALL)
 //    private List<DailyLessons> dailyLessons;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")
-    private List<Salary> salaries;
+//    @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")
+//    private List<Salary> salaries;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")
     private List<Achievement> achievements;
