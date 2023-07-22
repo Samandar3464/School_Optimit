@@ -14,7 +14,6 @@ import com.example.repository.SubjectRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 
 import static com.example.enums.Constants.*;
 

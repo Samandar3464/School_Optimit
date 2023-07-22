@@ -23,7 +23,6 @@ import static com.example.enums.Constants.*;
 public class TeachingHoursService implements BaseService<TeachingHoursRequest, UUID> {
 
     private final TeachingHoursRepository teachingHoursRepository;
-    //    private final TypeOfWorkRepository typeOfWorkRepository;
     private final SubjectRepository subjectRepository;
     private final StudentClassRepository studentClassRepository;
     private final UserRepository userRepository;
@@ -31,13 +30,11 @@ public class TeachingHoursService implements BaseService<TeachingHoursRequest, U
     @Override
     @ResponseStatus(HttpStatus.CREATED)
     public ApiResponse create(TeachingHoursRequest dto) {
-//        TypeOfWork typeOfWork = typeOfWorkRepository.findById(dto.getTypeOfWorkId()).orElseThrow(() -> new RecordNotFoundException(TYPE_OF_WORK_NOT_FOUND));
         Subject subject = subjectRepository.findById(dto.getSubjectId()).orElseThrow(() -> new RecordNotFoundException(SUBJECT_NOT_FOUND));
         User teacher = userRepository.findById(dto.getTeacherId()).orElseThrow(() -> new UserNotFoundException(USER_NOT_FOUND));
         StudentClass studentClass = studentClassRepository.findById(dto.getClassId()).orElseThrow(() -> new RecordNotFoundException(CLASS_NOT_FOUND));
         TeachingHours teachingHours = TeachingHours
                 .builder()
-//                .typeOfWork(typeOfWork)
                 .subject(subject)
                 .teacher(teacher)
                 .studentClass(studentClass)
@@ -66,10 +63,6 @@ public class TeachingHoursService implements BaseService<TeachingHoursRequest, U
             User teacher = userRepository.findById(dto.getTeacherId()).orElseThrow(() -> new UserNotFoundException(USER_NOT_FOUND));
             teachingHours.setTeacher(teacher);
         }
-//        if (dto.getTypeOfWorkId() != null) {
-//            TypeOfWork typeOfWork = typeOfWorkRepository.findById(dto.getTypeOfWorkId()).orElseThrow(() -> new RecordNotFoundException(TYPE_OF_WORK_NOT_FOUND));
-//            teachingHours.setTypeOfWork(typeOfWork);
-//        }
         if (dto.getSubjectId() != null) {
             Subject subject = subjectRepository.findById(dto.getSubjectId()).orElseThrow(() -> new RecordNotFoundException(SUBJECT_NOT_FOUND));
             teachingHours.setSubject(subject);

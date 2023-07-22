@@ -1,7 +1,6 @@
 package com.example.service;
 
 import com.example.entity.OverallReport;
-//import com.example.entity.Salary;
 import com.example.entity.User;
 import com.example.enums.Constants;
 import com.example.enums.Months;
@@ -85,9 +84,9 @@ public class OverallReportService implements BaseService<OverallReportRequest, I
 
     private OverallReport getOverallReport(User user) {
         String name = " ";
-        if (user.getStudentClass() != null) {
-            name = user.getStudentClass().getClassName();
-        }
+//        if (user.getStudentClass() != null) {
+//            name = user.getStudentClass().getClassName();
+//        }
         try {
             return OverallReport
                     .builder()

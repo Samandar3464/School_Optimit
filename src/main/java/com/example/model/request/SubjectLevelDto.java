@@ -1,7 +1,6 @@
 package com.example.model.request;
 
 
-import com.example.entity.Branch;
 import lombok.*;
 
 @Getter

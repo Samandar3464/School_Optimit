@@ -1,8 +1,6 @@
 package com.example.model.request;
 
-import com.example.entity.Level;
 import com.example.entity.StudentClass;
-import com.example.entity.User;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;

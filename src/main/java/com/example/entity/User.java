@@ -1,7 +1,6 @@
 package com.example.entity;
 
 import com.example.enums.Gender;
-import com.example.enums.Position;
 import com.example.model.request.UserRegisterDto;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;

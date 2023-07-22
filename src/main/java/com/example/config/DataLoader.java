@@ -3,7 +3,6 @@ package com.example.config;
 
 import com.example.entity.*;
 import com.example.enums.Gender;
-import com.example.kitchen.entity.Measurement;
 import com.example.kitchen.repository.MeasurementRepository;
 import com.example.repository.*;
 import lombok.RequiredArgsConstructor;

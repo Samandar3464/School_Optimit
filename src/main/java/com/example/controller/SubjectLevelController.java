@@ -2,7 +2,6 @@ package com.example.controller;
 
 import com.example.model.common.ApiResponse;
 import com.example.model.request.SubjectLevelDto;
-import com.example.model.request.SubjectRequestDto;
 import com.example.service.SubjectLevelService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;

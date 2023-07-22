@@ -37,7 +37,7 @@ public class TopicService implements BaseService<TopicRequestDto, UUID> {
     @Override
     @ResponseStatus(HttpStatus.CREATED)
     public ApiResponse create(TopicRequestDto dto) {
-        if (topicRepository.existsByNameAndSubjectId(dto.getName(), dto.getSubjectId())) {
+        if (Boolean.TRUE.equals(topicRepository.existsByNameAndSubjectId(dto.getName(), dto.getSubjectId()))) {
             throw new RecordAlreadyExistException(TOPIC_ALREADY_EXIST);
         }
         Level level = levelRepository.findById(dto.getLevelId())
