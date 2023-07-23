@@ -1,6 +1,7 @@
 package com.example.service;
 
 import com.example.entity.Attachment;
+import com.example.entity.Level;
 import com.example.entity.Subject;
 import com.example.entity.Topic;
 import com.example.exception.RecordAlreadyExistException;
@@ -8,6 +9,7 @@ import com.example.exception.RecordNotFoundException;
 import com.example.model.common.ApiResponse;
 import com.example.model.request.TopicRequestDto;
 import com.example.model.response.TopicResponseDto;
+import com.example.repository.LevelRepository;
 import com.example.repository.SubjectRepository;
 import com.example.repository.TopicRepository;
 import lombok.RequiredArgsConstructor;
@@ -30,18 +32,21 @@ public class TopicService implements BaseService<TopicRequestDto, UUID> {
     private final TopicRepository topicRepository;
     private final SubjectRepository subjectRepository;
     private final AttachmentService attachmentService;
+    private final LevelRepository levelRepository;
 
     @Override
     @ResponseStatus(HttpStatus.CREATED)
     public ApiResponse create(TopicRequestDto dto) {
-        if (topicRepository.existsByNameAndSubjectId(dto.getName(), dto.getSubjectId())) {
+        if (Boolean.TRUE.equals(topicRepository.existsByNameAndSubjectId(dto.getName(), dto.getSubjectId()))) {
             throw new RecordAlreadyExistException(TOPIC_ALREADY_EXIST);
         }
+        Level level = levelRepository.findById(dto.getLevelId())
+                .orElseThrow(() -> new RecordNotFoundException(LEVEL_NOT_FOUND));
         StringBuilder useFullLinks = new StringBuilder("");
         dto.getUseFullLinks().forEach(obj -> useFullLinks.append(obj).append("newLink"));
         Subject subject = subjectRepository.findById(dto.getSubjectId()).orElseThrow(() -> new RecordNotFoundException(SUBJECT_NOT_FOUND));
         List<Attachment> files = attachmentService.saveToSystemListFile(dto.getLessonFiles());
-        Topic topic = from(dto, useFullLinks, subject, files);
+        Topic topic = from(dto, useFullLinks, subject, files,level);
         topicRepository.save(topic);
         return new ApiResponse(SUCCESSFULLY, true);
     }
@@ -77,7 +82,12 @@ public class TopicService implements BaseService<TopicRequestDto, UUID> {
             files = attachmentService.saveToSystemListFile(dto.getLessonFiles());
             oldTopic.getLessonFiles().forEach(attachmentService::deleteNewName);
         }
-        Topic topic = from(dto, useFullLinks, subject, files);
+        Level level = oldTopic.getLevel();
+        if (dto.getLevelId()!=null) {
+             level = levelRepository.findById(dto.getLevelId())
+                    .orElseThrow(() -> new RecordNotFoundException(LEVEL_NOT_FOUND));
+        }
+        Topic topic = from(dto, useFullLinks, subject, files,level);
         topic.setId(dto.getId());
         topicRepository.save(topic);
         return new ApiResponse(SUCCESSFULLY, true);
@@ -95,8 +105,8 @@ public class TopicService implements BaseService<TopicRequestDto, UUID> {
     }
 
     @Transactional(rollbackFor = {Exception.class})
-    public boolean deleteALLBySubjectId(Integer subjectId) {
-        List<Topic> allBySubjectId = topicRepository.findAllBySubjectId(subjectId);
+    public boolean deleteALLBySubjectIdAndLevelId(Integer subjectId, Integer levelId) {
+        List<Topic> allBySubjectId = topicRepository.findAllBySubjectIdAndLevelId(subjectId,levelId);
         allBySubjectId.forEach(topic -> {
             topic.getLessonFiles().forEach(attachmentService::deleteNewName);
             topicRepository.deleteById(topic.getId());
@@ -104,8 +114,8 @@ public class TopicService implements BaseService<TopicRequestDto, UUID> {
         return true;
     }
 
-    public List<TopicResponseDto> findALLBySubjectId(Integer subjectId) {
-        List<Topic> allBySubjectId = topicRepository.findAllBySubjectId(subjectId);
+    public List<TopicResponseDto> findALLBySubjectId(Integer subjectId, Integer levelId) {
+        List<Topic> allBySubjectId = topicRepository.findAllBySubjectIdAndLevelId(subjectId,levelId);
         List<TopicResponseDto> topicResponseDtoList = new ArrayList<>();
         allBySubjectId.forEach(topic -> {
             topicResponseDtoList.add(TopicResponseDto.from(topic, attachmentService.getUrlList(topic.getLessonFiles()), topic.getUseFullLinks().split("newLink")));
@@ -113,12 +123,13 @@ public class TopicService implements BaseService<TopicRequestDto, UUID> {
         return topicResponseDtoList;
     }
 
-    private static Topic from(TopicRequestDto dto, StringBuilder useFullLinks, Subject subject, List<Attachment> files) {
+    private static Topic from(TopicRequestDto dto, StringBuilder useFullLinks, Subject subject, List<Attachment> files,Level level) {
         return Topic.builder()
                 .name(dto.getName())
                 .useFullLinks(useFullLinks.toString())
                 .lessonFiles(files)
                 .subject(subject)
+                .level(level)
                 .creationDate(LocalDateTime.now())
                 .build();
     }

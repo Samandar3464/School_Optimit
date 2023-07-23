@@ -1,8 +1,8 @@
 package com.example.entity;
 
 import com.example.enums.Gender;
-import com.example.enums.Position;
 import com.example.model.request.UserRegisterDto;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -82,37 +82,14 @@ public class User implements UserDetails {
     private Role role;
 
     @ManyToOne
+    @JsonIgnore
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Branch branch;
 
     private boolean deleted;
 
-
-
-
-    @OneToOne(mappedBy = "classLeader")
-    private StudentClass studentClass;
-
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany
     private List<Subject> subjects;
-
-//    @ManyToMany(cascade = CascadeType.ALL)
-//    private List<DailyLessons> dailyLessons;
-
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")
-    private List<Salary> salaries;
-
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")
-    private List<Achievement> achievements;
-
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "employee")
-    private List<WorkExperience> workExperiences;
-
-
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "teacher")
-    private List<TeachingHours> teachingHours;
-
-
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

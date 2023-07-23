@@ -1,17 +1,11 @@
 package com.example.service;
 
-import com.example.entity.Branch;
-import com.example.entity.Room;
-import com.example.entity.StudentClass;
-import com.example.entity.User;
+import com.example.entity.*;
 import com.example.exception.RecordNotFoundException;
 import com.example.exception.UserNotFoundException;
 import com.example.model.common.ApiResponse;
 import com.example.model.request.StudentClassDto;
-import com.example.repository.BranchRepository;
-import com.example.repository.RoomRepository;
-import com.example.repository.StudentClassRepository;
-import com.example.repository.UserRepository;
+import com.example.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -19,7 +13,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 
 import static com.example.enums.Constants.*;
 
@@ -31,6 +24,7 @@ public class StudentClassService implements BaseService<StudentClassDto, Integer
     private final BranchRepository branchRepository;
     private final RoomRepository roomRepository;
     private final UserRepository userRepository;
+    private final LevelRepository levelRepository;
 
     @Override
     @ResponseStatus(HttpStatus.CREATED)
@@ -40,11 +34,14 @@ public class StudentClassService implements BaseService<StudentClassDto, Integer
         Room room = roomRepository.findById(studentClass.getRoomId())
                 .orElseThrow(() -> new RecordNotFoundException(ROOM_NOT_FOUND));
         User teacher = userRepository.findById(studentClass.getClassLeaderId())
-                .orElseThrow(()-> new UserNotFoundException(USER_NOT_FOUND));
+                .orElseThrow(() -> new UserNotFoundException(USER_NOT_FOUND));
+        Level level = levelRepository.findById(studentClass.getLevelId())
+                .orElseThrow(() -> new RecordNotFoundException(LEVEL_NOT_FOUND));
         StudentClass from = StudentClass.from(studentClass);
         from.setBranch(branch);
         from.setRoom(room);
         from.setClassLeader(teacher);
+        from.setLevel(level);
         studentClassRepository.save(from);
         return new ApiResponse(SUCCESSFULLY, true);
     }
@@ -62,15 +59,20 @@ public class StudentClassService implements BaseService<StudentClassDto, Integer
     public ApiResponse update(StudentClassDto studentClassDto) {
         StudentClass studentClass = studentClassRepository.findById(studentClassDto.getId())
                 .orElseThrow(() -> new RecordNotFoundException(CLASS_NOT_FOUND));
-        if (studentClassDto.getRoomId()!=null){
+        if (studentClassDto.getRoomId() != null) {
             Room room = roomRepository.findById(studentClassDto.getRoomId())
                     .orElseThrow(() -> new RecordNotFoundException(ROOM_NOT_FOUND));
             studentClass.setRoom(room);
         }
-        if (studentClassDto.getClassLeaderId()!=null){
+        if (studentClassDto.getClassLeaderId() != null) {
             User teacher = userRepository.findById(studentClassDto.getClassLeaderId())
-                    .orElseThrow(()-> new UserNotFoundException(USER_NOT_FOUND));
+                    .orElseThrow(() -> new UserNotFoundException(USER_NOT_FOUND));
             studentClass.setClassLeader(teacher);
+        }
+        if (studentClassDto.getLevelId() != null) {
+            Level level = levelRepository.findById(studentClassDto.getLevelId())
+                    .orElseThrow(() -> new RecordNotFoundException(LEVEL_NOT_FOUND));
+            studentClass.setLevel(level);
         }
         studentClass.setClassName(studentClassDto.getClassName());
         studentClass.setStartDate(studentClassDto.getStartDate());

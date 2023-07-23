@@ -1,7 +1,6 @@
 package com.example.service;
 
 import com.example.entity.OverallReport;
-import com.example.entity.Salary;
 import com.example.entity.User;
 import com.example.enums.Constants;
 import com.example.enums.Months;
@@ -31,7 +30,7 @@ public class OverallReportService implements BaseService<OverallReportRequest, I
     public ApiResponse create(OverallReportRequest overallReportRequest) {
         User user = userRepository.findById(overallReportRequest.getUserId()).orElseThrow(() -> new UserNotFoundException(USER_NOT_FOUND));
         OverallReport overallReport = getOverallReport(user);
-        setSalary(user, overallReport);
+//        setSalary(user, overallReport);
         overallReport.setMonth(overallReportRequest.getMonth());
         overallReportRepository.save(overallReport);
         return new ApiResponse(Constants.SUCCESSFULLY, true, OverallReportResponse.toOverallResponse(overallReport));
@@ -71,13 +70,13 @@ public class OverallReportService implements BaseService<OverallReportRequest, I
         return new ApiResponse(Constants.DELETED, true, OverallReportResponse.toOverallResponse(overallReport));
     }
 
-    private void setSalary(User user, OverallReport overallReport) {
-        for (Salary salary : user.getSalaries()) {
-            if (salary.isActive()) {
-                overallReport.setSalary(salary);
-            }
-        }
-    }
+//    private void setSalary(User user, OverallReport overallReport) {
+//        for (Salary salary : user.getSalaries()) {
+//            if (salary.isActive()) {
+//                overallReport.setSalary(salary);
+//            }
+//        }
+//    }
 
     private OverallReport checkById(Integer integer) {
         return overallReportRepository.findById(integer).orElseThrow(() -> new RecordNotFoundException(Constants.OVERALL_REPORT_NOT_FOUND));
@@ -85,9 +84,9 @@ public class OverallReportService implements BaseService<OverallReportRequest, I
 
     private OverallReport getOverallReport(User user) {
         String name = " ";
-        if (user.getStudentClass() != null) {
-            name = user.getStudentClass().getClassName();
-        }
+//        if (user.getStudentClass() != null) {
+//            name = user.getStudentClass().getClassName();
+//        }
         try {
             return OverallReport
                     .builder()

@@ -9,5 +9,5 @@ import java.util.UUID;
 public interface TopicRepository extends JpaRepository<Topic, UUID> {
     Boolean existsByNameAndSubjectId(String name, Integer subjectId);
 
-    List<Topic> findAllBySubjectId(Integer subjectId);
+    List<Topic> findAllBySubjectIdAndLevelId(Integer subjectId, Integer levelId);
 }

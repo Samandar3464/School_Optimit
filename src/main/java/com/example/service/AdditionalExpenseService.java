@@ -1,7 +1,6 @@
 package com.example.service;
 
 import com.example.entity.*;
-import com.example.enums.ExpenseType;
 import com.example.exception.RecordNotFoundException;
 import com.example.exception.UserNotFoundException;
 import com.example.model.common.ApiResponse;
@@ -54,6 +53,7 @@ public class AdditionalExpenseService implements BaseService<ExpenseRequestDto, 
                 .branch(branch)
                 .expenseType(dto.getExpenseType())
                 .paymentType(paymentType)
+                .givenDate(dto.getGivenDate())
                 .build();
         additionalExpenseRepository.save(additionalExpense);
         balanceRepository.save(balance);

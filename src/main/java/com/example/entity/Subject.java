@@ -1,8 +1,11 @@
 package com.example.entity;
 
 import com.example.model.request.SubjectRequestDto;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 @Getter
 @Setter
@@ -18,16 +21,19 @@ public class Subject {
 
     private String name;
 
-    private int level;
+    private boolean active;
 
-    private int teachingHours;
+    @ManyToOne
+    @JsonIgnore
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    private Branch branch;
 
-    public static Subject from(SubjectRequestDto subjectRequestDto) {
+    public static Subject from(SubjectRequestDto subjectRequestDto,Branch branch) {
         return Subject
                 .builder()
                 .name(subjectRequestDto.getName())
-                .level(subjectRequestDto.getLevel())
-                .teachingHours(subjectRequestDto.getTeachingHours())
+                .branch(branch)
+                .active(true)
                 .build();
     }
 }

@@ -2,8 +2,8 @@ package com.example.enums;
 public class Constants {
 
     public static final String USER_NOT_FOUND = "USER NOT FOUND";
+    public static final String LEVEL_NOT_FOUND = "LEVEL NOT FOUND";
     public static final String PERMISSION_NOT_FOUND = "PERMISSION NOT FOUND";
-    public static final String NAME_NOT_FOUND = "NAME NOT FOUND";
     public static final String USER_ALREADY_EXIST = "USER ALREADY EXIST";
     public static final String TOKEN_TIME_OUT = "TOKEN TIME OUT";
     public static final String BLOCKED = "BLOCKED";
@@ -12,7 +12,6 @@ public class Constants {
     public static final String SUCCESSFULLY="SUCCESSFULLY";
 
     public static final String DELETED="DELETED";
-    public static final String CAN_NOT_DELETED="CON NOT DELETED";
     public static final String ACTIVATED="ACTIVATED";
     public static final String DEACTIVATED="DEACTIVATED";
     public static final String FILE_NAME_NULL="FILE NAME NULL";
@@ -43,15 +42,14 @@ public class Constants {
     public static final String BRANCH_NOT_FOUND = "BRANCH NOT FOUND";
     public static final String BRANCH_NAME_ALREADY_EXIST = "BRANCH NAME ALREADY EXIST";
     public static final String TARIFF_NOT_FOUND = "TARIFF NOT FOUND";
-    public static final String FOUND = "FOUND  OBJECT";
     public static final String ROOM_TYPE_ALREADY_EXIST = "ROOM TYPE ALREADY EXIST";
     public static final String ROOM_TYPE_NOT_FOUND = "ROOM TYPE NOT FOUND";
     public static final String ROOM_NOT_FOUND = "ROOM NOT FOUND";
     public static final String ROOM_NUMBER_ALREADY_EXIST = "ROOM NUMBER ALREADY EXIST";
     public static final String SUBJECT_NOT_FOUND = "SUBJECT NOT FOUND";
+    public static final String SUBJECT_LEVEL_NOT_FOUND = "SUBJECT LEVEL NOT FOUND";
     public static final String LESSON_SCHEDULE_NOT_FOUND = "LESSON SCHEDULE NOT FOUND";
 
-    public static final String LIFE_TIME_DONT_MATCH = "LIFE TIME DONT MATCH !! PLEASE ENTER CORRECT DATA";
     public static final String TYPE_OF_WORK_NOT_FOUND = "TYPE_OF_WORK_NOT_FOUND";
     public static final String SUBJECT_ALREADY_EXIST = "SUBJECT_ALREADY_EXIST";
 
@@ -66,22 +64,15 @@ public class Constants {
     public static final String ACHIEVEMENT_ALREADY_EXIST = "ACHIEVEMENT_ALREADY_EXIST";
     public static final String JOURNAL_NOT_FOUND = "JOURNAL_NOT_FOUND";
     public static final String SCORE_NOT_FOUND = "SCORE_NOT_FOUND";
-    public static final String ATTENDANT_NOT_FOUND = "ATTENDANT_NOT_FOUND";
     public static final String CLASS_ALREADY_HAVE_JOURNAL = "CLASS ALREADY HAVE JOURNAL";
 
     public static final String TEACHING_HOURS_NOT_FOUND = "TEACHING_HOURS_NOT_FOUND";
-    public static final String HOURS_NOT_ENOUGH = "HOURS_NOT_ENOUGH";
     public static final String OVERALL_REPORT_NOT_FOUND = "OVERALL_REPORT_NOT_FOUND";
     public static final String SALARY_NOT_FOUND = "SALARY_NOT_FOUND";
     public static final String SALARY_NOT_ENOUGH = "SALARY_NOT_ENOUGH";
     public static final String FIX_NOT_ENOUGH = "FIX_NOT_ENOUGH";
-
-    public static final String DATE_DO_NOT_MATCH = "DATE_DO_NOT_MATCH";
     public static final String STAFF_ATTENDANCE_NOT_FOUND = "STAFF_ATTENDANCE_NOT_FOUND";
     public static final String AMOUNT_NOT_ENOUGH = "AMOUNT_NOT_ENOUGH";
-    public static final String EXTRA_MONEY_WAS_ADDED = "extra money was added";
-
-    public static final String CAN_BE_ADDED_ONCE_A_DAY = "can be added once a day";
     public static final String REASON_NOT_FOUND = "REASON NOT FOUND";
     public static final String STUDENT_BALANCE_NOT_FOUND = "ACCOUNT NOT FOUND";
     public static final String ACCOUNT_ALREADY_EXIST = "ACCOUNT ALREADY EXIST";

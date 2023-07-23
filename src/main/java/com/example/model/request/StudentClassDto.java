@@ -1,7 +1,6 @@
 package com.example.model.request;
 
 import com.example.entity.StudentClass;
-import com.example.entity.User;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
@@ -37,6 +36,9 @@ public class StudentClassDto {
 
     private Integer classLeaderId;
 
+    private Integer levelId;
+
+    private Double salaryForClassLeader;
     public static StudentClassDto toResponse(StudentClass studentClass) {
         if (studentClass==null)return null;
 
@@ -47,6 +49,7 @@ public class StudentClassDto {
                 .classLeaderId(studentClass.getClassLeader().getId())
                 .roomId(studentClass.getRoom().getId())
                 .branchId(studentClass.getBranch().getId())
+                .levelId(studentClass.getLevel().getId())
                 .build();
     }
 }

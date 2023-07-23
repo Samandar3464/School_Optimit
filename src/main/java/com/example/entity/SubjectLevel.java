@@ -1,6 +1,6 @@
 package com.example.entity;
 
-import com.example.enums.Months;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.OnDelete;
@@ -12,28 +12,27 @@ import org.hibernate.annotations.OnDeleteAction;
 @NoArgsConstructor
 @Builder
 @Entity
-public class OverallReport {
+public class SubjectLevel {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-//    @Enumerated(EnumType.STRING)
-//    private Position position;
-
-    @Enumerated(EnumType.STRING)
-    private Months month;
-
-    private String classLeadership;
-
-//    @ManyToOne
-//    private Salary salary;
-
     @ManyToOne
-    private User user;
-
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    private Subject subject;
 
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
+    private Level level;
+
+    private int teachingHour;
+
+    private double priceForPerHour;
+
+    @ManyToOne
+    @JsonIgnore
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Branch branch;
+
 }

@@ -33,4 +33,7 @@ public class Topic {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Subject subject;
 
+    @OneToOne
+    private Level level;
+
 }
