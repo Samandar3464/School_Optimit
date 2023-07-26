@@ -14,6 +14,8 @@ public class BranchDto {
     @Column(nullable = false)
     private String name;
 
+    private String address;
+
     private Integer businessId;
 
 }

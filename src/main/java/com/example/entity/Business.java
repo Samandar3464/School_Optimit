@@ -18,8 +18,6 @@ public class Business {
     @Column(nullable = false)
     private String name;
 
-    private String address;
-
     private String description;
 
     private String phoneNumber;
@@ -31,7 +29,6 @@ public class Business {
     public static Business from(Business business){
         return Business.builder()
                 .name(business.getName())
-                .address(business.getAddress())
                 .description(business.getDescription())
                 .phoneNumber(business.getPhoneNumber())
                 .active(true)
