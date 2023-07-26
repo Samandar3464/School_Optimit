@@ -55,6 +55,7 @@ public class BranchService implements BaseService<BranchDto, Integer> {
         Branch branch = branchRepository.findById(branchDto.getId())
                 .orElseThrow(() -> new RecordNotFoundException(BRANCH_NOT_FOUND));
         branch.setName(branchDto.getName());
+        branch.setAddress(branchDto.getAddress());
         branchRepository.save(branch);
         return new ApiResponse(SUCCESSFULLY, true);
     }
