@@ -30,8 +30,8 @@ public class ScoreResponseForStudent {
     public static ScoreResponseForStudent from(Score score) {
         return ScoreResponseForStudent.builder()
                 .id(score.getId())
-                .score(score.getScore())
-                .teacherName(score.getTeacher().getName())
+                .score(score.getScoreOrAttendance())
+//                .teacherName(score.getTeacher().getFullName())
                 .createdDate(score.getCreatedDate())
                 .build();
     }

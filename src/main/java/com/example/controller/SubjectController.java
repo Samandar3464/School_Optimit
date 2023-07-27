@@ -1,7 +1,7 @@
 package com.example.controller;
 
 import com.example.model.common.ApiResponse;
-import com.example.model.request.SubjectRequest;
+import com.example.model.request.SubjectRequestDto;
 import com.example.service.SubjectService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -13,24 +13,28 @@ public class SubjectController {
 
     private final SubjectService subjectService;
 
-    @PostMapping("save")
-    public ApiResponse save(@RequestBody SubjectRequest subjectRequest) {
-        return subjectService.create(subjectRequest);
+    @PostMapping("create")
+    public ApiResponse save(@RequestBody SubjectRequestDto subjectRequestDto) {
+        return subjectService.create(subjectRequestDto);
     }
 
-    @GetMapping("getById/{id}")
-    public ApiResponse getById(@PathVariable Integer id) {
-        return subjectService.getById(id);
+    @GetMapping("getById")
+    public ApiResponse getById(
+            @RequestParam(name = "subjectId") Integer subjectId,
+            @RequestParam(name = "levelId") Integer levelId) {
+        return subjectService.getById(subjectId, levelId);
     }
 
-    @GetMapping("getAllSubjectByBranchId/{id}")
-    public ApiResponse getAllSubjectByBranchId(@PathVariable Integer id) {
+
+    @GetMapping("getAllByBranchId/{id}")
+    public ApiResponse getAllByBranchId(@PathVariable Integer id) {
         return subjectService.getAllSubjectByBranchId(id);
     }
 
+
     @PutMapping("update")
-    public ApiResponse update(@RequestBody SubjectRequest subjectRequest) {
-        return subjectService.update(subjectRequest);
+    public ApiResponse update(@RequestBody SubjectRequestDto subjectRequestDto) {
+        return subjectService.update(subjectRequestDto);
     }
 
     @DeleteMapping("delete/{id}")

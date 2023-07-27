@@ -85,4 +85,17 @@ public class TariffService implements BaseService<TariffDto, Integer> {
     private Tariff checkById(Integer id) {
         return repository.findById(id).orElseThrow(() -> new RecordNotFoundException(Constants.TARIFF_NOT_FOUND));
     }
+
+
+    private void setPermission(TariffDto tariffDto, Tariff tariff) {
+        tariff.setPermissions(permissionRepository.findAllById(tariffDto.getPermissionsList()));
+    }
+
+    private static void checkLifeTimeValid(TariffDto tariffDto, Tariff tariff) {
+        try {
+            tariff.setLifetime(Lifetime.valueOf(tariffDto.getLifetime()));
+        } catch (Exception e) {
+            throw new RecordNotFoundException(Constants.LIFE_TIME_DONT_MATCH + "    " + e);
+        }
+    }
 }

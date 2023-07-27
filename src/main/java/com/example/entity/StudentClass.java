@@ -28,6 +28,9 @@ public class StudentClass {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
+    @OneToOne
+    private Level level;
+
     @Column(nullable = false)
     private String className;
 
@@ -40,7 +43,6 @@ public class StudentClass {
     private LocalDate endDate;
 
     private boolean active;
-
 
     @JsonIgnore
     @ManyToOne
@@ -56,19 +58,18 @@ public class StudentClass {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Branch branch;
 
-
     @OneToOne
     private User classLeader;
 
+    private Double salaryForClassLeader;
 
-    public static StudentClass from(StudentClassDto studentClass, Branch branch, Room room) {
+    public static StudentClass from(StudentClassDto studentClass) {
         return StudentClass.builder()
                 .className(studentClass.getClassName())
                 .createdDate(LocalDateTime.now())
                 .startDate(studentClass.getStartDate())
                 .endDate(studentClass.getEndDate())
-                .branch(branch)
-                .room(room)
+                .salaryForClassLeader(studentClass.getSalaryForClassLeader())
                 .active(true)
                 .build();
     }

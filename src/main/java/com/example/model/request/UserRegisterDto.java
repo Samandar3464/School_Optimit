@@ -63,7 +63,7 @@ public class UserRegisterDto {
     private MultipartFile profilePhoto;
 
     private List<Integer> rolesIds;
-    
+
     private List<Integer> subjectsIds;
 
     private boolean married;

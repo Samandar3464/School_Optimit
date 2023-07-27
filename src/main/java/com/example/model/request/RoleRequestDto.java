@@ -1,6 +1,7 @@
 package com.example.model.request;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
 
 import java.util.List;
@@ -13,8 +14,10 @@ public class RoleRequestDto {
     @NotBlank
     private String name;
 
-    private String parentRole;
+    private Integer parentId;
 
-    @NotBlank
+    private Integer branchId;
+
+    @NotEmpty
     private List<Integer> permissionIdList;
 }

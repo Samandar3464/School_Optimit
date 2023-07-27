@@ -7,7 +7,8 @@ import java.util.List;
 import java.util.Optional;
 
 public interface SubjectRepository extends JpaRepository<Subject,Integer> {
-    Optional<Subject> findByNameAndActiveTrue(String name);
+    Optional<Subject> findByName(String name);
+    Optional<Subject> findByIdAndActiveTrue(Integer id);
 
-    List<Subject> findAllByBranch_Id(Integer id);
+    List<Subject> findAllByBranchId(Integer branchId);
 }

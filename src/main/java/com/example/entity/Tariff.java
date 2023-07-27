@@ -19,22 +19,20 @@ public class Tariff {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String name;
 
-    @Column(nullable = false)
+    @Column(nullable = false , columnDefinition="TEXT")
     private String description;
 
-    @OneToMany
+    @ManyToMany
     private List<Permission> permissions;
 
     private int branchAmount;
 
-    private long productAmount;
+    private int productAmount;
 
     private int employeeAmount;
-
-    private long tradeAmount;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -53,7 +51,7 @@ public class Tariff {
 
     private boolean delete;
 
-    public static Tariff toEntity(TariffDto tariffDto) {
+    public static Tariff toEntity(TariffDto tariffDto, List<Permission> permissions) {
         return Tariff
                 .builder()
                 .name(tariffDto.getName())
@@ -61,14 +59,15 @@ public class Tariff {
                 .branchAmount(tariffDto.getBranchAmount())
                 .productAmount(tariffDto.getProductAmount())
                 .employeeAmount(tariffDto.getEmployeeAmount())
-                .tradeAmount(tariffDto.getTradeAmount())
                 .testDay(tariffDto.getTestDay())
                 .lifetime(tariffDto.getLifetime())
                 .interval(tariffDto.getInterval())
                 .price(tariffDto.getPrice())
                 .discount(tariffDto.getDiscount())
-                .active(tariffDto.isActive())
-                .delete(tariffDto.isDelete())
+                .active(true)
+                .delete(false)
+                .lifetime(tariffDto.getLifetime())
+                .permissions(permissions)
                 .build();
     }
 }

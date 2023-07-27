@@ -47,7 +47,7 @@ public class ScoreService implements BaseService<ScoreRequestDto, UUID> {
         Journal journal = journalRepository.findById(dto.getJournalId())
                 .orElseThrow(() -> new UserNotFoundException(JOURNAL_NOT_FOUND));
         Score score = Score.builder()
-                .score(dto.getScore())
+                .scoreOrAttendance(dto.getScore())
                 .student(student)
                 .teacher(teacher)
                 .subject(subject)
@@ -70,7 +70,7 @@ public class ScoreService implements BaseService<ScoreRequestDto, UUID> {
     public ApiResponse update(ScoreRequestDto dto) {
         Score score = scoreRepository.findById(dto.getId())
                 .orElseThrow(() -> new RecordNotFoundException(SCORE_NOT_FOUND));
-        score.setScore(dto.getScore());
+        score.setScoreOrAttendance(dto.getScore());
         scoreRepository.save(score);
         return new ApiResponse(SUCCESSFULLY, true);
     }

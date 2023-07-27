@@ -1,12 +1,11 @@
 package com.example.controller;
 
+import com.example.entity.Permission;
 import com.example.model.common.ApiResponse;
 import com.example.service.PermissionService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/permission/")
@@ -14,6 +13,21 @@ import org.springframework.web.bind.annotation.RestController;
 public class PermissionController {
 
     private final PermissionService permissionService;
+
+    @PostMapping("addPermission")
+    public ApiResponse addPermission(@RequestBody @Valid Permission permission) {
+        return permissionService.create(permission);
+    }
+
+    @PutMapping("updatePermission")
+    public ApiResponse updatePermission(@RequestBody @Valid Permission permission) {
+        return permissionService.update(permission);
+    }
+
+    @DeleteMapping("deletePermission/{id}")
+    public ApiResponse deletePermission(@PathVariable Integer id) {
+        return permissionService.delete(id);
+    }
 
     @GetMapping("getPermissionList")
     public ApiResponse getList() {

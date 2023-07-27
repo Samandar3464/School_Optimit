@@ -15,21 +15,21 @@ import java.util.UUID;
 @NoArgsConstructor
 public class TopicResponseDto {
 
-    private Integer id;
+    private UUID id;
 
     private String name;
 
     private List<String> lessonFiles;
 
-    private String [] useFullLinks;
+    private  String[] useFullLinks;
 
-    public static TopicResponseDto from(Topic topic, List<String> lessonFiles,String[] useFullLinks) {
-      return TopicResponseDto
-              .builder()
-              .id(topic.getId())
-              .name(topic.getName())
-              .lessonFiles(lessonFiles)
-              .useFullLinks(useFullLinks)
-              .build();
+
+    public static TopicResponseDto from(Topic topic, List<String> lessonFiles, String[] useFullLinks) {
+        return TopicResponseDto.builder()
+                .id(topic.getId())
+                .name(topic.getName())
+                .lessonFiles(lessonFiles)
+                .useFullLinks(useFullLinks)
+                .build();
     }
 }

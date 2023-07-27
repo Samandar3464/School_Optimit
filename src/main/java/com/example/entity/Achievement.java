@@ -1,11 +1,8 @@
 package com.example.entity;
 
 import com.example.model.request.AchievementDto;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
 
 import java.util.UUID;
 
@@ -20,11 +17,12 @@ public class Achievement {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
+    @Column(unique = true)
     private String name;
 
     private String aboutAchievement;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)
     private Attachment photoCertificate;
 
     @ManyToOne

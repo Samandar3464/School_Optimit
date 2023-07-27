@@ -1,9 +1,11 @@
 package com.example.entity;
 
+import com.example.enums.ExpenseType;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Getter
@@ -24,6 +26,9 @@ public class AdditionalExpense {
     @Column(nullable = false)
     private String reason;
 
+    @Enumerated(EnumType.STRING)
+    private ExpenseType expenseType;
+
     @OneToOne
     private User taker;
 
@@ -33,6 +38,8 @@ public class AdditionalExpense {
     @JsonIgnore
     @OneToOne
     private Branch branch;
+
+    private LocalDate givenDate;
 
     private LocalDateTime createdTime;
 }

@@ -2,6 +2,7 @@ package com.example.service;
 
 import com.example.entity.*;
 import com.example.exception.RecordNotFoundException;
+import com.example.exception.UserNotFoundException;
 import com.example.model.common.ApiResponse;
 import com.example.model.request.LessonScheduleDto;
 import com.example.model.response.ErrorResponseSchedule;
@@ -10,6 +11,7 @@ import com.example.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 import java.time.LocalDate;
@@ -30,9 +32,11 @@ public class LessonScheduleService implements BaseService<List<LessonScheduleDto
     private final RoomRepository roomRepository;
     private final StudentClassRepository studentClassRepository;
     private final LessonScheduleRepository lessonScheduleRepository;
+    private final TypeOfWorkRepository typeOfWorkRepository;
 
     @Override
     @ResponseStatus(HttpStatus.CREATED)
+    @Transactional(rollbackFor = {RecordNotFoundException.class, UserNotFoundException.class})
     public ApiResponse create(List<LessonScheduleDto> scheduleDtoList) {
         List<ErrorResponseSchedule> errorResponse = new ArrayList<>();
         int i = 0;
@@ -87,6 +91,7 @@ public class LessonScheduleService implements BaseService<List<LessonScheduleDto
 
 
     @ResponseStatus(HttpStatus.OK)
+    @Transactional(rollbackFor = {RecordNotFoundException.class, UserNotFoundException.class})
     public ApiResponse update(LessonScheduleDto schd) {
         Optional<LessonSchedule> teacherBusy = lessonScheduleRepository.findFirstByBranchIdAndTeacherIdAndStartTimeAndActiveTrue(schd.getBranchId(), schd.getTeacherId(), schd.getStartTime());
         Optional<LessonSchedule> studentClassBusy = lessonScheduleRepository.findFirstByBranchIdAndStudentClassIdAndStartTimeAndActiveTrue(schd.getBranchId(), schd.getStudentClassId(), schd.getStartTime());
@@ -145,10 +150,11 @@ public class LessonScheduleService implements BaseService<List<LessonScheduleDto
         List<LessonSchedule> lessonScheduleList = new ArrayList<>();
         scheduleDtoList.forEach(schd -> {
             Branch branch = branchRepository.findById(schd.getBranchId()).orElseThrow(() -> new RecordNotFoundException(BRANCH_NOT_FOUND));
-            User teacher = userRepository.findById(schd.getTeacherId()).orElseThrow(() -> new RecordNotFoundException(TEACHER_NOT_FOUND));
+            User teacher = userRepository.findById(schd.getTeacherId()).orElseThrow(() -> new UserNotFoundException(TEACHER_NOT_FOUND));
             Subject subject = subjectRepository.findById(schd.getSubjectId()).orElseThrow(() -> new RecordNotFoundException(SUBJECT_NOT_FOUND));
             Room room = roomRepository.findById(schd.getRoomId()).orElseThrow(() -> new RecordNotFoundException(ROOM_NOT_FOUND));
             StudentClass studentClass = studentClassRepository.findById(schd.getStudentClassId()).orElseThrow(() -> new RecordNotFoundException(CLASS_NOT_FOUND));
+            TypeOfWork typeOfWork = typeOfWorkRepository.findById(schd.getTypeOfWorkId()).orElseThrow(() -> new RecordNotFoundException(TYPE_OF_WORK_NOT_FOUND));
 
             LessonSchedule lessonSchedule = LessonSchedule.from(schd);
             lessonSchedule.setBranch(branch);
@@ -156,30 +162,37 @@ public class LessonScheduleService implements BaseService<List<LessonScheduleDto
             lessonSchedule.setSubject(subject);
             lessonSchedule.setRoom(room);
             lessonSchedule.setStudentClass(studentClass);
+            lessonSchedule.setTypeOfWork(typeOfWork);
             lessonScheduleList.add(lessonSchedule);
         });
         lessonScheduleRepository.saveAll(lessonScheduleList);
     }
 
     private void updateCreator(LessonScheduleDto schd) {
-        LessonSchedule lessonSchedule = lessonScheduleRepository.findById(schd.getId())
-                .orElseThrow(() -> new RecordNotFoundException(LESSON_SCHEDULE_NOT_FOUND));
-
-        Branch branch = branchRepository.findById(schd.getBranchId()).orElseThrow(() -> new RecordNotFoundException(BRANCH_NOT_FOUND));
-        User teacher = userRepository.findById(schd.getTeacherId()).orElseThrow(() -> new RecordNotFoundException(TEACHER_NOT_FOUND));
-        Subject subject = subjectRepository.findById(schd.getSubjectId()).orElseThrow(() -> new RecordNotFoundException(SUBJECT_NOT_FOUND));
-        Room room = roomRepository.findById(schd.getRoomId()).orElseThrow(() -> new RecordNotFoundException(ROOM_NOT_FOUND));
-        StudentClass studentClass = studentClassRepository.findById(schd.getStudentClassId()).orElseThrow(() -> new RecordNotFoundException(CLASS_NOT_FOUND));
-
+        LessonSchedule lessonSchedule = lessonScheduleRepository.findById(schd.getId()).orElseThrow(() -> new RecordNotFoundException(LESSON_SCHEDULE_NOT_FOUND));
         lessonSchedule.setDurationLesson(schd.getDurationLesson());
         lessonSchedule.setStartTime(schd.getStartTime());
         lessonSchedule.setEndTime(schd.getEndTime());
-        lessonSchedule.setBranch(branch);
-        lessonSchedule.setTeacher(teacher);
-        lessonSchedule.setSubject(subject);
-        lessonSchedule.setRoom(room);
-        lessonSchedule.setStudentClass(studentClass);
-
+        if (!schd.getTeacherId().equals(lessonSchedule.getTeacher().getId())) {
+            User teacher = userRepository.findById(schd.getTeacherId()).orElseThrow(() -> new UserNotFoundException(TEACHER_NOT_FOUND));
+            lessonSchedule.setTeacher(teacher);
+        }
+        if (!schd.getSubjectId().equals(lessonSchedule.getSubject().getId())) {
+            Subject subject = subjectRepository.findById(schd.getSubjectId()).orElseThrow(() -> new RecordNotFoundException(SUBJECT_NOT_FOUND));
+            lessonSchedule.setSubject(subject);
+        }
+        if (!schd.getRoomId().equals(lessonSchedule.getRoom().getId())) {
+            Room room = roomRepository.findById(schd.getRoomId()).orElseThrow(() -> new RecordNotFoundException(ROOM_NOT_FOUND));
+            lessonSchedule.setRoom(room);
+        }
+        if (!schd.getStudentClassId().equals(lessonSchedule.getStudentClass().getId())) {
+            StudentClass studentClass = studentClassRepository.findById(schd.getStudentClassId()).orElseThrow(() -> new RecordNotFoundException(CLASS_NOT_FOUND));
+            lessonSchedule.setStudentClass(studentClass);
+        }
+        if (!schd.getTeacherId().equals(lessonSchedule.getTypeOfWork().getId())) {
+            TypeOfWork typeOfWork = typeOfWorkRepository.findById(schd.getTypeOfWorkId()).orElseThrow(() -> new RecordNotFoundException(TYPE_OF_WORK_NOT_FOUND));
+            lessonSchedule.setTypeOfWork(typeOfWork);
+        }
         lessonScheduleRepository.save(lessonSchedule);
     }
 }

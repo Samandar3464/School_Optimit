@@ -19,6 +19,8 @@ import java.time.LocalDateTime;
 public class SalaryService implements BaseService<SalaryRequest, Integer> {
 
     private final SalaryRepository salaryRepository;
+    private final TeachingHoursRepository teachingHoursRepository;
+    private final StaffAttendanceService staffAttendanceService;
     private final UserRepository userRepository;
     private final BranchRepository branchRepository;
     private final PaymentTypeRepository paymentTypeRepository;

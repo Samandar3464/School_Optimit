@@ -3,12 +3,8 @@ package com.example.config;
 
 import com.example.entity.*;
 import com.example.enums.Gender;
-import com.example.kitchen.entity.Measurement;
-import com.example.kitchen.entity.Product;
 import com.example.kitchen.repository.MeasurementRepository;
-import com.example.kitchen.repository.ProductRepository;
 import com.example.repository.*;
-import com.example.service.PermissionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
@@ -18,107 +14,36 @@ import org.springframework.stereotype.Component;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
 public class DataLoader implements CommandLineRunner {
 
-    private final PermissionService permissionService;
+    private final PermissionRepository permissionRepository;
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
+    private final PaymentTypeRepository paymentTypeRepository;
+    private final LevelRepository levelRepository;
     private final BusinessRepository businessRepository;
     private final BranchRepository branchRepository;
     private final MeasurementRepository measurementRepository;
-    private final ProductRepository productRepository;
-    private final PaymentTypeRepository paymentTypeRepository;
+    private final RoomTypeRepository roomTypeRepository;
+    private final RoomRepository roomRepository;
+    private final StudentClassRepository studentClassRepository;
+    private final TypeOfWorkRepository typeOfWorkRepository;
+    private final SubjectRepository subjectRepository;
+    private final BalanceRepository balanceRepository;
+    private  final SubjectLevelRepository subjectLevelRepository;
+
     @Value("${spring.sql.init.mode}")
     private String initMode;
 
     @Override
-    public void run(String... args) throws Exception {
+    public void run(String... args) {
 
-        if (permissionService.isEmpty()) {
-            permissionService.create(new Permission(1, "ROLE_ACCESS"));
-            permissionService.create(new Permission(2, "ADD"));
-            permissionService.create(new Permission(3, "read"));
-        }
 
         if (initMode.equals("always")) {
-            Role supper_admin = new Role(1, "SUPER_ADMIN");
-            supper_admin.setPermissions(permissionService.getAll());
-            Role role = new Role();
-            if (roleRepository.findByName("SUPER_ADMIN").isEmpty()) {
-                role = roleRepository.save(supper_admin);
-            }
-            User admin = User.builder()
-                    .name("ADMIN")
-                    .surname("ADMIN")
-                    .fatherName("ADMIN")
-                    .phoneNumber("907403767")
-                    .birthDate(LocalDate.parse("1998-05-13"))
-                    .gender(Gender.ERKAK)
-                    .workDays(30)
-                    .registeredDate(LocalDateTime.now())
-                    .verificationCode(0)
-                    .password(passwordEncoder.encode("111111"))
-                    .blocked(false)
-                    .branch(branchRepository.findById(1).get())
-                    .roles(List.of(role))
-                    .build();
-            Optional<User> phoneNumber = userRepository.findByPhoneNumber("907403767");
-            if (phoneNumber.isEmpty()) {
-                userRepository.save(admin);
-            }
-            Business business = Business.builder()
-                    .name("Demo business")
-                    .address("Demo")
-                    .description("Demo")
-                    .phoneNumber("Demo")
-                    .active(true)
-                    .delete(false)
-                    .build();
-            Business save = businessRepository.save(business);
-
-            Branch branch = Branch.builder()
-                    .name("Demo branch")
-                    .business(save)
-                    .delete(false)
-                    .build();
-            Branch save1 = branchRepository.save(branch);
-
-            Measurement measurement = Measurement.builder()
-                    .name("KG")
-                    .branch(save1)
-                    .active(true)
-                    .build();
-            Measurement save2 = measurementRepository.save(measurement);
-
-            Measurement measurement1 = Measurement.builder()
-                    .name("Liter")
-                    .branch(save1)
-                    .active(true)
-                    .build();
-            Measurement save3 = measurementRepository.save(measurement1);
-
-            Product product = Product.builder()
-                    .branch(save1)
-                    .measurement(save2)
-                    .name("Kartoshka")
-                    .description("malumoti")
-                    .active(true)
-                    .build();
-            productRepository.save(product);
-
-            Product product1 = Product.builder()
-                    .branch(save1)
-                    .measurement(save3)
-                    .name("Sut")
-                    .description("malumoti")
-                    .active(true)
-                    .build();
-            productRepository.save(product1);
 
             PaymentType xisobdanXisobga = PaymentType.builder().name("Xisobdan xisobga").build();
             PaymentType karta = PaymentType.builder().name("Karta orqali").build();
@@ -128,9 +53,45 @@ public class DataLoader implements CommandLineRunner {
             paymentTypeRepository.saveAll(List.of(karta, elektron, xisobdanXisobga, naqt));
 
 
+            Level level1 = new Level(1, 1);
+            Level level2 = new Level(2, 2);
+            Level level3 = new Level(3, 3);
+            Level level4 = new Level(4, 4);
+            Level level5 = new Level(5, 5);
+            Level level6 = new Level(6, 6);
+            Level level7 = new Level(7, 7);
+            Level level8 = new Level(8, 8);
+            Level level9 = new Level(9, 9);
+            Level level10 = new Level(10, 10);
+            Level level11 = new Level(11, 11);
+
+            levelRepository.saveAll(List.of(level1, level2, level3, level4, level5, level6, level7, level8, level9, level10, level11));
+
+            Permission p1 = permissionRepository.save(new Permission(1, "ROLE_ACCESS"));
+            Permission p2 = permissionRepository.save(new Permission(2, "ADD"));
+            Permission p3 = permissionRepository.save(new Permission(3, "read"));
+
+            Role supper_admin = Role.builder().id(1).name("SUPER_ADMIN").permissions(List.of(p1, p2, p3)).active(true).build();
+
+            roleRepository.save(supper_admin);
+
+            User superAdmin = User.builder()
+                    .name("Super Admin")
+                    .surname("Admin")
+                    .fatherName("Admin")
+                    .phoneNumber("906163464")
+                    .birthDate(LocalDate.parse("1998-05-13"))
+                    .gender(Gender.ERKAK)
+                    .workDays(30)
+                    .registeredDate(LocalDateTime.now())
+                    .verificationCode(0)
+                    .password(passwordEncoder.encode("111111"))
+                    .isBlocked(true)
+                    .deleted(false)
+                    .role(supper_admin)
+                    .build();
+            userRepository.save(superAdmin);
 
         }
-
-
     }
 }

@@ -3,8 +3,8 @@ package com.example.controller;
 import com.example.model.common.ApiResponse;
 import com.example.model.request.RoleRequestDto;
 import com.example.service.RoleService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -16,13 +16,13 @@ public class RoleController {
 
     @PostMapping("/save")
 //    @PreAuthorize("hasAuthority('ROLE_ACCESS' or 'SUPER_ADMIN')")
-    public ApiResponse save(@RequestBody RoleRequestDto requestDto) {
+    public ApiResponse create(@RequestBody @Valid RoleRequestDto requestDto) {
         return roleService.create(requestDto);
     }
 
     @PutMapping("/update")
 //    @PreAuthorize("hasAuthority('ROLE_ACCESS' or 'SUPER_ADMIN')")
-    public ApiResponse update(@RequestBody RoleRequestDto requestDto) {
+    public ApiResponse update(@RequestBody @Valid RoleRequestDto requestDto) {
         return roleService.update(requestDto);
     }
 
@@ -33,10 +33,11 @@ public class RoleController {
 
     @GetMapping("/getList")
     public ApiResponse getList(
-            @RequestParam(name = "page", defaultValue = "0") int page,
-            @RequestParam(name = "page", defaultValue = "5") int size
+            @RequestParam(name = "page", defaultValue = "1") int page,
+            @RequestParam(name = "size", defaultValue = "10") int size,
+            @RequestParam(name = "branchId") int branchId
     ) {
-        return roleService.getList(size,page);
+        return roleService.getList(size,page,branchId);
     }
 
     @DeleteMapping("/delete/{id}")

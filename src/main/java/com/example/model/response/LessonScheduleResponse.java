@@ -44,7 +44,7 @@ public class LessonScheduleResponse {
         return LessonScheduleResponse.builder()
                 .id(schedule.getId())
                 .subject(schedule.getSubject().getName())
-                .teacher(schedule.getTeacher().getName())
+//                .teacher(schedule.getTeacher().getFullName())
                 .durationLesson(schedule.getDurationLesson())
                 .startTime(schedule.getStartTime())
                 .endTime(schedule.getEndTime())

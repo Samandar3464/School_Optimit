@@ -24,6 +24,8 @@ public class Branch {
     @Column(nullable = false)
     private String name;
 
+    private String address;
+
     @JsonIgnore
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
@@ -31,14 +33,11 @@ public class Branch {
 
     private boolean delete;
 
-    @OneToMany(mappedBy = "branch")
-    @JsonIgnore
-    private List<User> userList;
-
     public static Branch from(BranchDto branchDto, Business business) {
         return Branch.builder()
                 .name(branchDto.getName())
                 .business(business)
+                .address(branchDto.getAddress())
                 .delete(false)
                 .build();
     }
