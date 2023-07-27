@@ -72,8 +72,8 @@ public class User implements UserDetails {
     @OneToOne(cascade = CascadeType.ALL)
     private Attachment profilePhoto;
 
-    @ManyToMany(fetch = FetchType.EAGER)
-    private List<Role> roles;
+    @ManyToOne
+    private Role role;
 
     @ManyToOne
     @JsonIgnore
@@ -86,10 +86,8 @@ public class User implements UserDetails {
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         List<SimpleGrantedAuthority> authorityList = new ArrayList<>();
-        for (Role role : roles) {
-            authorityList.add(new SimpleGrantedAuthority("ROLE_" + role.getName()));
-            role.getPermissions().forEach(permission -> authorityList.add(new SimpleGrantedAuthority(permission.getName())));
-        }
+        authorityList.add(new SimpleGrantedAuthority("ROLE_" + role.getName()));
+        role.getPermissions().forEach(permission -> authorityList.add(new SimpleGrantedAuthority(permission.getName())));
         return authorityList;
     }
 
@@ -115,7 +113,7 @@ public class User implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return blocked;
+        return true;
     }
 
     public static User from(UserRegisterDto userRegisterDto) {

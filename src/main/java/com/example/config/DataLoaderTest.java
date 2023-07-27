@@ -67,14 +67,14 @@ public class DataLoaderTest implements CommandLineRunner {
                     .name(" teacher")
                     .surname("teacher")
                     .fatherName("teacher")
-                    .phoneNumber("111111111")
+                    .phoneNumber("111111112")
                     .birthDate(LocalDate.parse("1998-05-13"))
                     .gender(Gender.ERKAK)
                     .registeredDate(LocalDateTime.now())
                     .verificationCode(0)
                     .password(passwordEncoder.encode("111111"))
-                    .blocked(true)
-                    .roles(Collections.singletonList(savedRole))
+                    .blocked(false)
+                    .role(savedRole)
                     .branch(saveBranch)
                     .build();
             User savedTeacher = userRepository.save(teacher);
