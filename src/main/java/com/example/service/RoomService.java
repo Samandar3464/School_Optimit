@@ -59,11 +59,13 @@ public class RoomService implements BaseService<RoomRequestDto, Integer> {
     @Override
     @ResponseStatus(HttpStatus.OK)
     public ApiResponse update(RoomRequestDto roomRequestDto) {
-        if (roomRepository.existsByBranchIdAndRoomNumber(roomRequestDto.getBranchId(), roomRequestDto.getRoomNumber())) {
-            throw new RecordNotFoundException(ROOM_NUMBER_ALREADY_EXIST);
-        }
         Room room = roomRepository.findById(roomRequestDto.getRoomId())
                 .orElseThrow(() -> new RecordNotFoundException(ROOM_NOT_FOUND));
+        if (!room.getRoomNumber().equals(roomRequestDto.getRoomNumber())){
+            if (roomRepository.existsByBranchIdAndRoomNumber(roomRequestDto.getBranchId(), roomRequestDto.getRoomNumber())) {
+                throw new RecordNotFoundException(ROOM_NUMBER_ALREADY_EXIST);
+            }
+        }
         RoomType roomType = roomTypeRepository.findById(roomRequestDto.getRoomTypeId())
                 .orElseThrow(() -> new RecordNotFoundException(ROOM_TYPE_NOT_FOUND));
         room.setRoomNumber(roomRequestDto.getRoomNumber());

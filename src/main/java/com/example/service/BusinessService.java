@@ -43,11 +43,13 @@ public class BusinessService implements BaseService<Business, Integer> {
     @Override
     @ResponseStatus(HttpStatus.OK)
     public ApiResponse update(Business newBusiness) {
-        if (businessRepository.existsByName(newBusiness.getName())) {
-            throw new RecordAlreadyExistException(BUSINESS_NAME_ALREADY_EXIST);
-        }
         Business business = businessRepository.findById(newBusiness.getId())
                 .orElseThrow(() -> new RecordNotFoundException(BUSINESS_NOT_FOUND));
+        if (!business.getName().equals(newBusiness.getName())){
+            if (businessRepository.existsByName(newBusiness.getName())) {
+                throw new RecordAlreadyExistException(BUSINESS_NAME_ALREADY_EXIST);
+            }
+        }
         business.setName(newBusiness.getName());
         business.setDescription(newBusiness.getDescription());
         businessRepository.save(business);
