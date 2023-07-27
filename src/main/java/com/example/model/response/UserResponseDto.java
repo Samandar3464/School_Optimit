@@ -45,7 +45,11 @@ public class UserResponseDto {
 
     private List<Subject> subjects;
 
-    private List<Role> roles;
+    private Role role;
+
+    private Branch branch;
+
+    private Integer businessId;
 
 
     public static UserResponseDto from(User user) {
@@ -59,10 +63,12 @@ public class UserResponseDto {
                 .inn(user.getInn())
                 .inps(user.getInps())
                 .subjects(user.getSubjects())
-                .roles(user.getRoles())
+                .role(user.getRole())
                 .phoneNumber(user.getPhoneNumber())
                 .birthDate(user.getBirthDate().toString())
                 .gender(user.getGender().toString())
+                .branch(user.getBranch() == null ? null : user.getBranch())
+                .businessId(user.getBranch() == null ? null : user.getBranch().getBusiness().getId())
                 .build();
     }
 }

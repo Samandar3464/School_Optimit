@@ -87,8 +87,8 @@ public class DataLoader implements CommandLineRunner {
                     .registeredDate(LocalDateTime.now())
                     .verificationCode(0)
                     .password(passwordEncoder.encode("111111"))
-                    .blocked(true)
-                    .roles(Collections.singletonList(supper_admin))
+                    .blocked(false)
+                    .role(supper_admin)
                     .build();
             userRepository.save(superAdmin);
 

@@ -20,6 +20,7 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+
 public class UserRegisterDto {
 
     private Integer id;
@@ -62,7 +63,7 @@ public class UserRegisterDto {
 
     private MultipartFile profilePhoto;
 
-    private List<Integer> rolesIds;
+    private Integer roleId;
 
     private List<Integer> subjectsIds;
 

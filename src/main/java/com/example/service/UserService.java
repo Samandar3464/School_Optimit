@@ -254,7 +254,7 @@ public class UserService implements BaseService<UserRegisterDto, Integer> {
         }
         User user = User.from(userRegisterDto);
         user.setBranch(branchRepository.findById(userRegisterDto.getBranchId()).orElseThrow(() -> new RecordNotFoundException(BRANCH_NOT_FOUND)));
-        user.setRoles(userRegisterDto.getRolesIds() == null ? null : roleRepository.findAllById(userRegisterDto.getRolesIds()));
+        user.setRole(roleRepository.findById(userRegisterDto.getRoleId()).orElseThrow(() -> new RecordNotFoundException(ROLE_NOT_FOUND)));
         user.setPassword(passwordEncoder.encode(userRegisterDto.getPassword()));
         user.setSubjects(userRegisterDto.getSubjectsIds() == null ? null : subjectRepository.findAllById(userRegisterDto.getSubjectsIds()));
         return user;
