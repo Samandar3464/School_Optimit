@@ -1,6 +1,5 @@
 package com.example.service;
 
-import com.example.entity.User;
 import com.example.entity.WorkExperience;
 import com.example.enums.Constants;
 import com.example.exception.RecordAlreadyExistException;
@@ -15,10 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-import java.util.ArrayList;
 import java.util.List;
-
-import static com.example.enums.Constants.*;
 
 @Service
 @RequiredArgsConstructor
@@ -28,55 +24,61 @@ public class WorkExperienceService implements BaseService<WorkExperienceDto, Int
     private final UserRepository userRepository;
 
     @Override
-    @ResponseStatus(HttpStatus.CREATED)
-    public ApiResponse create(WorkExperienceDto dto) {
-        if (workExperienceRepository.findByPlaceOfWorkAndPositionAndEmployeeIdAndStartDateAfterAndEndDateBefore(dto.getPlaceOfWork(),
-                dto.getPosition(), dto.getEmployeeId(), dto.getStartDate(), dto.getEndDate()).isPresent()) {
-            throw new RecordAlreadyExistException(WORK_EXPERIENCE_ALREADY_EXIST);
-        }
-        User user = userRepository.findById(dto.getEmployeeId()).orElseThrow(() -> new UserNotFoundException(USER_NOT_FOUND));
-        WorkExperience workExperience = WorkExperience.toWorkExperience(dto, user);
+    public ApiResponse create(WorkExperienceDto workExperienceDto) {
+        checkIfExist(workExperienceDto);
+        WorkExperience workExperience = WorkExperience.toWorkExperience(workExperienceDto);
+        workExperience.setEmployee(userRepository.findById(workExperienceDto.getEmployeeId()).orElseThrow(() -> new UserNotFoundException(Constants.USER_NOT_FOUND)));
         workExperienceRepository.save(workExperience);
-        return new ApiResponse(SUCCESSFULLY, true);
+        return new ApiResponse(Constants.SUCCESSFULLY, true);
     }
 
     @Override
-    @ResponseStatus(HttpStatus.OK)
     public ApiResponse getById(Integer id) {
         return new ApiResponse(checkById(id), true);
     }
 
     @Override
-    @ResponseStatus(HttpStatus.OK)
-    public ApiResponse update(WorkExperienceDto dto) {
-        checkById(dto.getId());
-        User user = userRepository.findById(dto.getEmployeeId()).orElseThrow(() -> new UserNotFoundException(USER_NOT_FOUND));
-        WorkExperience experience = WorkExperience.toWorkExperience(dto, user);
-        experience.setId(dto.getId());
+    public ApiResponse update(WorkExperienceDto workExperienceDto) {
+        checkById(workExperienceDto.getId());
+        WorkExperience experience = WorkExperience.toWorkExperience(workExperienceDto);
+        experience.setEmployee(userRepository.findById(workExperienceDto.getEmployeeId()).orElseThrow(() -> new UserNotFoundException(Constants.USER_NOT_FOUND)));
+        experience.setId(workExperienceDto.getId());
         workExperienceRepository.save(experience);
-        return new ApiResponse(SUCCESSFULLY, true);
+        return new ApiResponse(Constants.SUCCESSFULLY, true);
     }
 
     @Override
-    @ResponseStatus(HttpStatus.OK)
     public ApiResponse delete(Integer id) {
-        checkById(id);
+        WorkExperienceDto workExperience = checkById(id);
         workExperienceRepository.deleteById(id);
-        return new ApiResponse(DELETED, true);
+        return new ApiResponse(Constants.DELETED, true, workExperience);
+    }
+
+    @ResponseStatus(HttpStatus.OK)
+    public ApiResponse getAllById(List<Integer> workExperiences) {
+        return new ApiResponse(Constants.SUCCESSFULLY, true,WorkExperienceDto.toAllResponse(workExperienceRepository.findAllById(workExperiences)));
     }
 
     @ResponseStatus(HttpStatus.OK)
     public ApiResponse getAllByUserId(Integer id) {
-        List<WorkExperienceDto> workExperienceDtoList = new ArrayList<>();
-        workExperienceRepository.findAllByEmployeeId(id).forEach(workExperience -> {
-            workExperienceDtoList.add(WorkExperienceDto.toWorkExperienceDto(workExperience));
-        });
-        return new ApiResponse(workExperienceDtoList, true);
+        return new ApiResponse(Constants.SUCCESSFULLY, true, WorkExperienceDto.toAllResponse(workExperienceRepository.findAllByEmployee(id)));
     }
 
-    private WorkExperienceDto checkById(Integer id) {
+    private void checkIfExist(WorkExperienceDto workExperienceDto) {
+        boolean present = workExperienceRepository
+                .findByPlaceOfWorkAndPositionAndEmployeeIdAndStartDateAndEndDate(
+                        workExperienceDto.getPlaceOfWork(),
+                        workExperienceDto.getPosition(),
+                        workExperienceDto.getEmployeeId(),
+                        workExperienceDto.getStartDate(),
+                        workExperienceDto.getEndDate()).isPresent();
+        if (present) {
+            throw new RecordAlreadyExistException(Constants.WORK_EXPERIENCE_ALREADY_EXIST);
+        }
+    }
+
+    public WorkExperienceDto checkById(Integer id) {
         return WorkExperienceDto.toWorkExperienceDto(workExperienceRepository.findById(id)
-                .orElseThrow(() -> new RecordNotFoundException(WORK_EXPERIENCE_NOT_FOUND)));
+                .orElseThrow(() -> new RecordNotFoundException(Constants.WORK_EXPERIENCE_NOT_FOUND)));
     }
-
 }

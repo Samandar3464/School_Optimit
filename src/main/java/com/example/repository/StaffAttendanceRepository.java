@@ -1,13 +1,18 @@
 package com.example.repository;
 
 import com.example.entity.StaffAttendance;
+import com.example.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 public interface StaffAttendanceRepository extends JpaRepository<StaffAttendance,Integer> {
 
-   List<StaffAttendance> findAllByUserIdAndCreatedDateBetweenOrderByCreatedDateDesc(Integer userId, LocalDateTime startTime, LocalDateTime endTime);
-   List<StaffAttendance> findAllByBranchIdAndCreatedDateBetweenOrderByCreatedDateDesc(Integer branchId, LocalDateTime createdDate, LocalDateTime createdDate2);
+    List<StaffAttendance> findAllByUserId(Integer id);
+
+    Optional<StaffAttendance> findByUserIdAndDate(Integer user_id, LocalDate date);
+
+    List<StaffAttendance> findAllByBranchId(Integer id);
 }

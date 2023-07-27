@@ -26,7 +26,7 @@ public class ApplicationConfig {
 
     @Bean
     public UserDetailsService userDetailsService() {
-        return username -> userRepository.findByPhoneNumberAndDeletedFalse(username)
+        return username -> userRepository.findByPhoneNumberAndBlockedFalse(username)
                 .orElseThrow(() -> new UserNotFoundException(USER_NOT_FOUND));
     }
 

@@ -1,5 +1,6 @@
 package com.example.controller;
 
+import com.example.enums.Constants;
 import com.example.model.common.ApiResponse;
 import com.example.model.request.FireBaseTokenRegisterDto;
 import com.example.model.request.UserDto;
@@ -11,6 +12,8 @@ import lombok.AllArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 
 @RestController
@@ -25,24 +28,16 @@ public class UserController {
         return userService.create(userRegisterDto);
     }
 
+    @PostMapping("/addSubjectToUser")
+    public ApiResponse addSubjectToUser(@RequestParam Integer userId,
+                                        @RequestParam List<Integer> subjectIds) {
+        return userService.addSubjectToUser(userId, subjectIds);
+    }
+
+
     @PostMapping("/login")
-    public ApiResponse login(@RequestBody @Valid UserDto userLoginRequestDto) {
+    public ApiResponse login(@RequestBody @Validated UserDto userLoginRequestDto) {
         return userService.login(userLoginRequestDto);
-    }
-
-    @GetMapping("/getById/{id}")
-    public ApiResponse getUserById(@PathVariable Integer id) {
-        return userService.getById(id);
-    }
-
-    @PutMapping("/update")
-    public ApiResponse update(@ModelAttribute @Valid UserRegisterDto userUpdateDto) {
-        return userService.update(userUpdateDto);
-    }
-
-    @DeleteMapping("/delete/{id}")
-    public ApiResponse delete(@PathVariable Integer id) {
-        return userService.delete(id);
     }
 
     @PostMapping("/verify")
@@ -51,16 +46,30 @@ public class UserController {
     }
 
     @PostMapping("/forgetPassword")
-    public ApiResponse forgetPassword(@RequestParam String number) {
+    public ApiResponse forgetPassword(@RequestBody String number) {
         return userService.forgetPassword(number);
     }
 
+    @GetMapping("/getById/{id}")
+//    @PreAuthorize("hasAnyRole('ADMIN')")
+    public ApiResponse getUserById(@PathVariable Integer id) {
+        return userService.getById(id);
+    }
+
+    @GetMapping("/getUserByNumber/{phoneNumber}")
+//    @PreAuthorize("hasAnyRole('ADMIN')")
+    public ApiResponse getUserByNumber(@PathVariable String phoneNumber) {
+        return new ApiResponse(Constants.SUCCESSFULLY, true, userService.getUserByNumber(phoneNumber));
+    }
+
     @PutMapping("/block/{id}")
+//    @PreAuthorize("hasAnyRole('ADMIN')")
     public ApiResponse blockUserById(@PathVariable Integer id) {
         return userService.addBlockUserByID(id);
     }
 
     @PutMapping("/openBlock/{id}")
+//    @PreAuthorize("hasAnyRole('ADMIN')")
     public ApiResponse openBlockUserById(@PathVariable Integer id) {
         return userService.openToBlockUserByID(id);
     }
@@ -75,16 +84,22 @@ public class UserController {
         return userService.changePassword(number, password);
     }
 
-    @GetMapping("/getUserList")
-    public ApiResponse getUserList(@RequestParam(name = "page", defaultValue = "0") Integer page,
-                                   @RequestParam(name = "size", defaultValue = "5") Integer size,
-                                   @RequestParam(name = "branchId") Integer branchId) {
-        return userService.getUserList(page, size, branchId);
+    @PutMapping("/update")
+//    @PreAuthorize("hasAnyRole('DRIVER','CLIENT','ADMIN')")
+    public ApiResponse update(@RequestBody UserRegisterDto userUpdateDto) {
+        return userService.update(userUpdateDto);
     }
 
-    @GetMapping("/logout")
-    public ApiResponse deleteUserFromContext() {
-        return userService.removeUserFromContext();
+    @GetMapping("/getUserList")
+//    @PreAuthorize("hasRole('ADMIN')")
+    public ApiResponse getUserList(@RequestParam(name = "page", defaultValue = "0") int page,
+                                   @RequestParam(name = "size", defaultValue = "5") int size) {
+        return userService.getUserList(page, size);
+    }
+
+    @GetMapping("/getByToken")
+    public ApiResponse checkUserResponseExistById() {
+        return userService.checkUserResponseExistById();
     }
 
     @GetMapping("/reSendSms/{phone}")
@@ -92,15 +107,13 @@ public class UserController {
         return userService.reSendSms(phone);
     }
 
-
-    @PostMapping("/addSubjectToUser")
-    public ApiResponse addSubjectToUser(@RequestBody @Valid UserRegisterDto userRegisterDto) {
-        return userService.addSubjectToUser(userRegisterDto);
+    @GetMapping("/logout")
+    public ApiResponse deleteUserFromContext() {
+        return userService.removeUserFromContext();
     }
 
-//    @PostMapping("/addDailyLessonToUser")
-//    public ApiResponse addDailyLessonToUser(@RequestBody @Valid UserRegisterDto userRegisterDto) {
-//        return userService.addDailyLessonToUser(userRegisterDto);
-//    }
-
+    @DeleteMapping("/delete/{id}")
+    public ApiResponse delete(@PathVariable Integer id) {
+        return userService.delete(id);
+    }
 }

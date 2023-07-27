@@ -7,7 +7,7 @@ import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import lombok.*;
 
 import java.time.LocalDate;
-import java.util.UUID;
+import java.util.List;
 
 @Getter
 @Setter
@@ -16,17 +16,25 @@ import java.util.UUID;
 @Builder
 public class TeachingHoursRequest {
 
-    private UUID id;
+    private Integer id;
 
     private int lessonHours;
 
-    private Integer subjectId;
-
-    private Integer teacherId;
-
-    private Integer classId;
+    private int oldLessonHours;
 
     @JsonSerialize(using = LocalDateSerializer.class)
     @JsonDeserialize(using = LocalDateDeserializer.class)
-    private LocalDate passedDate;
+    private LocalDate date;
+
+    @JsonSerialize(using = LocalDateSerializer.class)
+    @JsonDeserialize(using = LocalDateDeserializer.class)
+    private LocalDate oldDate;
+
+    private Integer teacherId;
+
+    private Integer subjectId;
+
+    private Integer typeOfWorkId;
+
+    private Integer studentClassId;
 }

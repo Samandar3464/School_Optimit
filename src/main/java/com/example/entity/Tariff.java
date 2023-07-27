@@ -30,7 +30,7 @@ public class Tariff {
 
     private int branchAmount;
 
-    private int productAmount;
+    private long productAmount;
 
     private int employeeAmount;
 
@@ -60,6 +60,7 @@ public class Tariff {
                 .productAmount(tariffDto.getProductAmount())
                 .employeeAmount(tariffDto.getEmployeeAmount())
                 .testDay(tariffDto.getTestDay())
+                .lifetime(tariffDto.getLifetime())
                 .interval(tariffDto.getInterval())
                 .price(tariffDto.getPrice())
                 .discount(tariffDto.getDiscount())

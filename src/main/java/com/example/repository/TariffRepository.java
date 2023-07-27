@@ -7,7 +7,8 @@ import java.util.List;
 import java.util.Optional;
 
 public interface TariffRepository extends JpaRepository<Tariff,Integer> {
-    List<Tariff> findAllByActiveTrueAndDeleteFalseOrderByPrice();
+    List<Tariff> findAllByActiveAndDelete(boolean active, boolean delete);
+    List<Tariff> findAllByDelete(boolean delete);
+
     Optional<Tariff> findByIdAndDeleteFalse(Integer id);
-    List<Tariff> findAllByDeleteFalseOrderByPrice();
 }

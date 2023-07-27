@@ -1,8 +1,7 @@
 package com.example.model.request;
 
+import com.example.entity.User;
 import com.example.entity.WorkExperience;
-import com.fasterxml.jackson.databind.JsonDeserializer;
-import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
@@ -10,7 +9,6 @@ import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import lombok.*;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -46,14 +44,14 @@ public class WorkExperienceDto {
                 .startDate(workExperience.getStartDate())
                 .endDate(workExperience.getEndDate())
                 .position(workExperience.getPosition())
-                .employeeId(workExperience.getEmployee().getId()).build();
+                .build();
     }
 
-//    public static List<WorkExperienceDto> toAllResponse(List<WorkExperience> workExperiences) {
-//        List<WorkExperienceDto> workExperienceDtoList = new ArrayList<>();
-//        workExperiences.forEach(workExperience -> {
-//            workExperienceDtoList.add(toWorkExperienceDto(workExperience));
-//        });
-//        return workExperienceDtoList;
-//    }
+    public static List<WorkExperienceDto> toAllResponse(List<WorkExperience> workExperiences) {
+        List<WorkExperienceDto> workExperienceDtoList = new ArrayList<>();
+        workExperiences.forEach(workExperience -> {
+            workExperienceDtoList.add(toWorkExperienceDto(workExperience));
+        });
+        return workExperienceDtoList;
+    }
 }

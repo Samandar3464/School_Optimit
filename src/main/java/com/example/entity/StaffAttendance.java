@@ -1,11 +1,12 @@
 package com.example.entity;
 
-import com.example.model.request.StaffAttendanceDto;
+import com.example.model.request.StaffAttendanceRequest;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @AllArgsConstructor
@@ -20,13 +21,16 @@ public class StaffAttendance {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
+    private boolean cameToWork;
+
     private LocalDateTime comeTime;
 
-    private LocalDateTime goTime;
+    private LocalDateTime leaveTime;
+
+    private LocalDate date;
 
     private String description;
 
-    private LocalDateTime createdDate;
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
     private User user;
@@ -35,15 +39,14 @@ public class StaffAttendance {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Branch branch;
 
-    public static StaffAttendance from(StaffAttendanceDto dto, User user, Branch branch) {
+    public static StaffAttendance toStaffAttendance(StaffAttendanceRequest staffAttendanceRequest){
         return StaffAttendance
                 .builder()
-                .comeTime(dto.getComeTime() == null ? null : dto.getComeTime())
-                .goTime(dto.getGoTime() == null ? null : dto.getGoTime())
-                .description(dto.getDescription()== null ? null : dto.getDescription())
-                .user(user)
-                .createdDate(LocalDateTime.now())
-                .branch(branch)
+                .cameToWork(staffAttendanceRequest.isCameToWork())
+                .description(staffAttendanceRequest.getDescription())
+                .comeTime(staffAttendanceRequest.getComeTime())
+                .leaveTime(staffAttendanceRequest.getLeaveTime())
+                .date(staffAttendanceRequest.getDate())
                 .build();
     }
 }

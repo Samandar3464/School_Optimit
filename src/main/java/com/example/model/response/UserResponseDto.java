@@ -9,6 +9,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.util.List;
 
 
@@ -20,65 +21,48 @@ public class UserResponseDto {
 
     private Integer id;
 
+    private int inn;
+
+    private int inps;
+
     private String name;
 
     private String surname;
 
     private String fatherName;
 
+    private String biography;
+
+    private String registeredDate;
+
     private String phoneNumber;
 
-    private String emailAddress;
-
-    private Role role;
+    private String profilePhotoUrl;
 
     private String birthDate;
 
     private String gender;
 
-    private int inn;
-
-    private int inps;
-
-    private String profilePhoto;
-
-    private String biography;
-
-    private String registeredDate;
-
-
-    private StudentClassDto studentClass;
-
-    private List<AchievementDto> achievements;
-
-    private List<WorkExperienceDto> workExperiences;
-
     private List<Subject> subjects;
 
+    private List<Role> roles;
 
-    public static UserResponseDto from(User user, String photoUrl) {
+
+    public static UserResponseDto from(User user) {
         return UserResponseDto.builder()
                 .id(user.getId())
+                .registeredDate(user.getRegisteredDate().toString())
                 .name(user.getName())
                 .surname(user.getSurname())
                 .fatherName(user.getFatherName())
-                .phoneNumber(user.getPhoneNumber())
-                .role(user.getRole())
-                .birthDate(user.getBirthDate().toString())
-                .registeredDate(user.getRegisteredDate().toString())
-                .gender(user.getGender().toString())
-                .profilePhoto(photoUrl)
-                .inn(user.getInn() == 0 ? 0 : user.getInn())
-                .inps(user.getInps() == 0 ? 0 : user.getInps())
-                .biography(user.getBiography() == null ? null : user.getEmail())
-                .emailAddress(user.getEmail() == null ? null : user.getEmail())
+                .biography(user.getBiography())
+                .inn(user.getInn())
+                .inps(user.getInps())
                 .subjects(user.getSubjects())
-
-//                .workExperiences(WorkExperienceDto.toAllResponse(user.getWorkExperiences()))
-//                .achievements(AchievementDto.toAllResponse(user.getAchievements()))
-//                .teachingHoursResponses(TeachingHoursResponse.toAllResponse(user.getTeachingHours()))
-//                .studentClass(StudentClassDto.toResponse(user.getStudentClass()))
-//                .salaries(SalaryResponse.toAllResponse(user.getSalaries()))
+                .roles(user.getRoles())
+                .phoneNumber(user.getPhoneNumber())
+                .birthDate(user.getBirthDate().toString())
+                .gender(user.getGender().toString())
                 .build();
     }
 }

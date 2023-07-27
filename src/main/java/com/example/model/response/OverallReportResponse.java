@@ -18,18 +18,15 @@ public class OverallReportResponse {
     private Integer id;
 
     @Enumerated(EnumType.STRING)
-    private Position position;
-
-    @Enumerated(EnumType.STRING)
     private Months month;
 
     private String classLeadership;
 
-//    private SalaryResponse salary;
+    private SalaryResponse salary;
 
     private String fullName;
 
-//    private List<TeachingHoursResponse> teachingHours;
+    private List<TeachingHoursResponse> teachingHours;
 
     private Branch branch;
 
@@ -41,10 +38,8 @@ public class OverallReportResponse {
                 .classLeadership(overallReport.getClassLeadership())
                 .month(overallReport.getMonth())
                 .branch(overallReport.getBranch())
-//                .teachingHours(TeachingHoursResponse.toAllResponse(overallReport.getUser().getTeachingHours()))
-//                .position(overallReport.getPosition())
-//                .salary(SalaryResponse.toResponse(overallReport.getSalary()))
-//                .fullName(overallReport.getUser().getFullName())
+                .salary(SalaryResponse.toResponse(overallReport.getSalary()))
+                .fullName(overallReport.getUser().getName() + overallReport.getUser().getSurname())
                 .build();
     }
 

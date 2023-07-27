@@ -5,6 +5,8 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -35,14 +37,20 @@ public class UserRegisterDto {
     @Size(min = 9, max = 9)
     private String phoneNumber;
 
-    @Email
-    private String email;
-
     @NotBlank
     @Size(min = 6)
     private String password;
 
+    @Email
+    private String email;
+
+    @Enumerated(EnumType.STRING)
+    private Gender gender;
+
     private int inn;
+
+    @NotBlank
+    private int workDays;
 
     private int inps;
 
@@ -52,16 +60,13 @@ public class UserRegisterDto {
     @JsonDeserialize(using = LocalDateDeserializer.class)
     private LocalDate birthDate;
 
-    private Gender gender;
-
     private MultipartFile profilePhoto;
 
-    private Integer roleId;
+    private List<Integer> rolesIds;
+
+    private List<Integer> subjectsIds;
 
     private boolean married;
 
     private Integer branchId;
-
-    private List<Integer> subjectsIdList;
-
 }

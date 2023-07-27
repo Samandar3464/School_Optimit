@@ -1,11 +1,14 @@
 package com.example.entity;
 
+import com.example.enums.SalaryType;
 import com.example.model.request.TypeOfWorkRequest;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
+
+import java.util.List;
 
 
 @Getter
@@ -22,21 +25,18 @@ public class TypeOfWork {
 
     private String name;// asosiy | to'garaklar | vazifa darslar
 
-    private double priceForPerHour;
-
-    private boolean active;
+    private double price;
 
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
-    @JsonIgnore
     private Branch branch;
-    public static TypeOfWork toTypeOfWork(TypeOfWorkRequest typeOfWorkRequest,Branch branch) {
+
+
+    public static TypeOfWork toTypeOfWork(TypeOfWorkRequest typeOfWorkRequest) {
         return TypeOfWork
                 .builder()
-                .branch(branch)
                 .name(typeOfWorkRequest.getName())
-                .priceForPerHour(typeOfWorkRequest.getPriceForPerHour())
-                .active(true)
+                .price(typeOfWorkRequest.getPrice())
                 .build();
     }
 }

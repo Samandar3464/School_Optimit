@@ -3,12 +3,12 @@ package com.example.repository;
 import com.example.entity.Salary;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import java.time.Month;
+import java.util.List;
 import java.util.Optional;
 
 public interface SalaryRepository extends JpaRepository<Salary,Integer> {
 
-//    Optional<SalaryNew> findByUserIdAndActiveTrueAndSalaryDateBetween(Integer userId, LocalDate salaryDate, LocalDate salaryDate2);
+    List<Salary> findAllByUserIdAndActiveTrue(Integer userId);
 
-    Optional<Salary> findByUserIdAndMonthsAndYearAndActiveTrue(Integer userId, Month months, Integer year);
+    Optional<Salary> findByUserIdAndActiveTrue(Integer id);
 }
