@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 
 @Component
@@ -79,16 +80,15 @@ public class DataLoader implements CommandLineRunner {
                     .name("Super Admin")
                     .surname("Admin")
                     .fatherName("Admin")
-                    .phoneNumber("906163464")
+                    .phoneNumber("111111111")
                     .birthDate(LocalDate.parse("1998-05-13"))
                     .gender(Gender.ERKAK)
                     .workDays(30)
                     .registeredDate(LocalDateTime.now())
                     .verificationCode(0)
                     .password(passwordEncoder.encode("111111"))
-                    .isBlocked(true)
-                    .deleted(false)
-                    .role(supper_admin)
+                    .blocked(true)
+                    .roles(Collections.singletonList(supper_admin))
                     .build();
             userRepository.save(superAdmin);
 

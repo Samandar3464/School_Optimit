@@ -32,7 +32,7 @@ public class OverallReportService implements BaseService<OverallReportRequest, I
     public ApiResponse create(OverallReportRequest overallReportRequest) {
         User user = userService.getUserById(overallReportRequest.getUserId());
         OverallReport overallReport = getOverallReport(user);
-        Optional<StudentClass> classLeader = studentClassRepository.findByClassLeaderId(user.getId());
+        Optional<StudentClass> classLeader = studentClassRepository.findByClassLeaderIdAndActiveTrue(user.getId());
         classLeader.ifPresent(studentClass -> overallReport.setClassLeadership(studentClass.getClassName()));
         overallReport.setSalary(salaryRepository.findByUserIdAndActiveTrue(user.getId()).orElseThrow(()->new RecordNotFoundException(Constants.SALARY_NOT_FOUND)));
         overallReportRepository.save(overallReport);

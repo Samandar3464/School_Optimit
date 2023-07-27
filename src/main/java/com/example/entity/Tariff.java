@@ -30,7 +30,7 @@ public class Tariff {
 
     private int branchAmount;
 
-    private int productAmount;
+    private long productAmount;
 
     private int employeeAmount;
 

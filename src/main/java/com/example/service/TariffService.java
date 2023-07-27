@@ -26,8 +26,7 @@ public class TariffService implements BaseService<TariffDto, Integer> {
 
     @Override
     public ApiResponse create(TariffDto tariffDto) {
-        Tariff tariff = Tariff.toEntity(tariffDto);
-        tariff.setPermissions(permissionRepository.findAllById(tariffDto.getPermissionsList()));
+        Tariff tariff = Tariff.toEntity(tariffDto,permissionRepository.findAllById(tariffDto.getPermissionsList()));
         repository.save(tariff);
         return new ApiResponse(Constants.SUCCESSFULLY, true);
     }
@@ -40,9 +39,8 @@ public class TariffService implements BaseService<TariffDto, Integer> {
     @Override
     public ApiResponse update(TariffDto tariffDto) {
         checkById(tariffDto.getId());
-        Tariff tariff = Tariff.toEntity(tariffDto);
+        Tariff tariff = Tariff.toEntity(tariffDto,permissionRepository.findAllById(tariffDto.getPermissionsList()));
         tariff.setId(tariffDto.getId());
-        tariff.setPermissions(permissionRepository.findAllById(tariffDto.getPermissionsList()));
         repository.save(tariff);
         return new ApiResponse(Constants.SUCCESSFULLY, true);
     }
@@ -72,30 +70,17 @@ public class TariffService implements BaseService<TariffDto, Integer> {
     public ApiResponse getTariffListForAdmin() {
         List<Tariff> tariffList = repository.findAllByDelete(false);
         tariffList.sort(Comparator.comparing(Tariff::getPrice));
-        return new ApiResponse(Constants.FOUND, true, tariffList);
+        return new ApiResponse(SUCCESSFULLY, true, tariffList);
     }
 
 
     public ApiResponse getTariffListForUser() {
         List<Tariff> tariffList = repository.findAllByActiveAndDelete(true, false);
         tariffList.sort(Comparator.comparing(Tariff::getPrice));
-        return new ApiResponse(Constants.FOUND, true, tariffList);
+        return new ApiResponse(SUCCESSFULLY, true, tariffList);
     }
 
     private Tariff checkById(Integer id) {
         return repository.findById(id).orElseThrow(() -> new RecordNotFoundException(Constants.TARIFF_NOT_FOUND));
-    }
-
-
-    private void setPermission(TariffDto tariffDto, Tariff tariff) {
-        tariff.setPermissions(permissionRepository.findAllById(tariffDto.getPermissionsList()));
-    }
-
-    private static void checkLifeTimeValid(TariffDto tariffDto, Tariff tariff) {
-        try {
-            tariff.setLifetime(Lifetime.valueOf(tariffDto.getLifetime()));
-        } catch (Exception e) {
-            throw new RecordNotFoundException(Constants.LIFE_TIME_DONT_MATCH + "    " + e);
-        }
     }
 }

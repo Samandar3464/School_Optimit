@@ -46,7 +46,7 @@ public class StaffAttendance {
                 .description(staffAttendanceRequest.getDescription())
                 .comeTime(staffAttendanceRequest.getComeTime())
                 .leaveTime(staffAttendanceRequest.getLeaveTime())
-                .date(LocalDate.now())
+                .date(staffAttendanceRequest.getDate())
                 .build();
     }
 }

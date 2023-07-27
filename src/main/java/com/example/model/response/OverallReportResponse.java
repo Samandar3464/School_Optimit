@@ -18,9 +18,6 @@ public class OverallReportResponse {
     private Integer id;
 
     @Enumerated(EnumType.STRING)
-    private Position position;
-
-    @Enumerated(EnumType.STRING)
     private Months month;
 
     private String classLeadership;
@@ -41,7 +38,6 @@ public class OverallReportResponse {
                 .classLeadership(overallReport.getClassLeadership())
                 .month(overallReport.getMonth())
                 .branch(overallReport.getBranch())
-                .position(overallReport.getPosition())
                 .salary(SalaryResponse.toResponse(overallReport.getSalary()))
                 .fullName(overallReport.getUser().getName() + overallReport.getUser().getSurname())
                 .build();

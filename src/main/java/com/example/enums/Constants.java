@@ -104,7 +104,6 @@ public class Constants {
     public static final String PERMISSION_ALREADY_EXIST = "PERMISSION ALREADY EXIST";
     public static final String CLASS_LEADER_NOT_FOUND = "CLASS_LEADER_NOT_FOUND";
     public static final String STUDENT_CLASS_NOT_FOUND = "STUDENT_CLASS_NOT_FOUND";
-    public static final String LEVEL_NOT_FOUND = "LEVEL_NOT_FOUND";
     public static final String DEBT_WAS_COLLECTED = "qarz ushlab qolindi";
     public static final String NO_DEBT_EXISTS = "Qarzdorlik mavjud emas";
     public static final String SALARY_NOT_ENOUGH_REMAINING_DEBT = "maosh yetarlik emas, qolgan qarz => ";

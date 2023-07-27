@@ -42,17 +42,17 @@ public class StaffAttendanceService implements BaseService<StaffAttendanceReques
     @Override
     public ApiResponse getById(Integer integer) {
         StaffAttendance staffAttendance = attendanceRepository.findById(integer).orElseThrow(() -> new RecordNotFoundException(Constants.STAFF_ATTENDANCE_NOT_FOUND));
-        return new ApiResponse(Constants.FOUND, true, StaffAttendanceResponse.toResponse(staffAttendance));
+        return new ApiResponse(Constants.SUCCESSFULLY, true, StaffAttendanceResponse.toResponse(staffAttendance));
     }
 
     public ApiResponse getAllByUserId(Integer id) {
         List<StaffAttendanceResponse> all = StaffAttendanceResponse.toAllResponse(attendanceRepository.findAllByUserId(id));
-        return new ApiResponse(Constants.FOUND, true, all);
+        return new ApiResponse(Constants.SUCCESSFULLY, true, all);
     }
 
     public ApiResponse getAllByBranchId(Integer id) {
         List<StaffAttendanceResponse> all = StaffAttendanceResponse.toAllResponse(attendanceRepository.findAllByBranchId(id));
-        return new ApiResponse(Constants.FOUND, true, all);
+        return new ApiResponse(Constants.SUCCESSFULLY, true, all);
     }
 
     @Override

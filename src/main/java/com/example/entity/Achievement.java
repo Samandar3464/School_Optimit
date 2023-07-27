@@ -1,10 +1,12 @@
 package com.example.entity;
 
 import com.example.model.request.AchievementDto;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
-import java.util.UUID;
 
 @Getter
 @Setter

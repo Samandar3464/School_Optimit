@@ -13,6 +13,7 @@ import com.example.model.response.TokenResponse;
 import com.example.model.response.UserResponseDto;
 import com.example.model.response.UserResponseListForAdmin;
 import com.example.repository.BranchRepository;
+import com.example.repository.RoleRepository;
 import com.example.repository.SubjectRepository;
 import com.example.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -49,7 +50,7 @@ public class UserService implements BaseService<UserRegisterDto, Integer> {
     private final AuthenticationManager authenticationManager;
     private final SmsService service;
     private final FireBaseMessagingService fireBaseMessagingService;
-    private final RoleService roleService;
+    private final RoleRepository roleRepository;
     private final BranchRepository branchRepository;
 
 
@@ -226,7 +227,7 @@ public class UserService implements BaseService<UserRegisterDto, Integer> {
     }
 
     public User getUserByNumber(String number) {
-        return userRepository.findByPhoneNumber(number).orElseThrow(() -> new UserNotFoundException(USER_NOT_FOUND));
+        return userRepository.findByPhoneNumberAndBlockedFalse(number).orElseThrow(() -> new UserNotFoundException(USER_NOT_FOUND));
     }
 
     public String getPhotoLink(Attachment attachment) {
@@ -253,7 +254,7 @@ public class UserService implements BaseService<UserRegisterDto, Integer> {
         }
         User user = User.from(userRegisterDto);
         user.setBranch(branchRepository.findById(userRegisterDto.getBranchId()).orElseThrow(() -> new RecordNotFoundException(BRANCH_NOT_FOUND)));
-        user.setRoles(userRegisterDto.getRolesIds() == null ? null : roleService.getAllByIds(userRegisterDto.getRolesIds()));
+        user.setRoles(userRegisterDto.getRolesIds() == null ? null : roleRepository.findAllById(userRegisterDto.getRolesIds()));
         user.setPassword(passwordEncoder.encode(userRegisterDto.getPassword()));
         user.setSubjects(userRegisterDto.getSubjectsIds() == null ? null : subjectRepository.findAllById(userRegisterDto.getSubjectsIds()));
         return user;

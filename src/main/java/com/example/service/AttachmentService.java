@@ -157,18 +157,5 @@ public class AttachmentService {
         return true;
     }
 
-    public List<String> getUrlList(List<Attachment> attachmentList) {
-        List<String> urlList = new ArrayList<>();
-        if (!attachmentList.isEmpty()) {
-            attachmentList.forEach(attachment -> {
-                if (attachment != null) {
-                    urlList.add(attachUploadFolder + attachment.getPath() + "/" + attachment.getNewName() + "." + attachment.getType());
-                }
-            });
-            return urlList;
-        } else {
-            return null;
-        }
-    }
 }
 

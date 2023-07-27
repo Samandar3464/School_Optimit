@@ -52,12 +52,12 @@ public class TeachingHoursService implements BaseService<TeachingHoursRequest, I
 
     public ApiResponse getByTeacherIdAndActiveTrue(Integer id) {
         List<TeachingHoursResponse> all = TeachingHoursResponse.toAllResponse(teachingHoursRepository.findAllByTeacherIdAndActiveTrue(id));
-        return new ApiResponse(Constants.FOUND, true, all);
+        return new ApiResponse(Constants.SUCCESSFULLY, true, all);
     }
 
     public ApiResponse getByTeacherIdAndDate(Integer teacherId, LocalDate startDay, LocalDate finishDay) {
         List<TeachingHoursResponse> all = TeachingHoursResponse.toAllResponse(teachingHoursRepository.findAllByTeacherIdAndDateBetween(teacherId, startDay, finishDay));
-        return new ApiResponse(Constants.FOUND, true, all);
+        return new ApiResponse(Constants.SUCCESSFULLY, true, all);
     }
 
     @Override

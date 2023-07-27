@@ -33,7 +33,7 @@ public class SalaryService implements BaseService<SalaryRequest, Integer> {
             throw new RecordAlreadyExistException(Constants.SALARY_ALREADY_EXISTS);
         }
         Salary salary = Salary.toSalary(salaryRequest);
-        if (studentClassRepository.findByClassLeaderId(salaryRequest.getUserId()).isPresent()) {
+        if (studentClassRepository.findByClassLeaderIdAndActiveTrue(salaryRequest.getUserId()).isPresent()) {
             salary.setClassLeaderSalary(500000);
             salary.setSalary(salary.getSalary() + 500000);
         }
@@ -44,7 +44,7 @@ public class SalaryService implements BaseService<SalaryRequest, Integer> {
     @Override
     public ApiResponse getById(Integer userId) {
         SalaryResponse response = SalaryResponse.toResponse(findByUserIdAndActiveTrue(userId));
-        return new ApiResponse(Constants.FOUND, true, response);
+        return new ApiResponse(Constants.SUCCESSFULLY, true, response);
     }
 
     @Override

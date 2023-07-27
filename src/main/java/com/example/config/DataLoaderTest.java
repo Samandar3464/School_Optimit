@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 
 @Component
@@ -48,7 +49,6 @@ public class DataLoaderTest implements CommandLineRunner {
             Role savedRole = roleRepository.save(teacher1);
             Business business = Business.builder()
                     .name("Demo business")
-                    .address("Demo")
                     .description("Demo")
                     .phoneNumber("Demo")
                     .active(true)
@@ -58,6 +58,7 @@ public class DataLoaderTest implements CommandLineRunner {
 
             Branch branch = Branch.builder()
                     .name("Demo branch")
+                    .address("Demo")
                     .business(savedBusiness)
                     .delete(false)
                     .build();
@@ -72,9 +73,8 @@ public class DataLoaderTest implements CommandLineRunner {
                     .registeredDate(LocalDateTime.now())
                     .verificationCode(0)
                     .password(passwordEncoder.encode("111111"))
-                    .isBlocked(true)
-                    .deleted(false)
-                    .role(savedRole)
+                    .blocked(true)
+                    .roles(Collections.singletonList(savedRole))
                     .branch(saveBranch)
                     .build();
             User savedTeacher = userRepository.save(teacher);
@@ -123,10 +123,9 @@ public class DataLoaderTest implements CommandLineRunner {
             studentClassRepository.save(studentClass);
 
             TypeOfWork typeOfWork = TypeOfWork.builder()
-                    .active(true)
                     .branch(saveBranch)
                     .name("dars berish")
-                    .priceForPerHour(50000D)
+                    .price(50000D)
                     .build();
             typeOfWorkRepository.save(typeOfWork);
 
