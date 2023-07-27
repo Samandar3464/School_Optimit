@@ -63,6 +63,7 @@ public class Tariff {
                 .employeeAmount(tariffDto.getEmployeeAmount())
                 .tradeAmount(tariffDto.getTradeAmount())
                 .testDay(tariffDto.getTestDay())
+                .lifetime(tariffDto.getLifetime())
                 .interval(tariffDto.getInterval())
                 .price(tariffDto.getPrice())
                 .discount(tariffDto.getDiscount())

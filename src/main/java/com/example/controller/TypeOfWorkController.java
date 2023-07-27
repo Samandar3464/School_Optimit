@@ -23,9 +23,9 @@ public class TypeOfWorkController {
         return typeOfWorkService.getById(id);
     }
 
-    @GetMapping("getAll")
-    public ApiResponse getAll() {
-        return typeOfWorkService.getAll();
+    @GetMapping("getAllByBranchId/{id}")
+    public ApiResponse getAllByBranchId(@PathVariable Integer id) {
+        return typeOfWorkService.getAllByBranchId(id);
     }
 
     @PutMapping("update")

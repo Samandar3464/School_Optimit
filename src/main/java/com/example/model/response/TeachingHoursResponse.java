@@ -23,14 +23,15 @@ public class TeachingHoursResponse {
     private String date;
 
     private Integer teacherId;
-    private List<Integer> classesIds;
+
+    private Integer studentClassId;
 
     public static TeachingHoursResponse teachingHoursDTO(TeachingHours teachingHours){
         return TeachingHoursResponse
                 .builder()
                 .id(teachingHours.getId())
                 .typeOfWork(teachingHours.getTypeOfWork())
-                .classesIds(teachingHours.getClassIds())
+                .studentClassId(teachingHours.getStudentClass().getId())
                 .lessonHours(teachingHours.getLessonHours())
                 .date(teachingHours.getDate().toString())
                 .teacherId(teachingHours.getTeacher().getId())

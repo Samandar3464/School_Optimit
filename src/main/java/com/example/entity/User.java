@@ -3,11 +3,14 @@ package com.example.entity;
 import com.example.enums.Gender;
 import com.example.enums.Position;
 import com.example.model.request.UserRegisterDto;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.*;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -31,22 +34,19 @@ public class User implements UserDetails {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @NotBlank
-    private String fullName;
+    private String name;
 
-    @NotBlank
-    @Size(min = 9, max = 9)
+    private String surname;
+
+    private String fatherName;
+
     private String phoneNumber;
 
-    @Enumerated(EnumType.STRING)
-    private Position position;
-
-    @NotBlank
-    @Size(min = 6)
     private String password;
 
-    @Email
     private String email;
+
+    private int workDays;
 
     private int inn;
 
@@ -60,7 +60,7 @@ public class User implements UserDetails {
 
     private LocalDateTime registeredDate;
 
-    private boolean isBlocked;
+    private boolean blocked;
 
     private String fireBaseToken;
 
@@ -72,32 +72,16 @@ public class User implements UserDetails {
     @OneToOne(cascade = CascadeType.ALL)
     private Attachment profilePhoto;
 
-    @OneToOne(mappedBy = "classLeader")
-    private StudentClass studentClass;
-
-    @ManyToOne
-    private Branch branch;
-
-    @OneToMany(cascade = CascadeType.ALL,mappedBy = "user")
-    private List<Salary> salaries;
-
-    @OneToMany(cascade = CascadeType.ALL,mappedBy = "user")
-    private List<Achievement> achievements;
-
-    @ManyToMany(fetch = FetchType.EAGER)
-    private List<Subject> subjects;
-
-    @OneToMany(cascade = CascadeType.ALL,mappedBy = "employee")
-    private List<WorkExperience> workExperiences;
-
     @ManyToMany(fetch = FetchType.EAGER)
     private List<Role> roles;
 
-    @ManyToMany(cascade = CascadeType.ALL)
-    private List<DailyLessons> dailyLessons;
+    @ManyToOne
+    @JsonIgnore
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    private Branch branch;
 
-    @OneToMany(cascade = CascadeType.ALL,mappedBy = "teacher")
-    private List<TeachingHours> teachingHours;
+    @ManyToMany(fetch = FetchType.EAGER)
+    private List<Subject> subjects;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -131,22 +115,25 @@ public class User implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return isBlocked;
+        return blocked;
     }
 
     public static User from(UserRegisterDto userRegisterDto) {
         return User.builder()
-                .fullName(userRegisterDto.getFullName())
+                .name(userRegisterDto.getName())
+                .surname(userRegisterDto.getSurname())
+                .fatherName(userRegisterDto.getFatherName())
                 .phoneNumber(userRegisterDto.getPhoneNumber())
+                .birthDate(userRegisterDto.getBirthDate())
+                .workDays(userRegisterDto.getWorkDays())
                 .inn(userRegisterDto.getInn())
                 .inps(userRegisterDto.getInps())
                 .biography(userRegisterDto.getBiography())
                 .registeredDate(LocalDateTime.now())
                 .email(userRegisterDto.getEmail())
-                .position(userRegisterDto.getPosition())
                 .married(userRegisterDto.isMarried())
                 .gender(userRegisterDto.getGender())
-                .isBlocked(true)
+                .blocked(false)
                 .build();
     }
 }

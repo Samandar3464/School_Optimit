@@ -12,10 +12,12 @@ import lombok.*;
 @NoArgsConstructor
 public class TypeOfWorkRequest {
 
-    private Integer id;//qachonki update bolsa shunda kerak boladi
+    private Integer id;
 
     private String name;// asosiy | to'garaklar | vazifa darslar
 
     private double price;
+
+    private Integer branchId;
 
 }

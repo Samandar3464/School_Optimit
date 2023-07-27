@@ -41,10 +41,9 @@ public class OverallReportResponse {
                 .classLeadership(overallReport.getClassLeadership())
                 .month(overallReport.getMonth())
                 .branch(overallReport.getBranch())
-                .teachingHours(TeachingHoursResponse.toAllResponse(overallReport.getUser().getTeachingHours()))
                 .position(overallReport.getPosition())
                 .salary(SalaryResponse.toResponse(overallReport.getSalary()))
-                .fullName(overallReport.getUser().getFullName())
+                .fullName(overallReport.getUser().getName() + overallReport.getUser().getSurname())
                 .build();
     }
 

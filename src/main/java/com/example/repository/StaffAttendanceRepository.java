@@ -10,7 +10,9 @@ import java.util.Optional;
 
 public interface StaffAttendanceRepository extends JpaRepository<StaffAttendance,Integer> {
 
-    List<StaffAttendance> findAllByUserAndDateBetweenAndCameToWorkTrue(User user, LocalDate date, LocalDate date2);
+    List<StaffAttendance> findAllByUserId(Integer id);
 
     Optional<StaffAttendance> findByUserIdAndDate(Integer user_id, LocalDate date);
+
+    List<StaffAttendance> findAllByBranchId(Integer id);
 }

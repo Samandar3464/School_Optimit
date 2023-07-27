@@ -4,16 +4,25 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class TopicRequest {
+
     private Integer id;
+
     private String name;
 
-    public TopicRequest(String topicName) {
-        this.name=topicName;
-    }
+    private List<MultipartFile> lessonFiles;
+
+    private List<String> useFullLinks;
+
+    private Integer subjectId;
+
+    private Integer levelId;
 }

@@ -1,12 +1,12 @@
 package com.example.entity;
 
 import com.example.model.request.SubjectRequest;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
-import java.util.List;
 
 @Getter
 @Setter
@@ -22,17 +22,18 @@ public class Subject {
 
     private String name;
 
-    private int level;
+    private boolean active;
 
-    @OneToMany(cascade = CascadeType.ALL)
-    private List<Topic> topicList;
-
+    @ManyToOne
+    @JsonIgnore
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    private Branch branch;
 
     public static Subject toSubject(SubjectRequest subjectRequest) {
         return Subject
                 .builder()
                 .name(subjectRequest.getName())
-                .level(subjectRequest.getLevel())
+                .active(true)
                 .build();
     }
 }

@@ -1,9 +1,12 @@
 package com.example.model.request;
 
-import com.example.entity.*;
 import com.example.enums.Gender;
-import com.example.enums.Position;
-import jakarta.persistence.*;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -13,7 +16,6 @@ import lombok.NoArgsConstructor;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 @Data
 @AllArgsConstructor
@@ -23,7 +25,13 @@ public class UserRegisterDto {
     private Integer id;
 
     @NotBlank
-    private String fullName;
+    private String name;
+
+    @NotBlank
+    private String surname;
+
+    @NotBlank
+    private String fatherName;
 
     @NotBlank
     @Size(min = 9, max = 9)
@@ -33,28 +41,30 @@ public class UserRegisterDto {
     @Size(min = 6)
     private String password;
 
+    @Email
+    private String email;
+
+    @Enumerated(EnumType.STRING)
+    private Gender gender;
+
     private int inn;
+
+    @NotBlank
+    private int workDays;
 
     private int inps;
 
     private String biography;
 
-    private String birthDate;
-
-    @Enumerated(EnumType.STRING)
-    private Gender gender;
+    @JsonSerialize(using = LocalDateSerializer.class)
+    @JsonDeserialize(using = LocalDateDeserializer.class)
+    private LocalDate birthDate;
 
     private MultipartFile profilePhoto;
 
     private List<Integer> rolesIds;
-
+    
     private List<Integer> subjectsIds;
-
-    private List<Integer> dailyLessonsIds;
-
-    private Position position;
-
-    private String email;
 
     private boolean married;
 

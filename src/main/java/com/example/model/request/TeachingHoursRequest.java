@@ -1,7 +1,12 @@
 package com.example.model.request;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import lombok.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Getter
@@ -13,14 +18,23 @@ public class TeachingHoursRequest {
 
     private Integer id;
 
-    private Integer typeOfWorkId;
-
     private int lessonHours;
 
-    private String date;
+    private int oldLessonHours;
+
+    @JsonSerialize(using = LocalDateSerializer.class)
+    @JsonDeserialize(using = LocalDateDeserializer.class)
+    private LocalDate date;
+
+    @JsonSerialize(using = LocalDateSerializer.class)
+    @JsonDeserialize(using = LocalDateDeserializer.class)
+    private LocalDate oldDate;
 
     private Integer teacherId;
 
-    private Integer classId;
-    private List<Integer> classesIds;
+    private Integer subjectId;
+
+    private Integer typeOfWorkId;
+
+    private Integer studentClassId;
 }

@@ -31,7 +31,7 @@ public class ScoreResponseForStudent {
         return ScoreResponseForStudent.builder()
                 .id(score.getId())
                 .score(score.getScore())
-                .teacherName(score.getTeacher().getFullName())
+                .teacherName(score.getTeacher().getName())
                 .createdDate(score.getCreatedDate())
                 .build();
     }

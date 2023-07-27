@@ -6,6 +6,8 @@ import com.example.service.SalaryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/salary/")
@@ -18,55 +20,9 @@ public class SalaryController {
         return salaryService.create(salaryRequest);
     }
 
-    @GetMapping("giveCashAdvance/{salaryId}/{cashSalary}/{paymentTypeId}")
-    public ApiResponse giveCashAdvance(@PathVariable Integer salaryId,
-                                       @PathVariable double cashSalary,
-                                       @PathVariable Integer paymentTypeId) {
-        return salaryService.giveCashAdvance(salaryId, cashSalary, paymentTypeId);
-    }
-
-    @GetMapping("takeDebitAmount/{salaryId}/{debitAmount}")
-    public ApiResponse takeDebitAmount(@PathVariable Integer salaryId,
-                                       @PathVariable double debitAmount) {
-        return salaryService.takeDebitAmount(salaryId, debitAmount);
-    }
-
-    @GetMapping("givePartlySalary/{salaryId}/{partlySalary}/{paymentTypeId}")
-    public ApiResponse givePartlySalary(@PathVariable Integer salaryId,
-                                        @PathVariable double partlySalary,
-                                        @PathVariable Integer paymentTypeId) {
-        return salaryService.givePartlySalary(salaryId, partlySalary, paymentTypeId);
-    }
-
-    @GetMapping("getCurrentMonthFixSalary/{fromDate}/{toDate}/{salaryId}")
-    public ApiResponse getCurrentMonthFixSalary(@PathVariable String fromDate,
-                                                @PathVariable String toDate,
-                                                @PathVariable Integer salaryId) {
-        return salaryService.getCurrentMonthFixSalary(fromDate, toDate, salaryId);
-    }
-
-
-    @GetMapping("currentMonthSalaryAmount/{salaryId}")
-    public ApiResponse giveRemainSalary(@PathVariable Integer salaryId) {
-        return salaryService.currentMonthSalaryAmount(salaryId);
-    }
-
-    @GetMapping("giveSalary/{salaryId}/{salary},/{withholdingOfDebtIfAny}/{paymentTypeId}")
-    public ApiResponse giveSalary(@PathVariable Integer salaryId,
-                                  @PathVariable double salary,
-                                  @PathVariable boolean withholdingOfDebtIfAny,
-                                  @PathVariable Integer paymentTypeId) {
-        return salaryService.giveSalary(salaryId, salary, withholdingOfDebtIfAny, paymentTypeId);
-    }
-
-    @GetMapping("getCurrentMonthTeachingHoursSalary/{salaryId}")
-    public ApiResponse getCurrentMonthTeachingHoursSalary(@PathVariable Integer salaryId) {
-        return salaryService.getCurrentMonthTeachingHoursSalary(salaryId);
-    }
-
-    @GetMapping("getById/{id}")
-    public ApiResponse getById(@PathVariable Integer id) {
-        return salaryService.getById(id);
+    @GetMapping("getByUserId/{userId}")
+    public ApiResponse getByUserId(@PathVariable Integer userId) {
+        return salaryService.getById(userId);
     }
 
     @PutMapping("update")
@@ -74,8 +30,42 @@ public class SalaryController {
         return salaryService.update(salaryRequest);
     }
 
-    @DeleteMapping("delete/{id}")
-    public ApiResponse delete(@PathVariable Integer id) {
-        return salaryService.delete(id);
+    @DeleteMapping("delete/{userId}")
+    public ApiResponse delete(@PathVariable Integer userId) {
+        return salaryService.delete(userId);
+    }
+
+
+    @GetMapping("giveCashAdvance/{userId}/{cashSalary}/{paymentTypeId}")
+    public ApiResponse giveCashAdvance(@PathVariable Integer userId,
+                                       @PathVariable double cashSalary,
+                                       @PathVariable Integer paymentTypeId) {
+        return salaryService.giveCashAdvance(userId, cashSalary, paymentTypeId);
+    }
+
+    @GetMapping("giveDebtToEmployee/{userId}/{debitAmount}/{paymentTypeId}")
+    public ApiResponse giveDebtToEmployee(@PathVariable Integer userId,
+                                @PathVariable double debitAmount,
+                                @PathVariable Integer paymentTypeId) {
+        return salaryService.giveDebtToEmployee(userId, debitAmount, paymentTypeId);
+    }
+
+    @GetMapping("debtRepayment/{userId}")
+    public ApiResponse debtRepayment(@PathVariable Integer userId) {
+        return salaryService.debtRepayment(userId);
+    }
+
+    @GetMapping("givePartlySalary/{userId}/{partlySalary}/{paymentTypeId}")
+    public ApiResponse givePartlySalary(@PathVariable Integer userId,
+                                        @PathVariable double partlySalary,
+                                        @PathVariable Integer paymentTypeId) {
+        return salaryService.givePartlySalary(userId, partlySalary, paymentTypeId);
+    }
+
+    @GetMapping("giveSalary/{userId}/{withholdingOfDebtIfAny}/{paymentTypeId}")
+    public ApiResponse giveSalary(@PathVariable Integer userId,
+                                  @PathVariable boolean withholdingOfDebtIfAny,
+                                  @PathVariable Integer paymentTypeId) {
+        return salaryService.giveSalary(userId, withholdingOfDebtIfAny, paymentTypeId);
     }
 }

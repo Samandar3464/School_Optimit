@@ -1,5 +1,9 @@
 package com.example.model.request;
 
+import com.example.enums.Lifetime;
+import jakarta.persistence.Column;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -23,7 +27,9 @@ public class TariffDto {
 
     private long tradeAmount;
 
-    private String lifetime;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Lifetime lifetime;
 
     private int testDay;
 

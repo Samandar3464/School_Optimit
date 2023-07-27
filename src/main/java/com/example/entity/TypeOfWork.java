@@ -5,6 +5,8 @@ import com.example.model.request.TypeOfWorkRequest;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import java.util.List;
 
@@ -25,9 +27,10 @@ public class TypeOfWork {
 
     private double price;
 
-    @OneToMany(mappedBy = "typeOfWork")
-    @JsonIgnore
-    private List<TeachingHours> teachingHoursList;
+    @ManyToOne
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    private Branch branch;
+
 
     public static TypeOfWork toTypeOfWork(TypeOfWorkRequest typeOfWorkRequest) {
         return TypeOfWork

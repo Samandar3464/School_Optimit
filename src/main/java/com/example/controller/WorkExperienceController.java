@@ -5,6 +5,9 @@ import com.example.model.request.WorkExperienceDto;
 import com.example.service.WorkExperienceService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/workExperience/")
@@ -22,6 +25,15 @@ public class WorkExperienceController {
         return workExperienceService.getById(id);
     }
 
+    @GetMapping("getAllByUserId/{id}")
+    public ApiResponse getAllByUserId(@PathVariable Integer id) {
+        return workExperienceService.getAllByUserId(id);
+    }
+
+    @GetMapping("getAllById/{ids}")
+    public ApiResponse getAllById(@PathVariable List<Integer> ids) {
+        return workExperienceService.getAllById(ids);
+    }
 
     @PutMapping("update")
     public ApiResponse update(@RequestBody WorkExperienceDto workExperience) {

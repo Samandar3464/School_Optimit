@@ -6,6 +6,7 @@ import jakarta.persistence.Enumerated;
 import lombok.Builder;
 import lombok.Data;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,12 +16,13 @@ public class SalaryResponse {
 
     private Integer id;
 
-    @Enumerated
-    private Months month;
+    private String date;
+
+    private Integer userId;
+
+    private Integer branchId;
 
     private double fix;
-
-    private double currentMonthSalary;
 
     private double partlySalary;
 
@@ -30,23 +32,24 @@ public class SalaryResponse {
 
     private double cashAdvance;
 
-    private double classLeaderSalary;
-
     private double amountDebt;
+
+    private double classLeaderSalary;
 
     public static SalaryResponse toResponse(Salary salary) {
         return SalaryResponse
                 .builder()
                 .id(salary.getId())
-                .month(salary.getMonth())
-                .amountDebt(salary.getAmountDebt())
-                .classLeaderSalary(salary.getClassLeaderSalary())
-                .salary(salary.getSalary())
-                .partlySalary(salary.getPartlySalary())
-                .givenSalary(salary.getGivenSalary())
                 .fix(salary.getFix())
+                .salary(salary.getSalary())
+                .userId(salary.getUser().getId())
+                .date(salary.getDate().toString())
+                .amountDebt(salary.getAmountDebt())
+                .givenSalary(salary.getGivenSalary())
                 .cashAdvance(salary.getCashAdvance())
-                .currentMonthSalary(salary.getCurrentMonthSalary())
+                .branchId(salary.getBranch().getId())
+                .partlySalary(salary.getPartlySalary())
+                .classLeaderSalary(salary.getClassLeaderSalary())
                 .build();
     }
 

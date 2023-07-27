@@ -53,14 +53,18 @@ public class DataLoader implements CommandLineRunner {
                 role = roleRepository.save(supper_admin);
             }
             User admin = User.builder()
-                    .fullName("ADMIN")
+                    .name("ADMIN")
+                    .surname("ADMIN")
+                    .fatherName("ADMIN")
                     .phoneNumber("907403767")
                     .birthDate(LocalDate.parse("1998-05-13"))
                     .gender(Gender.ERKAK)
+                    .workDays(30)
                     .registeredDate(LocalDateTime.now())
                     .verificationCode(0)
                     .password(passwordEncoder.encode("111111"))
-                    .isBlocked(true)
+                    .blocked(false)
+                    .branch(branchRepository.findById(1).get())
                     .roles(List.of(role))
                     .build();
             Optional<User> phoneNumber = userRepository.findByPhoneNumber("907403767");

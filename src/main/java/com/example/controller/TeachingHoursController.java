@@ -6,6 +6,8 @@ import com.example.service.TeachingHoursService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/teachingHours/")
@@ -24,31 +26,22 @@ public class TeachingHoursController {
         return teachingHoursService.getById(id);
     }
 
-    @GetMapping("/getByTeacherIdAndDate/{id}/{date}")
+    @GetMapping("/getByTeacherIdAndDate/{id}/{startDay}/{finishDay}")
     public ApiResponse getByTeacherIdAndDate(@PathVariable Integer id,
-                               @PathVariable String date
+                                             @PathVariable LocalDate startDay,
+                                             @PathVariable LocalDate finishDay
     ) {
-        return teachingHoursService.getByTeacherIdAndDate(id, date);
+        return teachingHoursService.getByTeacherIdAndDate(id, startDay,finishDay);
     }
 
     @GetMapping("/getByTeacherId/{id}")
     public ApiResponse getByTeacherId(@PathVariable Integer id) {
-        return teachingHoursService.getByTeacherId(id);
+        return teachingHoursService.getByTeacherIdAndActiveTrue(id);
     }
 
     @GetMapping("/getAll")
     public ApiResponse getAll() {
         return teachingHoursService.getAll();
-    }
-
-    @PostMapping("/incrementHours")
-    public ApiResponse incrementHours(@RequestBody TeachingHoursRequest teachingHoursRequest) {
-        return teachingHoursService.incrementHours(teachingHoursRequest);
-    }
-
-    @PostMapping("/decrementHours")
-    public ApiResponse decrementHours(@RequestBody TeachingHoursRequest teachingHoursRequest) {
-        return teachingHoursService.decrementHours(teachingHoursRequest);
     }
 
     @PutMapping("/update")

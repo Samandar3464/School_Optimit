@@ -22,9 +22,13 @@ public class StaffAttendanceController {
         return service.getById(id);
     }
 
-    @GetMapping("getAll")
-    public ApiResponse getAll(){
-        return service.getAll();
+    @GetMapping("getAllByUserId/{id}")
+    public ApiResponse getAllByUserId(@PathVariable Integer id){
+        return service.getAllByUserId(id);
+    }
+    @GetMapping("getAllByBranchId/{id}")
+    public ApiResponse getAllByBranchId(@PathVariable Integer id){
+        return service.getAllByBranchId(id);
     }
 
     @PutMapping("update")
@@ -32,7 +36,7 @@ public class StaffAttendanceController {
         return service.update(staffAttendanceRequest);
     }
 
-    @GetMapping("delete/{id}")
+    @DeleteMapping("delete/{id}")
     public ApiResponse delete(@PathVariable Integer id){
         return service.delete(id);
     }

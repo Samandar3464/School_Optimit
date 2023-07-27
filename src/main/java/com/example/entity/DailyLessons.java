@@ -29,12 +29,15 @@ public class DailyLessons {
     private TypeOfWork typeOfWork;
 
     @ManyToOne
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private User teacher;
 
     @ManyToOne
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Subject subject;
 
     @ManyToOne
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private StudentClass studentClass;
 
     @ManyToOne

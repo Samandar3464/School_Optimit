@@ -20,19 +20,29 @@ public class TariffController {
         return tariffService.create(tariffDto);
     }
 
+    @GetMapping("/deActivate/{id}")
+    public ApiResponse deActivate(@PathVariable Integer id) {
+        return tariffService.deActivate(id);
+    }
+
+    @GetMapping("/activate/{id}")
+    public ApiResponse activate(@PathVariable Integer id) {
+        return tariffService.activate(id);
+    }
+
     @GetMapping("/getTariffById/{id}")
     public ApiResponse getTariffByID(@PathVariable Integer id) {
         return tariffService.getById(id);
     }
 
-    @GetMapping("/getTariffList")
-    public ApiResponse getTariffList() {
-        return tariffService.getTariffList();
+    @GetMapping("/getTariffListForAdmin")
+    public ApiResponse getTariffListForAdmin() {
+        return tariffService.getTariffListForAdmin();
     }
 
-    @GetMapping("/getToChooseATariff")
-    public ApiResponse getToChooseATariff() {
-        return tariffService.getToChooseATariff();
+    @GetMapping("/getTariffListForUser")
+    public ApiResponse getTariffListForUser() {
+        return tariffService.getTariffListForUser();
     }
 
     @PutMapping("/update")

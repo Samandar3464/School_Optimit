@@ -1,15 +1,19 @@
 package com.example.controller;
 
+import com.example.enums.Constants;
 import com.example.model.common.ApiResponse;
 import com.example.model.request.FireBaseTokenRegisterDto;
 import com.example.model.request.UserDto;
 import com.example.model.request.UserRegisterDto;
 import com.example.model.request.UserVerifyDto;
 import com.example.service.UserService;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 
 @RestController
@@ -20,19 +24,16 @@ public class UserController {
     private UserService userService;
 
     @PostMapping("/register")
-    public ApiResponse registerUser(@RequestBody UserRegisterDto userRegisterDto) {
+    public ApiResponse registerUser(@ModelAttribute @Valid UserRegisterDto userRegisterDto) {
         return userService.create(userRegisterDto);
     }
-    
+
     @PostMapping("/addSubjectToUser")
-    public ApiResponse addSubjectToUser(@RequestBody UserRegisterDto userRegisterDto) {
-        return userService.addSubjectToUser(userRegisterDto);
+    public ApiResponse addSubjectToUser(@RequestParam Integer userId,
+                                        @RequestParam List<Integer> subjectIds) {
+        return userService.addSubjectToUser(userId, subjectIds);
     }
 
-    @PostMapping("/addDailyLessonToUser")
-    public ApiResponse addDailyLessonToUser(@RequestBody UserRegisterDto userRegisterDto) {
-        return userService.addDailyLessonToUser(userRegisterDto);
-    }
 
     @PostMapping("/login")
     public ApiResponse login(@RequestBody @Validated UserDto userLoginRequestDto) {
@@ -40,7 +41,7 @@ public class UserController {
     }
 
     @PostMapping("/verify")
-    public ApiResponse verify(@RequestBody  UserVerifyDto userVerifyDto) {
+    public ApiResponse verify(@RequestBody UserVerifyDto userVerifyDto) {
         return userService.verify(userVerifyDto);
     }
 
@@ -53,6 +54,12 @@ public class UserController {
 //    @PreAuthorize("hasAnyRole('ADMIN')")
     public ApiResponse getUserById(@PathVariable Integer id) {
         return userService.getById(id);
+    }
+
+    @GetMapping("/getUserByNumber/{phoneNumber}")
+//    @PreAuthorize("hasAnyRole('ADMIN')")
+    public ApiResponse getUserByNumber(@PathVariable String phoneNumber) {
+        return new ApiResponse(Constants.SUCCESSFULLY, true, userService.getUserByNumber(phoneNumber));
     }
 
     @PutMapping("/block/{id}")
@@ -84,7 +91,7 @@ public class UserController {
     }
 
     @GetMapping("/getUserList")
-    @PreAuthorize("hasRole('ADMIN')")
+//    @PreAuthorize("hasRole('ADMIN')")
     public ApiResponse getUserList(@RequestParam(name = "page", defaultValue = "0") int page,
                                    @RequestParam(name = "size", defaultValue = "5") int size) {
         return userService.getUserList(page, size);
