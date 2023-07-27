@@ -63,6 +63,7 @@ public class DataLoaderTest implements CommandLineRunner {
                     .delete(false)
                     .build();
             Branch saveBranch = branchRepository.save(branch);
+
             User teacher = User.builder()
                     .name(" teacher")
                     .surname("teacher")

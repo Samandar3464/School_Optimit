@@ -24,7 +24,7 @@ public class UserController {
     private UserService userService;
 
     @PostMapping("/register")
-    public ApiResponse registerUser(@ModelAttribute @Valid UserRegisterDto userRegisterDto) {
+    public ApiResponse registerUser(@ModelAttribute @Validated UserRegisterDto userRegisterDto) {
         return userService.create(userRegisterDto);
     }
 

@@ -43,11 +43,9 @@ public class BusinessService implements BaseService<Business, Integer> {
     @Override
     @ResponseStatus(HttpStatus.OK)
     public ApiResponse update(Business newBusiness) {
-        if (businessRepository.existsByName(newBusiness.getName())) {
-            throw new RecordAlreadyExistException(BUSINESS_NAME_ALREADY_EXIST);
-        }
         Business business = businessRepository.findById(newBusiness.getId())
                 .orElseThrow(() -> new RecordNotFoundException(BUSINESS_NOT_FOUND));
+        business.setPhoneNumber(newBusiness.getPhoneNumber());
         business.setName(newBusiness.getName());
         business.setDescription(newBusiness.getDescription());
         businessRepository.save(business);
@@ -63,6 +61,7 @@ public class BusinessService implements BaseService<Business, Integer> {
         businessRepository.save(business);
         return new ApiResponse(DELETED, true);
     }
+
     @ResponseStatus(HttpStatus.OK)
     public ApiResponse getAll(int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
@@ -70,6 +69,7 @@ public class BusinessService implements BaseService<Business, Integer> {
         return new ApiResponse(new BusinessResponseListForAdmin(
                 all.getContent(), all.getTotalElements(), all.getTotalPages(), all.getNumber()), true);
     }
+
     @ResponseStatus(HttpStatus.OK)
     public ApiResponse deActivate(Integer integer) {
         Business business = businessRepository.findById(integer)
