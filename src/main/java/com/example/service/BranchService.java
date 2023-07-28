@@ -54,10 +54,12 @@ public class BranchService implements BaseService<BranchDto, Integer> {
     public ApiResponse update(BranchDto branchDto) {
         Branch branch = branchRepository.findById(branchDto.getId())
                 .orElseThrow(() -> new RecordNotFoundException(BRANCH_NOT_FOUND));
+        branch.setBusiness(businessRepository.findById(branchDto.getBusinessId())
+                .orElseThrow(()-> new RecordNotFoundException(BUSINESS_NOT_FOUND)));
         branch.setName(branchDto.getName());
         branch.setAddress(branchDto.getAddress());
         branchRepository.save(branch);
-        return new ApiResponse(SUCCESSFULLY, true);
+        return new ApiResponse(branch, true);
     }
 
     @Override
@@ -68,6 +70,7 @@ public class BranchService implements BaseService<BranchDto, Integer> {
         branchRepository.save(branch);
         return new ApiResponse(DELETED, true);
     }
+
     @ResponseStatus(HttpStatus.OK)
     public ApiResponse getByBusinessId(Integer integer) {
         List<Branch> allByBusinessId = branchRepository.findAllByBusinessIdAndDeleteFalse(integer);
@@ -76,6 +79,7 @@ public class BranchService implements BaseService<BranchDto, Integer> {
         }
         return new ApiResponse(allByBusinessId, true);
     }
+
     @ResponseStatus(HttpStatus.OK)
     public ApiResponse getAll(int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
