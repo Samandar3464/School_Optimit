@@ -1,6 +1,7 @@
 package com.example.model.request;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
 @Getter
@@ -11,9 +12,12 @@ public class BranchDto {
 
     private Integer id;
 
-    @Column(nullable = false)
+    @NotBlank
     private String name;
 
-    private Integer businessId;
+    @NotBlank
+    private String address;
 
+    @NotBlank
+    private Integer businessId;
 }

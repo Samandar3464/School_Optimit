@@ -1,6 +1,7 @@
 package com.example.entity;
 
 import com.example.enums.Gender;
+import com.example.enums.Position;
 import com.example.model.request.UserRegisterDto;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
@@ -33,31 +34,24 @@ public class User implements UserDetails {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @NotBlank
     private String name;
 
-    @NotBlank
     private String surname;
 
-    @NotBlank
     private String fatherName;
 
-    @NotBlank
-    @Size(min = 9, max = 9)
     private String phoneNumber;
 
-    @NotBlank
-    @Size(min = 6)
     private String password;
 
-    @Email
     private String email;
+
+    private int workDays;
 
     private int inn;
 
     private int inps;
 
-    @Column(columnDefinition = "TEXT")
     private String biography;
 
     private boolean married;
@@ -66,7 +60,7 @@ public class User implements UserDetails {
 
     private LocalDateTime registeredDate;
 
-    private boolean isBlocked;
+    private boolean blocked;
 
     private String fireBaseToken;
 
@@ -78,7 +72,7 @@ public class User implements UserDetails {
     @OneToOne(cascade = CascadeType.ALL)
     private Attachment profilePhoto;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne
     private Role role;
 
     @ManyToOne
@@ -86,15 +80,14 @@ public class User implements UserDetails {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Branch branch;
 
-    private boolean deleted;
-
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     private List<Subject> subjects;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         List<SimpleGrantedAuthority> authorityList = new ArrayList<>();
         authorityList.add(new SimpleGrantedAuthority("ROLE_" + role.getName()));
+        role.getPermissions().forEach(permission -> authorityList.add(new SimpleGrantedAuthority(permission.getName())));
         return authorityList;
     }
 
@@ -120,7 +113,7 @@ public class User implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return isBlocked;
+        return true;
     }
 
     public static User from(UserRegisterDto userRegisterDto) {
@@ -129,16 +122,16 @@ public class User implements UserDetails {
                 .surname(userRegisterDto.getSurname())
                 .fatherName(userRegisterDto.getFatherName())
                 .phoneNumber(userRegisterDto.getPhoneNumber())
-                .registeredDate(LocalDateTime.now())
-                .gender(userRegisterDto.getGender())
                 .birthDate(userRegisterDto.getBirthDate())
-                .isBlocked(true)
-                .email(userRegisterDto.getEmail() == null ? null : userRegisterDto.getEmail())
-                .inn(userRegisterDto.getInn() == 0 ? 0 : userRegisterDto.getInn())
-                .inps(userRegisterDto.getInps() == 0 ? 0 : userRegisterDto.getInps())
-                .biography(userRegisterDto.getBiography() == null ? null : userRegisterDto.getBiography())
+                .workDays(userRegisterDto.getWorkDays())
+                .inn(userRegisterDto.getInn())
+                .inps(userRegisterDto.getInps())
+                .biography(userRegisterDto.getBiography())
+                .registeredDate(LocalDateTime.now())
+                .email(userRegisterDto.getEmail())
                 .married(userRegisterDto.isMarried())
-                .deleted(false)
+                .gender(userRegisterDto.getGender())
+                .blocked(false)
                 .build();
     }
 }

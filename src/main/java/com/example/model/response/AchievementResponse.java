@@ -23,7 +23,6 @@ public class AchievementResponse {
 
     private Integer userId;
 
-    private String createdDate;
 
     public static AchievementResponse from(Achievement achievement) {
         return AchievementResponse
@@ -32,7 +31,6 @@ public class AchievementResponse {
                 .userId(achievement.getUser().getId())
                 .name(achievement.getName())
                 .aboutAchievement(achievement.getAboutAchievement())
-                .createdDate(achievement.getCreatedDate().toString())
                 .build();
     }
 }

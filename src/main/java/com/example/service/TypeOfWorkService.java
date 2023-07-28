@@ -1,6 +1,5 @@
 package com.example.service;
 
-import com.example.entity.Branch;
 import com.example.entity.TypeOfWork;
 import com.example.enums.Constants;
 import com.example.exception.RecordNotFoundException;
@@ -13,8 +12,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-import static com.example.enums.Constants.*;
-
 @Service
 @RequiredArgsConstructor
 public class TypeOfWorkService implements BaseService<TypeOfWorkRequest, Integer> {
@@ -23,41 +20,38 @@ public class TypeOfWorkService implements BaseService<TypeOfWorkRequest, Integer
     private final BranchRepository branchRepository;
 
     @Override
-    @ResponseStatus(HttpStatus.CREATED)
     public ApiResponse create(TypeOfWorkRequest typeOfWorkRequest) {
-        Branch branch = branchRepository.findById(typeOfWorkRequest.getBranchId()).orElseThrow(() -> new RecordNotFoundException(BRANCH_NOT_FOUND));
-        TypeOfWork typeOfWork = TypeOfWork.toTypeOfWork(typeOfWorkRequest, branch);
+        TypeOfWork typeOfWork = TypeOfWork.toTypeOfWork(typeOfWorkRequest);
+        typeOfWork.setBranch(branchRepository.findById(typeOfWorkRequest.getBranchId()).orElseThrow(() -> new RecordNotFoundException(Constants.BRANCH_NOT_FOUND)));
         typeOfWorkRepository.save(typeOfWork);
-        return new ApiResponse(SUCCESSFULLY, true);
+        return new ApiResponse(Constants.SUCCESSFULLY, true);
     }
 
     @Override
-    @ResponseStatus(HttpStatus.OK)
     public ApiResponse getById(Integer id) {
         return new ApiResponse(checkById(id), true);
     }
 
     @ResponseStatus(HttpStatus.OK)
     public ApiResponse getAllByBranchId(Integer branchId) {
-        return new ApiResponse(typeOfWorkRepository.findAllByBranchIdAndActiveTrue(branchId), true);
+        return new ApiResponse(typeOfWorkRepository.findAllByBranch_Id(branchId), true);
     }
 
     @Override
-    @ResponseStatus(HttpStatus.OK)
     public ApiResponse update(TypeOfWorkRequest typeOfWorkRequest) {
-        TypeOfWork typeOfWork = checkById(typeOfWorkRequest.getId());
-        typeOfWork.setName(typeOfWorkRequest.getName());
-        typeOfWork.setPriceForPerHour(typeOfWorkRequest.getPriceForPerHour());
+        checkById(typeOfWorkRequest.getId());
+        TypeOfWork typeOfWork = TypeOfWork.toTypeOfWork(typeOfWorkRequest);
+        typeOfWork.setBranch(branchRepository.findById(typeOfWorkRequest.getBranchId()).orElseThrow(() -> new RecordNotFoundException(Constants.BRANCH_NOT_FOUND)));
+        typeOfWork.setId(typeOfWorkRequest.getId());
         typeOfWorkRepository.save(typeOfWork);
-        return new ApiResponse(SUCCESSFULLY, true);
+        return new ApiResponse(Constants.SUCCESSFULLY, true);
     }
 
     @Override
-    @ResponseStatus(HttpStatus.OK)
     public ApiResponse delete(Integer id) {
         TypeOfWork typeOfWork = checkById(id);
-       typeOfWork.setActive(false);
-        return new ApiResponse(DELETED, true);
+        typeOfWorkRepository.deleteById(id);
+        return new ApiResponse(Constants.DELETED, true, typeOfWork);
     }
 
     public TypeOfWork checkById(Integer typeOfWorkRequest) {

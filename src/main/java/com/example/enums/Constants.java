@@ -102,4 +102,13 @@ public class Constants {
     public static final String ROLE_NOT_FOUND = "ROLE NOT FOUND";
     public static final String PARENT_ROLE_NOT_FOUND = "PARENT ROLE NOT FOUND";
     public static final String PERMISSION_ALREADY_EXIST = "PERMISSION ALREADY EXIST";
+    public static final String CLASS_LEADER_NOT_FOUND = "CLASS_LEADER_NOT_FOUND";
+    public static final String STUDENT_CLASS_NOT_FOUND = "STUDENT_CLASS_NOT_FOUND";
+    public static final String DEBT_WAS_COLLECTED = "qarz ushlab qolindi";
+    public static final String NO_DEBT_EXISTS = "Qarzdorlik mavjud emas";
+    public static final String SALARY_NOT_ENOUGH_REMAINING_DEBT = "maosh yetarlik emas, qolgan qarz => ";
+    public static final String SALARY_ALREADY_GIVEN_FOR_THIS_MONTH = "SALARY_ALREADY_GIVEN_FOR_THIS_MONTH";
+    public static final String SALARY_ALREADY_EXISTS = "SALARY_ALREADY_EXISTS";
+    public static final String SALARY_CALCULATED_ALREADY = "SALARY_CALCULATED_ALREADY";
+    public static final String STAFF_ATTENDANCE_ALREADY_EXISTS_FOR_THIS_DATE = "STAFF_ATTENDANCE_ALREADY_EXISTS_FOR_THIS_DATE";
 }

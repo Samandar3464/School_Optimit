@@ -8,10 +8,9 @@ import java.util.List;
 import java.util.Optional;
 
 public interface WorkExperienceRepository extends JpaRepository<WorkExperience,Integer> {
-//    Optional<WorkExperience> findByPlaceOfWorkAndPositionAndEmployeeId(String placeOfWork, String position, Integer employeeId);
-    Optional<WorkExperience> findByPlaceOfWorkAndPositionAndEmployeeIdAndStartDateAfterAndEndDateBefore(String placeOfWork, String position, Integer employeeId, LocalDate startDate, LocalDate endDate);
+    Optional<WorkExperience> findByPlaceOfWorkAndPositionAndEmployeeIdAndStartDateAndEndDate(String placeOfWork, String position, Integer employee_id, LocalDate startDate, LocalDate endDate);
     Optional<WorkExperience> findByPosition(String position);
 
-    List<WorkExperience> findAllByEmployeeId(Integer employeeId);
+    List<WorkExperience> findAllByEmployee(int employee);
 
 }

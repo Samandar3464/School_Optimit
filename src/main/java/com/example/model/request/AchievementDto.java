@@ -13,6 +13,7 @@ import java.util.List;
 @NoArgsConstructor
 @Builder
 public class AchievementDto {
+
     private Integer id;
 
     private String name;

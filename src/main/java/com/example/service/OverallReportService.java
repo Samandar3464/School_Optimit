@@ -1,22 +1,22 @@
 package com.example.service;
 
 import com.example.entity.OverallReport;
+import com.example.entity.StudentClass;
 import com.example.entity.User;
 import com.example.enums.Constants;
 import com.example.enums.Months;
 import com.example.exception.RecordNotFoundException;
-import com.example.exception.UserNotFoundException;
 import com.example.model.common.ApiResponse;
 import com.example.model.request.OverallReportRequest;
 import com.example.model.response.OverallReportResponse;
 import com.example.repository.OverallReportRepository;
-import com.example.repository.UserRepository;
+import com.example.repository.SalaryRepository;
+import com.example.repository.StudentClassRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-
-import static com.example.enums.Constants.USER_NOT_FOUND;
+import java.util.Optional;
 
 
 @Service
@@ -24,14 +24,17 @@ import static com.example.enums.Constants.USER_NOT_FOUND;
 public class OverallReportService implements BaseService<OverallReportRequest, Integer> {
 
     private final OverallReportRepository overallReportRepository;
-    private final UserRepository userRepository;
+    private final UserService userService;
+    private final StudentClassRepository studentClassRepository;
+    private final SalaryRepository salaryRepository;
 
     @Override
     public ApiResponse create(OverallReportRequest overallReportRequest) {
-        User user = userRepository.findById(overallReportRequest.getUserId()).orElseThrow(() -> new UserNotFoundException(USER_NOT_FOUND));
+        User user = userService.getUserById(overallReportRequest.getUserId());
         OverallReport overallReport = getOverallReport(user);
-//        setSalary(user, overallReport);
-        overallReport.setMonth(overallReportRequest.getMonth());
+        Optional<StudentClass> classLeader = studentClassRepository.findByClassLeaderIdAndActiveTrue(user.getId());
+        classLeader.ifPresent(studentClass -> overallReport.setClassLeadership(studentClass.getClassName()));
+        overallReport.setSalary(salaryRepository.findByUserIdAndActiveTrue(user.getId()).orElseThrow(()->new RecordNotFoundException(Constants.SALARY_NOT_FOUND)));
         overallReportRepository.save(overallReport);
         return new ApiResponse(Constants.SUCCESSFULLY, true, OverallReportResponse.toOverallResponse(overallReport));
     }
@@ -57,7 +60,7 @@ public class OverallReportService implements BaseService<OverallReportRequest, I
     @Override
     public ApiResponse update(OverallReportRequest overallReportRequest) {
         checkById(overallReportRequest.getId());
-        User user = userRepository.findById(overallReportRequest.getUserId()).orElseThrow(() -> new UserNotFoundException(USER_NOT_FOUND));
+        User user = userService.getUserById(overallReportRequest.getUserId());
         OverallReport overallReport = getOverallReport(user);
         overallReportRepository.save(overallReport);
         return new ApiResponse(Constants.SUCCESSFULLY, true, OverallReportResponse.toOverallResponse(overallReport));
@@ -70,29 +73,15 @@ public class OverallReportService implements BaseService<OverallReportRequest, I
         return new ApiResponse(Constants.DELETED, true, OverallReportResponse.toOverallResponse(overallReport));
     }
 
-//    private void setSalary(User user, OverallReport overallReport) {
-//        for (Salary salary : user.getSalaries()) {
-//            if (salary.isActive()) {
-//                overallReport.setSalary(salary);
-//            }
-//        }
-//    }
-
     private OverallReport checkById(Integer integer) {
         return overallReportRepository.findById(integer).orElseThrow(() -> new RecordNotFoundException(Constants.OVERALL_REPORT_NOT_FOUND));
     }
 
     private OverallReport getOverallReport(User user) {
-        String name = " ";
-//        if (user.getStudentClass() != null) {
-//            name = user.getStudentClass().getClassName();
-//        }
         try {
             return OverallReport
                     .builder()
                     .branch(user.getBranch())
-
-                    .classLeadership(name)
                     .user(user)
                     .build();
         } catch (Exception e) {

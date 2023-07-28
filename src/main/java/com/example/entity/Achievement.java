@@ -1,13 +1,12 @@
 package com.example.entity;
 
 import com.example.model.request.AchievementDto;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
-import java.time.LocalDateTime;
-import java.util.UUID;
 
 @Getter
 @Setter
@@ -29,17 +28,15 @@ public class Achievement {
     private Attachment photoCertificate;
 
     @ManyToOne
+    @JsonIgnore
     @OnDelete(action = OnDeleteAction.CASCADE)
     private User user;
-
-    private LocalDateTime createdDate;
 
     public static Achievement toAchievement(AchievementDto achievement) {
         return Achievement
                 .builder()
                 .name(achievement.getName())
                 .aboutAchievement(achievement.getAboutAchievement())
-                .createdDate(LocalDateTime.now())
                 .build();
     }
 }

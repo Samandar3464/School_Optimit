@@ -1,98 +1,128 @@
 package com.example.service;
 
-import com.example.entity.*;
+import com.example.entity.Salary;
+import com.example.entity.TeachingHours;
 import com.example.enums.Constants;
+import com.example.exception.RecordAlreadyExistException;
 import com.example.exception.RecordNotFoundException;
-import com.example.exception.UserNotFoundException;
 import com.example.model.common.ApiResponse;
 import com.example.model.request.TeachingHoursRequest;
+import com.example.model.response.TeachingHoursResponse;
 import com.example.repository.*;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.ResponseStatus;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.UUID;
-
-import static com.example.enums.Constants.*;
 
 @Service
 @RequiredArgsConstructor
-public class TeachingHoursService implements BaseService<TeachingHoursRequest, UUID> {
+public class TeachingHoursService implements BaseService<TeachingHoursRequest, Integer> {
 
     private final TeachingHoursRepository teachingHoursRepository;
-    private final SubjectRepository subjectRepository;
     private final StudentClassRepository studentClassRepository;
+    private final TypeOfWorkRepository typeOfWorkRepository;
     private final UserRepository userRepository;
+    private final SubjectRepository subjectRepository;
+    private final SalaryRepository salaryRepository;
 
     @Override
-    @ResponseStatus(HttpStatus.CREATED)
-    public ApiResponse create(TeachingHoursRequest dto) {
-        Subject subject = subjectRepository.findById(dto.getSubjectId()).orElseThrow(() -> new RecordNotFoundException(SUBJECT_NOT_FOUND));
-        User teacher = userRepository.findById(dto.getTeacherId()).orElseThrow(() -> new UserNotFoundException(USER_NOT_FOUND));
-        StudentClass studentClass = studentClassRepository.findById(dto.getClassId()).orElseThrow(() -> new RecordNotFoundException(CLASS_NOT_FOUND));
-        TeachingHours teachingHours = TeachingHours
-                .builder()
-                .subject(subject)
-                .teacher(teacher)
-                .studentClass(studentClass)
-                .lessonHours(dto.getLessonHours())
-                .passedDate(dto.getPassedDate())
-                .active(true)
-                .build();
+    public ApiResponse create(TeachingHoursRequest teachingHoursRequest) {
+        TeachingHours teachingHours = TeachingHours.toTeachingHours(teachingHoursRequest);
+        if (teachingHoursRepository.findByTeacherIdAndDateAndLessonHours(teachingHoursRequest.getTeacherId(), teachingHoursRequest.getDate(), teachingHours.getLessonHours()).isPresent()) {
+            throw new RecordAlreadyExistException(Constants.TEACHING_HOURS_ALREADY_EXIST_THIS_DATE);
+        }
+        setAndSave(teachingHoursRequest, teachingHours);
+        addPriceToSalary(teachingHours);
         teachingHoursRepository.save(teachingHours);
         return new ApiResponse(Constants.SUCCESSFULLY, true);
     }
 
+
     @Override
-    @ResponseStatus(HttpStatus.OK)
-    public ApiResponse getById(UUID id) {
-        return new ApiResponse(checkById(id), true);
+    public ApiResponse getById(Integer integer) {
+        TeachingHours teachingHours = teachingHoursRepository.findById(integer).orElseThrow(() -> new RecordNotFoundException(Constants.TEACHING_HOURS_NOT_FOUND));
+        return new ApiResponse(TeachingHoursResponse.teachingHoursDTO(teachingHours), true);
     }
 
+    public ApiResponse getAll() {
+        List<TeachingHoursResponse> all = TeachingHoursResponse.toAllResponse(teachingHoursRepository.findAll());
+        return new ApiResponse(Constants.SUCCESSFULLY, true, all);
+    }
+
+    public ApiResponse getByTeacherIdAndActiveTrue(Integer id) {
+        List<TeachingHoursResponse> all = TeachingHoursResponse.toAllResponse(teachingHoursRepository.findAllByTeacherIdAndActiveTrue(id));
+        return new ApiResponse(Constants.SUCCESSFULLY, true, all);
+    }
+
+    public ApiResponse getByTeacherIdAndDate(Integer teacherId, LocalDate startDay, LocalDate finishDay) {
+        List<TeachingHoursResponse> all = TeachingHoursResponse.toAllResponse(teachingHoursRepository.findAllByTeacherIdAndDateBetween(teacherId, startDay, finishDay));
+        return new ApiResponse(Constants.SUCCESSFULLY, true, all);
+    }
 
     @Override
-    @ResponseStatus(HttpStatus.OK)
-    public ApiResponse update(TeachingHoursRequest dto) {
-        TeachingHours teachingHours = checkById(dto.getId());
-        teachingHours.setLessonHours(dto.getLessonHours());
-        teachingHours.setPassedDate(dto.getPassedDate());
-        if (dto.getTeacherId() != null) {
-            User teacher = userRepository.findById(dto.getTeacherId()).orElseThrow(() -> new UserNotFoundException(USER_NOT_FOUND));
-            teachingHours.setTeacher(teacher);
-        }
-        if (dto.getSubjectId() != null) {
-            Subject subject = subjectRepository.findById(dto.getSubjectId()).orElseThrow(() -> new RecordNotFoundException(SUBJECT_NOT_FOUND));
-            teachingHours.setSubject(subject);
-        }
-        if (dto.getClassId() != null) {
-            StudentClass studentClass = studentClassRepository.findById(dto.getClassId()).orElseThrow(() -> new RecordNotFoundException(CLASS_NOT_FOUND));
-            teachingHours.setStudentClass(studentClass);
-        }
+    public ApiResponse update(TeachingHoursRequest teachingHoursRequest) {
+        TeachingHours teachingHours = teachingHoursRepository.findByTeacherIdAndDateAndLessonHours(teachingHoursRequest.getTeacherId(), teachingHoursRequest.getOldDate(), teachingHoursRequest.getOldLessonHours()).orElseThrow(() -> new RecordNotFoundException(Constants.TEACHING_HOURS_NOT_FOUND));
+        double oldPrice = teachingHours.getTypeOfWork().getPrice();
+
+        teachingHours.setLessonHours(teachingHoursRequest.getLessonHours());
+        teachingHours.setDate(teachingHoursRequest.getDate());
+        setAndSave(teachingHoursRequest, teachingHours);
         teachingHoursRepository.save(teachingHours);
-        return new ApiResponse(SUCCESSFULLY, true);
+
+        double debtOrExtra = teachingHours.getTypeOfWork().getPrice() - oldPrice;
+
+        Salary salary = salaryRepository.findByUserIdAndActiveTrue(teachingHours.getTeacher().getId()).orElseThrow(() -> new RecordNotFoundException(Constants.SALARY_NOT_FOUND));
+        hourlyWageSetting(debtOrExtra, salary);
+        salaryRepository.save(salary);
+        return new ApiResponse(Constants.SUCCESSFULLY, true, TeachingHoursResponse.teachingHoursDTO(teachingHours));
+    }
+
+    private static void hourlyWageSetting(double debtOrExtra, Salary salary) {
+        if (debtOrExtra < 0) {
+            debtOrExtra = Math.abs(debtOrExtra);
+            if (salary.getSalary() > debtOrExtra) {
+                salary.setSalary(salary.getSalary() - debtOrExtra);
+            } else {
+                salary.setAmountDebt(salary.getAmountDebt() + (debtOrExtra - salary.getSalary()));
+                salary.setSalary(0);
+            }
+        } else {
+            salary.setSalary(salary.getSalary() + debtOrExtra);
+        }
+    }
+
+    private void addPriceToSalary(TeachingHours teachingHours) {
+        Salary salary = salaryRepository.findByUserIdAndActiveTrue(teachingHours.getTeacher().getId()).orElseThrow(() -> new RecordNotFoundException(Constants.SALARY_NOT_FOUND));
+        if (salary.getAmountDebt() > 0) {
+            if (salary.getSalary() > salary.getAmountDebt()) {
+                salary.setSalary(salary.getSalary() - salary.getAmountDebt());
+                salary.setAmountDebt(0);
+            } else {
+                salary.setAmountDebt(salary.getAmountDebt() - salary.getSalary());
+                salary.setSalary(0);
+            }
+        } else {
+            salary.setSalary(salary.getSalary() + teachingHours.getTypeOfWork().getPrice());
+        }
+        salaryRepository.save(salary);
     }
 
     @Override
-    @ResponseStatus(HttpStatus.OK)
-    public ApiResponse delete(UUID id) {
-        TeachingHours teachingHours = checkById(id);
+    public ApiResponse delete(Integer integer) {
+        TeachingHours teachingHours = teachingHoursRepository.findById(integer).orElseThrow(() -> new RecordNotFoundException(Constants.TEACHING_HOURS_NOT_FOUND));
         teachingHours.setActive(false);
         teachingHoursRepository.save(teachingHours);
-        return new ApiResponse(DELETED, true);
+        Salary salary = salaryRepository.findByUserIdAndActiveTrue(teachingHours.getTeacher().getId()).orElseThrow(() -> new RecordNotFoundException(Constants.SALARY_NOT_FOUND));
+        hourlyWageSetting(-teachingHours.getTypeOfWork().getPrice(), salary);
+        salaryRepository.save(salary);
+        return new ApiResponse(Constants.DELETED, true, teachingHours);
     }
 
-    @ResponseStatus(HttpStatus.OK)
-    public ApiResponse getAllByTeacherId(Integer teacherId, LocalDate startDate, LocalDate endDate) {
-        List<TeachingHours> allByTeacherId = teachingHoursRepository.findAllByTeacherIdAndActiveTrueAndPassedDateBetween(teacherId, startDate, endDate);
-        return new ApiResponse(allByTeacherId, true);
+    private void setAndSave(TeachingHoursRequest teachingHoursRequest, TeachingHours teachingHours) {
+        teachingHours.setStudentClass(studentClassRepository.findById(teachingHoursRequest.getStudentClassId()).orElseThrow(() -> new RecordNotFoundException(Constants.STUDENT_CLASS_NOT_FOUND)));
+        teachingHours.setTeacher(userRepository.findById(teachingHoursRequest.getTeacherId()).orElseThrow(() -> new RecordNotFoundException(Constants.USER_NOT_FOUND)));
+        teachingHours.setTypeOfWork(typeOfWorkRepository.findById(teachingHoursRequest.getTypeOfWorkId()).orElseThrow(() -> new RecordNotFoundException(Constants.TYPE_OF_WORK_NOT_FOUND)));
+        teachingHours.setSubject(subjectRepository.findById(teachingHoursRequest.getSubjectId()).orElseThrow(() -> new RecordNotFoundException(Constants.SUBJECT_NOT_FOUND)));
     }
-
-    private TeachingHours checkById(UUID integer) {
-        return teachingHoursRepository.findById(integer).orElseThrow(() -> new RecordNotFoundException(Constants.TEACHING_HOURS_NOT_FOUND));
-    }
-
-
 }

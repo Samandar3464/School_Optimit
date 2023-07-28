@@ -7,7 +7,6 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 
 @Getter
 @Setter
@@ -33,14 +32,13 @@ public class WorkExperience {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private User employee;
 
-    public static WorkExperience toWorkExperience(WorkExperienceDto workExperienceDto,User user) {
+    public static WorkExperience toWorkExperience(WorkExperienceDto workExperienceDto) {
         return WorkExperience
                 .builder()
                 .placeOfWork(workExperienceDto.getPlaceOfWork())
                 .position(workExperienceDto.getPosition())
                 .startDate(workExperienceDto.getStartDate())
                 .endDate(workExperienceDto.getEndDate())
-                .employee(user)
                 .build();
     }
 }

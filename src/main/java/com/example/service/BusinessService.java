@@ -49,7 +49,6 @@ public class BusinessService implements BaseService<Business, Integer> {
         Business business = businessRepository.findById(newBusiness.getId())
                 .orElseThrow(() -> new RecordNotFoundException(BUSINESS_NOT_FOUND));
         business.setName(newBusiness.getName());
-        business.setAddress(newBusiness.getAddress());
         business.setDescription(newBusiness.getDescription());
         businessRepository.save(business);
         return new ApiResponse(SUCCESSFULLY, true);

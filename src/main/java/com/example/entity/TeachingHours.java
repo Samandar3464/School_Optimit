@@ -1,18 +1,15 @@
 package com.example.entity;
 
+import com.example.enums.Months;
+import com.example.model.request.TeachingHoursRequest;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
-import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import java.time.LocalDate;
-import java.util.UUID;
-
+import java.util.List;
 
 @Getter
 @Setter
@@ -23,14 +20,15 @@ import java.util.UUID;
 public class TeachingHours {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private UUID id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
 
-    private Integer lessonHours;
+    private int lessonHours;
 
-    @JsonSerialize(using = LocalDateSerializer.class)
-    @JsonDeserialize(using = LocalDateDeserializer.class)
-    private LocalDate passedDate;
+    private LocalDate date;
+
+    @ManyToOne
+    private TypeOfWork typeOfWork;
 
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
@@ -47,4 +45,12 @@ public class TeachingHours {
 
     private boolean active;
 
+    public static TeachingHours toTeachingHours(TeachingHoursRequest teachingHoursRequest){
+        return TeachingHours
+                .builder()
+                .active(true)
+                .lessonHours(teachingHoursRequest.getLessonHours())
+                .date(teachingHoursRequest.getDate())
+                .build();
+    }
 }
