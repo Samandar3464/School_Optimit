@@ -61,15 +61,12 @@ public class StudentClass {
     @OneToOne
     private User classLeader;
 
-    private Double salaryForClassLeader;
-
     public static StudentClass from(StudentClassDto studentClass) {
         return StudentClass.builder()
                 .className(studentClass.getClassName())
                 .createdDate(LocalDateTime.now())
                 .startDate(studentClass.getStartDate())
                 .endDate(studentClass.getEndDate())
-                .salaryForClassLeader(studentClass.getSalaryForClassLeader())
                 .active(true)
                 .build();
     }

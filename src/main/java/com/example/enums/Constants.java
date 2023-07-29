@@ -109,6 +109,8 @@ public class Constants {
     public static final String SALARY_NOT_ENOUGH_REMAINING_DEBT = "maosh yetarlik emas, qolgan qarz => ";
     public static final String SALARY_ALREADY_GIVEN_FOR_THIS_MONTH = "SALARY_ALREADY_GIVEN_FOR_THIS_MONTH";
     public static final String SALARY_ALREADY_EXISTS = "SALARY_ALREADY_EXISTS";
-    public static final String SALARY_CALCULATED_ALREADY = "SALARY_CALCULATED_ALREADY";
     public static final String STAFF_ATTENDANCE_ALREADY_EXISTS_FOR_THIS_DATE = "STAFF_ATTENDANCE_ALREADY_EXISTS_FOR_THIS_DATE";
+    public static final String STUDENT_HOMEWORK_NOT_FOUND = "STUDENT_HOMEWORK_NOT_FOUND";
+    public static final String STUDENT_HOMEWORK_ALREADY_EXISTS = "STUDENT_HOMEWORK_ALREADY_EXISTS";
+
 }

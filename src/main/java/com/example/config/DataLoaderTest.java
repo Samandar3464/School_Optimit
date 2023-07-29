@@ -45,8 +45,6 @@ public class DataLoaderTest implements CommandLineRunner {
         if (initMode.equals("always")) {
 
             Permission p1 = permissionRepository.save(new Permission(1, "ALL"));
-            Role teacher1 = Role.builder().id(2).name("TEACHER").permissions(List.of(p1)).active(true).build();
-            Role savedRole = roleRepository.save(teacher1);
             Business business = Business.builder()
                     .name("Demo business")
                     .description("Demo")
@@ -62,7 +60,14 @@ public class DataLoaderTest implements CommandLineRunner {
                     .business(savedBusiness)
                     .delete(false)
                     .build();
+
+            Role teacher1 = Role.builder().id(2).name("TEACHER").permissions(List.of(p1)).active(true).build();
             Branch saveBranch = branchRepository.save(branch);
+
+            teacher1.setBranch(saveBranch);
+
+            Role savedRole = roleRepository.save(teacher1);
+
 
             User teacher = User.builder()
                     .name(" teacher")
@@ -118,7 +123,6 @@ public class DataLoaderTest implements CommandLineRunner {
                     .createdDate(LocalDateTime.now())
                     .branch(saveBranch)
                     .classLeader(savedTeacher)
-                    .salaryForClassLeader(500000D)
                     .build();
 
             studentClassRepository.save(studentClass);
@@ -134,6 +138,7 @@ public class DataLoaderTest implements CommandLineRunner {
             Subject matemetika = Subject.builder()
                     .name("Matemetika")
                     .branch(saveBranch)
+                    .active(true)
                     .build();
             Subject subject = subjectRepository.save(matemetika);
 

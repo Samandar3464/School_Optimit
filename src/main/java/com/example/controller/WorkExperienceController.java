@@ -3,6 +3,7 @@ package com.example.controller;
 import com.example.model.common.ApiResponse;
 import com.example.model.request.WorkExperienceDto;
 import com.example.service.WorkExperienceService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,7 +17,7 @@ public class WorkExperienceController {
     private final WorkExperienceService workExperienceService;
 
     @PostMapping("save")
-    public ApiResponse save(@RequestBody WorkExperienceDto workExperience) {
+    public ApiResponse save(@RequestBody @Valid WorkExperienceDto workExperience) {
         return workExperienceService.create(workExperience);
     }
 
