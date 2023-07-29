@@ -6,6 +6,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 
+import java.util.List;
 import java.util.Optional;
 
 public interface RoleRepository extends JpaRepository<Role, Integer> {
@@ -13,4 +14,5 @@ public interface RoleRepository extends JpaRepository<Role, Integer> {
     Optional<Role> findByIdAndActiveTrue(Integer id);
 
     Page<Role> findAllByBranchIdAndActiveTrue(Integer branchId,Pageable pageable);
+    List<Role> findAllByBranchIdAndActiveTrue(Integer branchId);
 }

@@ -76,7 +76,6 @@ public class User implements UserDetails {
     private Role role;
 
     @ManyToOne
-    @JsonIgnore
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Branch branch;
 
@@ -87,7 +86,6 @@ public class User implements UserDetails {
     public Collection<? extends GrantedAuthority> getAuthorities() {
         List<SimpleGrantedAuthority> authorityList = new ArrayList<>();
         authorityList.add(new SimpleGrantedAuthority("ROLE_" + role.getName()));
-        role.getPermissions().forEach(permission -> authorityList.add(new SimpleGrantedAuthority(permission.getName())));
         return authorityList;
     }
 
@@ -122,7 +120,7 @@ public class User implements UserDetails {
                 .surname(userRegisterDto.getSurname())
                 .fatherName(userRegisterDto.getFatherName())
                 .phoneNumber(userRegisterDto.getPhoneNumber())
-                .birthDate(userRegisterDto.getBirthDate())
+//                .birthDate(userRegisterDto.getBirthDate())
                 .workDays(userRegisterDto.getWorkDays())
                 .inn(userRegisterDto.getInn())
                 .inps(userRegisterDto.getInps())

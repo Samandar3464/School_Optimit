@@ -8,6 +8,7 @@ import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -20,29 +21,26 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-
 public class UserRegisterDto {
 
     private Integer id;
 
-    @NotBlank
+    @NotBlank(message = "must be name")
     private String name;
 
-    @NotBlank
+    @NotBlank(message = "must be surname")
     private String surname;
 
-    @NotBlank
+    @NotBlank(message = "must be fatherName")
     private String fatherName;
 
-    @NotBlank
-    @Size(min = 9, max = 9)
+    @Size(min = 9, max = 9,message = "must be phoneNumber 9 digits")
     private String phoneNumber;
 
-    @NotBlank
-    @Size(min = 6)
+    @Size(min = 6,message = "must be password min 6 digits")
     private String password;
 
-    @Email
+    @Email(message = "the email is not correct")
     private String email;
 
     @Enumerated(EnumType.STRING)
@@ -50,16 +48,16 @@ public class UserRegisterDto {
 
     private int inn;
 
-    @NotBlank
+    @Min(value = 1,message = "must be workDays")
     private int workDays;
 
     private int inps;
 
     private String biography;
 
-    @JsonSerialize(using = LocalDateSerializer.class)
-    @JsonDeserialize(using = LocalDateDeserializer.class)
-    private LocalDate birthDate;
+//    @JsonSerialize(using = LocalDateSerializer.class)
+//    @JsonDeserialize(using = LocalDateDeserializer.class)
+//    private LocalDate birthDate;
 
     private MultipartFile profilePhoto;
 
@@ -69,5 +67,6 @@ public class UserRegisterDto {
 
     private boolean married;
 
+    @Min(value = 1,message = "must be branchId")
     private Integer branchId;
 }

@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
+import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
 import java.time.LocalDate;
@@ -22,6 +23,8 @@ public class WorkExperienceDto {
 
     private Integer id;
 
+
+    @NotBlank(message = "ninonoinn")
     private String placeOfWork;
 
     private String position;
@@ -46,6 +49,7 @@ public class WorkExperienceDto {
                 .position(workExperience.getPosition())
                 .build();
     }
+
 
     public static List<WorkExperienceDto> toAllResponse(List<WorkExperience> workExperiences) {
         List<WorkExperienceDto> workExperienceDtoList = new ArrayList<>();

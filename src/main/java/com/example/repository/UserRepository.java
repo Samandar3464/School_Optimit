@@ -14,4 +14,6 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     Optional<User> findByPhoneNumberAndVerificationCode(String phoneNumber, Integer verificationCode);
 
     boolean existsByPhoneNumberAndBlockedFalse(String phoneNumber);
+
+    Optional<User> findByIdAndBlockedFalse(Integer teacherId);
 }

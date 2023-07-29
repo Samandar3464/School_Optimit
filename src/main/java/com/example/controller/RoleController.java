@@ -40,6 +40,13 @@ public class RoleController {
         return roleService.getList(size,page,branchId);
     }
 
+    @GetMapping("/getListByBranchId")
+    public ApiResponse getListByBranchId(
+            @RequestParam(name = "branchId") Integer branchId
+    ) {
+        return roleService.getListByBranchId(branchId);
+    }
+
     @DeleteMapping("/delete/{id}")
 //    @PreAuthorize("hasAuthority('ROLE_ACCESS' or 'SUPER_ADMIN')")
     public ApiResponse remove(@PathVariable Integer id) {

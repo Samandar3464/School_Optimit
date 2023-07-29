@@ -38,7 +38,6 @@ public class StudentClassDto {
 
     private Integer levelId;
 
-    private Double salaryForClassLeader;
     public static StudentClassDto toResponse(StudentClass studentClass) {
         if (studentClass==null)return null;
 

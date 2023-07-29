@@ -13,4 +13,6 @@ public interface StudentClassRepository extends JpaRepository<StudentClass, Inte
     List<StudentClass> findAllByBranchIdAndStartDateAfterAndEndDateBeforeAndActiveFalse(Integer branchId, LocalDate startDate, LocalDate endDate);
 
     Optional<StudentClass> findByClassLeaderIdAndActiveTrue(Integer classLeaderId);
+
+    Optional<StudentClass> findByIdAndActiveTrue(Integer studentClassId);
 }

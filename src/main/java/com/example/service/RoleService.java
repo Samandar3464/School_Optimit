@@ -70,10 +70,16 @@ public class RoleService implements BaseService<RoleRequestDto, Integer> {
     }
 
     @ResponseStatus(HttpStatus.OK)
-    public ApiResponse getList(int size, int page,int branchId) {
+    public ApiResponse getList(int size, int page, int branchId) {
         Pageable pageable = PageRequest.of(page, size);
-        Page<Role> roles = roleRepository.findAllByBranchIdAndActiveTrue(branchId,pageable);
+        Page<Role> roles = roleRepository.findAllByBranchIdAndActiveTrue(branchId, pageable);
         return new ApiResponse(new RoleResponseList(roles.getContent(), roles.getTotalElements(), roles.getTotalPages(), roles.getNumberOfElements()), true);
+    }
+
+    @ResponseStatus(HttpStatus.OK)
+    public ApiResponse getListByBranchId(Integer branchId) {
+        List<Role> roles = roleRepository.findAllByBranchIdAndActiveTrue(branchId);
+        return new ApiResponse(SUCCESSFULLY, true, roles);
     }
 
     private Role from(RoleRequestDto requestDto) {

@@ -58,7 +58,14 @@ public class UserService implements BaseService<UserRegisterDto, Integer> {
     @Transactional(rollbackFor = {Exception.class})
     @Override
     public ApiResponse create(UserRegisterDto userRegisterDto) {
-        User user = setUserAndCheckByNumber(userRegisterDto);
+        if (userRepository.existsByPhoneNumberAndBlockedFalse(userRegisterDto.getPhoneNumber())) {
+            throw new RecordAlreadyExistException(PHONE_NUMBER_ALREADY_REGISTERED);
+        }
+        User user = User.from(userRegisterDto);
+        user.setBranch(branchRepository.findById(userRegisterDto.getBranchId()).orElseThrow(() -> new RecordNotFoundException(BRANCH_NOT_FOUND)));
+        user.setRole(roleRepository.findById(userRegisterDto.getRoleId()).orElseThrow(() -> new RecordNotFoundException(ROLE_NOT_FOUND)));
+        user.setPassword(passwordEncoder.encode(userRegisterDto.getPassword()));
+        user.setSubjects(userRegisterDto.getSubjectsIds() == null ? null : subjectRepository.findAllById(userRegisterDto.getSubjectsIds()));
         user.setProfilePhoto(userRegisterDto.getProfilePhoto() == null ? null : attachmentService.saveToSystem(userRegisterDto.getProfilePhoto()));
         userRepository.save(user);
         return new ApiResponse(SUCCESSFULLY, true);
@@ -166,6 +173,13 @@ public class UserService implements BaseService<UserRegisterDto, Integer> {
         return new ApiResponse(new UserResponseListForAdmin(userResponseDtoList, all.getTotalElements(), all.getTotalPages(), all.getNumber()), true);
     }
 
+    @ResponseStatus(HttpStatus.OK)
+    public ApiResponse getUserList() {
+        List<User> all = userRepository.findAll();
+        List<UserResponseDto> userResponseDtoList = new ArrayList<>();
+        all.forEach(obj -> userResponseDtoList.add(toUserResponse(obj)));
+        return new ApiResponse(userResponseDtoList, true);
+    }
 
     @ResponseStatus(HttpStatus.OK)
     public ApiResponse checkUserResponseExistById() {

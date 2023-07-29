@@ -9,7 +9,6 @@ import com.example.model.request.UserVerifyDto;
 import com.example.service.UserService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,7 +23,7 @@ public class UserController {
     private UserService userService;
 
     @PostMapping("/register")
-    public ApiResponse registerUser(@ModelAttribute @Validated UserRegisterDto userRegisterDto) {
+    public ApiResponse registerUser(@ModelAttribute @Valid UserRegisterDto userRegisterDto) {
         return userService.create(userRegisterDto);
     }
 
@@ -90,11 +89,17 @@ public class UserController {
         return userService.update(userUpdateDto);
     }
 
-    @GetMapping("/getUserList")
+    @GetMapping("/getUserListByPage")
 //    @PreAuthorize("hasRole('ADMIN')")
     public ApiResponse getUserList(@RequestParam(name = "page", defaultValue = "0") int page,
-                                   @RequestParam(name = "size", defaultValue = "5") int size) {
+                                   @RequestParam(name = "size", defaultValue = "1") int size) {
         return userService.getUserList(page, size);
+    }
+
+    @GetMapping("/getUserList")
+//    @PreAuthorize("hasRole('ADMIN')")
+    public ApiResponse getUserList() {
+        return userService.getUserList();
     }
 
     @GetMapping("/getByToken")

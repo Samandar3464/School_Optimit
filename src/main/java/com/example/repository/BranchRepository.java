@@ -15,4 +15,6 @@ public interface BranchRepository extends JpaRepository<Branch, Integer> {
     List<Branch> findAllByBusinessIdAndDeleteFalse(Integer business_id);
 
     Page<Branch> findAllByDeleteFalse(Pageable pageable);
+
+    Optional<Branch> findByIdAndDeleteFalse(Integer branchId);
 }
