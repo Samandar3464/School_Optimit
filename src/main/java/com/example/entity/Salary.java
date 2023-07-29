@@ -45,7 +45,6 @@ public class Salary {
     private User user;
 
     @ManyToOne
-    @JsonIgnore
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Branch branch;
 

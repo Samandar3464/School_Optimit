@@ -2,5 +2,7 @@ package com.example.enums;
 
 public enum ExpenseType {
     SALARY,
-    ADDITIONAL
+    PAYMENT,
+    ADDITIONAL_PAYMENT,
+    ADDITIONAL_EXPENSE,
 }

@@ -29,7 +29,6 @@ public class OverallReport {
     @ManyToOne
     private User user;
 
-
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Branch branch;

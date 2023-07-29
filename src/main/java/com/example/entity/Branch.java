@@ -31,6 +31,11 @@ public class Branch {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Business business;
 
+    @JsonIgnore
+    @ManyToOne
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    private MainBalance mainBalance;
+
     private boolean delete;
 
     public static Branch from(BranchDto branchDto, Business business) {

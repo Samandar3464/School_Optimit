@@ -46,10 +46,10 @@ public class DataLoader implements CommandLineRunner {
 
         if (initMode.equals("always")) {
 
-            PaymentType xisobdanXisobga = PaymentType.builder().name("Xisobdan xisobga").build();
-            PaymentType karta = PaymentType.builder().name("Karta orqali").build();
-            PaymentType elektron = PaymentType.builder().name("Elektron to'lov").build();
-            PaymentType naqt = PaymentType.builder().name("Naqt").build();
+            PaymentType xisobdanXisobga = PaymentType.builder().name("XISOBDAN_XISOBGA").build();
+            PaymentType karta = PaymentType.builder().name("KARTA").build();
+            PaymentType elektron = PaymentType.builder().name("ELEKTRON").build();
+            PaymentType naqt = PaymentType.builder().name("NAQT").build();
 
             paymentTypeRepository.saveAll(List.of(karta, elektron, xisobdanXisobga, naqt));
 

@@ -58,19 +58,11 @@ public class UserService implements BaseService<UserRegisterDto, Integer> {
     @Transactional(rollbackFor = {Exception.class})
     @Override
     public ApiResponse create(UserRegisterDto userRegisterDto) {
-        if (userRepository.existsByPhoneNumberAndBlockedFalse(userRegisterDto.getPhoneNumber())) {
-            throw new RecordAlreadyExistException(PHONE_NUMBER_ALREADY_REGISTERED);
-        }
-        User user = User.from(userRegisterDto);
-        user.setBranch(branchRepository.findById(userRegisterDto.getBranchId()).orElseThrow(() -> new RecordNotFoundException(BRANCH_NOT_FOUND)));
-        user.setRole(roleRepository.findById(userRegisterDto.getRoleId()).orElseThrow(() -> new RecordNotFoundException(ROLE_NOT_FOUND)));
-        user.setPassword(passwordEncoder.encode(userRegisterDto.getPassword()));
-        user.setSubjects(userRegisterDto.getSubjectsIds() == null ? null : subjectRepository.findAllById(userRegisterDto.getSubjectsIds()));
+        User user = setAndCheckUser(userRegisterDto);
         user.setProfilePhoto(userRegisterDto.getProfilePhoto() == null ? null : attachmentService.saveToSystem(userRegisterDto.getProfilePhoto()));
         userRepository.save(user);
         return new ApiResponse(SUCCESSFULLY, true);
     }
-
 
     @Override
     public ApiResponse getById(Integer id) {
@@ -81,7 +73,7 @@ public class UserService implements BaseService<UserRegisterDto, Integer> {
     @Override
     public ApiResponse update(UserRegisterDto userRegisterDto) {
         getUserById(userRegisterDto.getId());
-        User user = setUserAndCheckByNumber(userRegisterDto);
+        User user = setAndCheckUser(userRegisterDto);
         user.setId(userRegisterDto.getId());
         setPhotoIfIsExist(userRegisterDto, user);
         userRepository.save(user);
@@ -168,6 +160,13 @@ public class UserService implements BaseService<UserRegisterDto, Integer> {
     @ResponseStatus(HttpStatus.OK)
     public ApiResponse getUserList(int page, int size) {
         Page<User> all = userRepository.findAll(PageRequest.of(page, size));
+        List<UserResponseDto> userResponseDtoList = new ArrayList<>();
+        all.forEach(obj -> userResponseDtoList.add(toUserResponse(obj)));
+        return new ApiResponse(new UserResponseListForAdmin(userResponseDtoList, all.getTotalElements(), all.getTotalPages(), all.getNumber()), true);
+    }
+
+    public ApiResponse getUserListByBranchId(int page, int size,Integer branchId) {
+        Page<User> all = userRepository.findAllByBranch_IdAndBlockedFalse(branchId,PageRequest.of(page, size));
         List<UserResponseDto> userResponseDtoList = new ArrayList<>();
         all.forEach(obj -> userResponseDtoList.add(toUserResponse(obj)));
         return new ApiResponse(new UserResponseListForAdmin(userResponseDtoList, all.getTotalElements(), all.getTotalPages(), all.getNumber()), true);
@@ -262,17 +261,6 @@ public class UserService implements BaseService<UserRegisterDto, Integer> {
         }
     }
 
-    private User setUserAndCheckByNumber(UserRegisterDto userRegisterDto) {
-        if (userRepository.existsByPhoneNumberAndBlockedFalse(userRegisterDto.getPhoneNumber())) {
-            throw new RecordAlreadyExistException(PHONE_NUMBER_ALREADY_REGISTERED);
-        }
-        User user = User.from(userRegisterDto);
-        user.setBranch(branchRepository.findById(userRegisterDto.getBranchId()).orElseThrow(() -> new RecordNotFoundException(BRANCH_NOT_FOUND)));
-        user.setRole(roleRepository.findById(userRegisterDto.getRoleId()).orElseThrow(() -> new RecordNotFoundException(ROLE_NOT_FOUND)));
-        user.setPassword(passwordEncoder.encode(userRegisterDto.getPassword()));
-        user.setSubjects(userRegisterDto.getSubjectsIds() == null ? null : subjectRepository.findAllById(userRegisterDto.getSubjectsIds()));
-        return user;
-    }
 
     private void sendNotificationByToken(User user, String message) {
         NotificationMessageResponse notificationMessageResponse = NotificationMessageResponse.from(user.getFireBaseToken(), message, new HashMap<>());
@@ -286,6 +274,18 @@ public class UserService implements BaseService<UserRegisterDto, Integer> {
                 .from(4546)
                 .callback_url("http://0000.uz/test.php")
                 .build());
+    }
+
+    private User setAndCheckUser(UserRegisterDto userRegisterDto) {
+        if (userRepository.existsByPhoneNumberAndBlockedFalse(userRegisterDto.getPhoneNumber())) {
+            throw new RecordAlreadyExistException(PHONE_NUMBER_ALREADY_REGISTERED);
+        }
+        User user = User.from(userRegisterDto);
+        user.setBranch(branchRepository.findById(userRegisterDto.getBranchId()).orElseThrow(() -> new RecordNotFoundException(BRANCH_NOT_FOUND)));
+        user.setRole(roleRepository.findById(userRegisterDto.getRoleId()).orElseThrow(() -> new RecordNotFoundException(ROLE_NOT_FOUND)));
+        user.setPassword(passwordEncoder.encode(userRegisterDto.getPassword()));
+        user.setSubjects(userRegisterDto.getSubjectsIds() == null ? null : subjectRepository.findAllById(userRegisterDto.getSubjectsIds()));
+        return user;
     }
 }
 
