@@ -40,4 +40,8 @@ public class RoomController {
         return roomService.getRoomListByBranchId(page, size, branchId);
     }
 
+    @GetMapping("/getAll/{branchId}")
+    public ApiResponse getAll(@PathVariable Integer branchId) {
+        return roomService.getRoomListByBranchId(branchId);
+    }
 }

@@ -1,6 +1,7 @@
 package com.example.repository;
 
 import com.example.entity.LessonSchedule;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.time.LocalDateTime;
@@ -15,7 +16,7 @@ public interface LessonScheduleRepository extends JpaRepository<LessonSchedule, 
 
     Optional<LessonSchedule> findFirstByBranchIdAndRoomIdAndStartTimeAndActiveTrue(Integer branchId, Integer roomId, LocalDateTime startTime);
 
-    List<LessonSchedule> findAllByBranchIdAndActiveTrueAndStartTimeBetween(Integer branchId, LocalDateTime startTime, LocalDateTime startTime2);
+    List<LessonSchedule> findAllByBranchIdAndActiveTrueAndStartTimeBetween(Integer branchId, LocalDateTime startTime, LocalDateTime startTime2, Sort sort);
 
-    List<LessonSchedule> findAllByTeacherIdAndActiveTrueAndStartTimeBetween(Integer teacherId, LocalDateTime startTime, LocalDateTime startTime2);
+    List<LessonSchedule> findAllByTeacherIdAndActiveTrueAndStartTimeBetween(Integer teacherId, LocalDateTime startTime, LocalDateTime startTime2,Sort sort);
 }

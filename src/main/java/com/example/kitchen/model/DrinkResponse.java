@@ -1,7 +1,6 @@
 package com.example.kitchen.model;
 
 import com.example.kitchen.entity.Drink;
-import com.example.kitchen.entity.Meal;
 import lombok.*;
 
 @Getter

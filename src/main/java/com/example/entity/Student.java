@@ -1,6 +1,6 @@
 package com.example.entity;
 
-import com.example.model.request.StudentDto;
+import com.example.model.request.StudentRequest;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -38,7 +38,7 @@ public class Student {
     @Column(nullable = false)
     private String fatherName;
 
-    private String username;  // phoneNumber
+    private String phoneNumber;  // phoneNumber
 
     private String password;
 
@@ -50,6 +50,10 @@ public class Student {
     private String docNumber;
 
     private boolean active;
+
+    private double paymentAmount;
+
+    private String accountNumber;
 
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
@@ -80,16 +84,17 @@ public class Student {
     @OneToOne(cascade = CascadeType.ALL)
     private Attachment medDocPhoto;  // med sprafka rasmi
 
-    public static Student from(StudentDto studentDto) {
+    public static Student from(StudentRequest studentRequest) {
         return Student.builder()
-                .firstName(studentDto.getFirstName())
-                .lastName(studentDto.getLastName())
-                .fatherName(studentDto.getFatherName())
-                .birthDate(studentDto.getBirthDate())
-                .docNumber(studentDto.getDocNumber())
+                .firstName(studentRequest.getFirstName())
+                .lastName(studentRequest.getLastName())
+                .paymentAmount(studentRequest.getPaymentAmount())
+                .fatherName(studentRequest.getFatherName())
+                .birthDate(studentRequest.getBirthDate())
+                .docNumber(studentRequest.getDocNumber())
                 .addedTime(LocalDateTime.now())
-                .username(studentDto.getUsername())
-                .password(studentDto.getPassword())
+                .phoneNumber(studentRequest.getPhoneNumber())
+                .password(studentRequest.getPassword())
                 .active(true)
                 .build();
     }

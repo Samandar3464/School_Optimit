@@ -1,12 +1,12 @@
 package com.example.controller;
 
+import com.example.enums.PaymentType;
 import com.example.model.common.ApiResponse;
 import com.example.model.request.SalaryRequest;
 import com.example.service.SalaryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
 
 @RestController
 @RequiredArgsConstructor
@@ -20,9 +20,9 @@ public class SalaryController {
         return salaryService.create(salaryRequest);
     }
 
-    @GetMapping("getByUserId/{userId}")
-    public ApiResponse getByUserId(@PathVariable Integer userId) {
-        return salaryService.getById(userId);
+    @GetMapping("getByUserId/{phoneNumber}")
+    public ApiResponse getByUserId(@PathVariable String phoneNumber) {
+        return salaryService.getById(phoneNumber);
     }
 
     @PutMapping("update")
@@ -30,42 +30,42 @@ public class SalaryController {
         return salaryService.update(salaryRequest);
     }
 
-    @DeleteMapping("delete/{userId}")
-    public ApiResponse delete(@PathVariable Integer userId) {
-        return salaryService.delete(userId);
+    @DeleteMapping("delete/{phoneNumber}")
+    public ApiResponse delete(@PathVariable String phoneNumber) {
+        return salaryService.delete(phoneNumber);
     }
 
 
-    @GetMapping("giveCashAdvance/{userId}/{cashSalary}/{paymentTypeId}")
-    public ApiResponse giveCashAdvance(@PathVariable Integer userId,
+    @GetMapping("giveCashAdvance/{phoneNumber}/{cashSalary}")
+    public ApiResponse giveCashAdvance(@PathVariable String phoneNumber,
                                        @PathVariable double cashSalary,
-                                       @PathVariable Integer paymentTypeId) {
-        return salaryService.giveCashAdvance(userId, cashSalary, paymentTypeId);
+                                       @RequestParam PaymentType paymentType) {
+        return salaryService.giveCashAdvance(phoneNumber, cashSalary, paymentType);
     }
 
-    @GetMapping("giveDebtToEmployee/{userId}/{debitAmount}/{paymentTypeId}")
-    public ApiResponse giveDebtToEmployee(@PathVariable Integer userId,
+    @GetMapping("giveDebtToEmployee/{phoneNumber}/{debitAmount}")
+    public ApiResponse giveDebtToEmployee(@PathVariable String phoneNumber,
                                 @PathVariable double debitAmount,
-                                @PathVariable Integer paymentTypeId) {
-        return salaryService.giveDebtToEmployee(userId, debitAmount, paymentTypeId);
+                                @RequestParam PaymentType paymentType) {
+        return salaryService.giveDebtToEmployee(phoneNumber, debitAmount, paymentType);
     }
 
-    @GetMapping("debtRepayment/{userId}")
-    public ApiResponse debtRepayment(@PathVariable Integer userId) {
-        return salaryService.debtRepayment(userId);
+    @GetMapping("debtRepayment/{phoneNumber}")
+    public ApiResponse debtRepayment(@PathVariable String phoneNumber) {
+        return salaryService.debtRepayment(phoneNumber);
     }
 
-    @GetMapping("givePartlySalary/{userId}/{partlySalary}/{paymentTypeId}")
-    public ApiResponse givePartlySalary(@PathVariable Integer userId,
+    @GetMapping("givePartlySalary/{phoneNumber}/{partlySalary}")
+    public ApiResponse givePartlySalary(@PathVariable String phoneNumber,
                                         @PathVariable double partlySalary,
-                                        @PathVariable Integer paymentTypeId) {
-        return salaryService.givePartlySalary(userId, partlySalary, paymentTypeId);
+                                        @RequestParam PaymentType paymentType) {
+        return salaryService.givePartlySalary(phoneNumber, partlySalary, paymentType);
     }
 
-    @GetMapping("giveSalary/{userId}/{withholdingOfDebtIfAny}/{paymentTypeId}")
-    public ApiResponse giveSalary(@PathVariable Integer userId,
+    @GetMapping("giveSalary/{phoneNumber}/{withholdingOfDebtIfAny}")
+    public ApiResponse giveSalary(@PathVariable String phoneNumber,
                                   @PathVariable boolean withholdingOfDebtIfAny,
-                                  @PathVariable Integer paymentTypeId) {
-        return salaryService.giveSalary(userId, withholdingOfDebtIfAny, paymentTypeId);
+                                  @RequestParam PaymentType paymentType) {
+        return salaryService.giveSalary(phoneNumber, withholdingOfDebtIfAny, paymentType);
     }
 }

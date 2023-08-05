@@ -92,8 +92,23 @@ public class UserController {
     @GetMapping("/getUserListByPage")
 //    @PreAuthorize("hasRole('ADMIN')")
     public ApiResponse getUserList(@RequestParam(name = "page", defaultValue = "0") int page,
-                                   @RequestParam(name = "size", defaultValue = "1") int size) {
+                                   @RequestParam(name = "size", defaultValue = "5") int size) {
         return userService.getUserList(page, size);
+    }
+
+    @GetMapping("/getUserListByBranchId")
+//    @PreAuthorize("hasRole('ADMIN')")
+    public ApiResponse getUserListByBranchId(
+            @RequestParam(name = "page", defaultValue = "0") int page,
+            @RequestParam(name = "size", defaultValue = "5") int size,
+            @RequestParam Integer branchId) {
+        return userService.getUserListByBranchId(page, size, branchId);
+    }
+
+    @GetMapping("/getUserListByBranchId/{branchId}")
+//    @PreAuthorize("hasRole('ADMIN')")
+    public ApiResponse getUserListByBranchId(@PathVariable Integer branchId) {
+        return userService.getUserListByBranchId(branchId);
     }
 
     @GetMapping("/getUserList")

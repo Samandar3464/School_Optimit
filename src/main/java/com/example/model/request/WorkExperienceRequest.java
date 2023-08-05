@@ -1,44 +1,38 @@
 package com.example.model.request;
 
-import com.example.enums.ExpenseType;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
-import jakarta.persistence.Column;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
 import java.time.LocalDate;
 
+
 @Getter
 @Setter
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
-
-public class ExpenseRequestDto {
+public class WorkExperienceRequest {
 
     private Integer id;
 
-    @Column(nullable = false)
-    private double summa;
+    @NotBlank
+    private String placeOfWork;
 
-    @Column(nullable = false)
-    private String reason;
-
-    @Column(nullable = false)
-    private Integer takerId;
-
-
-    @Column(nullable = false)
-    private Integer paymentTypeId;
-
-    @Column(nullable = false)
-    private Integer branchId;
-
-    private ExpenseType expenseType;
+    private String position;
 
     @JsonSerialize(using = LocalDateSerializer.class)
     @JsonDeserialize(using = LocalDateDeserializer.class)
-    private LocalDate givenDate;
+    private LocalDate startDate;
+
+    @JsonSerialize(using = LocalDateSerializer.class)
+    @JsonDeserialize(using = LocalDateDeserializer.class)
+    private LocalDate endDate;
+
+    @Min(value = 1)
+    private Integer employeeId;
 }

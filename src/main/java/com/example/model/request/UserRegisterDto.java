@@ -55,9 +55,9 @@ public class UserRegisterDto {
 
     private String biography;
 
-//    @JsonSerialize(using = LocalDateSerializer.class)
-//    @JsonDeserialize(using = LocalDateDeserializer.class)
-//    private LocalDate birthDate;
+    @JsonSerialize(using = LocalDateSerializer.class)
+    @JsonDeserialize(using = LocalDateDeserializer.class)
+    private LocalDate birthDate;
 
     private MultipartFile profilePhoto;
 

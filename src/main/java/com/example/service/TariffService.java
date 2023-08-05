@@ -9,6 +9,7 @@ import com.example.model.request.TariffDto;
 import com.example.repository.PermissionRepository;
 import com.example.repository.TariffRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -68,14 +69,14 @@ public class TariffService implements BaseService<TariffDto, Integer> {
     }
 
     public ApiResponse getTariffListForAdmin() {
-        List<Tariff> tariffList = repository.findAllByDelete(false);
+        List<Tariff> tariffList = repository.findAllByDelete(false, Sort.by(Sort.Direction.DESC,"id"));
         tariffList.sort(Comparator.comparing(Tariff::getPrice));
         return new ApiResponse(SUCCESSFULLY, true, tariffList);
     }
 
 
     public ApiResponse getTariffListForUser() {
-        List<Tariff> tariffList = repository.findAllByActiveAndDelete(true, false);
+        List<Tariff> tariffList = repository.findAllByActiveAndDelete(true, false, Sort.by(Sort.Direction.DESC,"id"));
         tariffList.sort(Comparator.comparing(Tariff::getPrice));
         return new ApiResponse(SUCCESSFULLY, true, tariffList);
     }

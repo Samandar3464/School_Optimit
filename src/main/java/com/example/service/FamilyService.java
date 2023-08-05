@@ -19,11 +19,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static com.example.enums.Constants.*;
@@ -88,9 +90,7 @@ public class FamilyService implements BaseService<Family, Integer> {
         Pageable pageable = PageRequest.of(page, size);
         Page<Family> familyList = familyRepository.findAllByBranchIdAndActiveTrue(branchId, pageable);
         List<FamilyResponse> familyResponses = new ArrayList<>();
-        familyList.getContent().forEach(obj -> {
-            familyResponses.add(FamilyResponse.from(obj));
-        });
+        familyList.getContent().forEach(obj -> familyResponses.add(FamilyResponse.from(obj)));
         return new ApiResponse(new FamilyResponseList(familyResponses, familyList.getTotalElements(), familyList.getTotalPages(), familyList.getNumber()), true);
     }
 
@@ -98,7 +98,7 @@ public class FamilyService implements BaseService<Family, Integer> {
     public ApiResponse familyLogIn(FamilyLoginDto dto) {
         Family family = familyRepository.findByPhoneNumberAndPassword(dto.getPhoneNumber(), dto.getPassword())
                 .orElseThrow(() -> new UserNotFoundException(FAMILY_NOT_FOUND));
-        List<Student> allByFamily = studentRepository.findByFamilyIn(List.of(family));
+        List<Student> allByFamily = studentRepository.findByFamilyIn(List.of(Collections.singletonList(family)), Sort.by(Sort.Direction.DESC,"id"));
         List<StudentResponseDto> studentResponseDtoList = new ArrayList<>();
         allByFamily.forEach(student ->
                 studentResponseDtoList.add(StudentResponseDto.from(student)));

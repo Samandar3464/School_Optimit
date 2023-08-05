@@ -8,9 +8,12 @@ import com.example.model.request.TypeOfWorkRequest;
 import com.example.repository.BranchRepository;
 import com.example.repository.TypeOfWorkRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.ResponseStatus;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -34,7 +37,8 @@ public class TypeOfWorkService implements BaseService<TypeOfWorkRequest, Integer
 
     @ResponseStatus(HttpStatus.OK)
     public ApiResponse getAllByBranchId(Integer branchId) {
-        return new ApiResponse(typeOfWorkRepository.findAllByBranch_Id(branchId), true);
+        List<TypeOfWork> all = typeOfWorkRepository.findAllByBranch_Id(branchId, Sort.by(Sort.Direction.DESC,"id"));
+        return new ApiResponse(all, true);
     }
 
     @Override

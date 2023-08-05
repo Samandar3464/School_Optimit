@@ -8,6 +8,7 @@ import com.example.model.common.ApiResponse;
 import com.example.repository.BranchRepository;
 import com.example.repository.RoomTypeRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -69,7 +70,7 @@ public class RoomTypeService implements BaseService<RoomType, Integer> {
     }
     @ResponseStatus(HttpStatus.OK)
     public ApiResponse getListRoomsByBranchId(Integer id) {
-        List<RoomType> allByBranchId = roomTypeRepository.findAllByBranchIdAndActiveTrue(id);
+        List<RoomType> allByBranchId = roomTypeRepository.findAllByBranchIdAndActiveTrue(id, Sort.by(Sort.Direction.DESC,"id"));
         return new ApiResponse(allByBranchId, true);
     }
 }

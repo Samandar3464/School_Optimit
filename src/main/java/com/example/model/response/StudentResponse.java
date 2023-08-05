@@ -1,20 +1,9 @@
 package com.example.model.response;
 
-import com.example.entity.Attachment;
 import com.example.entity.Family;
 import com.example.entity.Student;
-import com.example.model.request.StudentDto;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
-import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
-import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
-import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
-import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
@@ -32,9 +21,11 @@ public class StudentResponse {
 
     private String fatherName;
 
-    @JsonSerialize(using = LocalDateSerializer.class)
-    @JsonDeserialize(using = LocalDateDeserializer.class)
-    private LocalDate birthDate;
+    private String phoneNumber;
+
+    private double paymentAmount;
+
+    private String birthDate;
 
     private String docNumber;
 
@@ -44,15 +35,13 @@ public class StudentResponse {
 
     private String photo;
 
-    private String studentClass;
+    private StudentClassResponse studentClass;
 
     private boolean active;
 
     private List<Family> families;
 
-    @JsonSerialize(using = LocalDateTimeSerializer.class)
-    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
-    private LocalDateTime addedTime;
+    private String addedTime;
 
     private String medDocPhoto;
 
@@ -61,13 +50,15 @@ public class StudentResponse {
                 .id(student.getId())
                 .firstName(student.getFirstName())
                 .lastName(student.getLastName())
+                .paymentAmount(student.getPaymentAmount())
                 .fatherName(student.getFatherName())
-                .birthDate(student.getBirthDate())
+                .phoneNumber(student.getPhoneNumber())
+                .birthDate(student.getBirthDate().toString())
                 .docNumber(student.getDocNumber())
                 .families(student.getFamily())
-                .studentClass(student.getStudentClass().getClassName())
+                .studentClass(StudentClassResponse.toResponse(student.getStudentClass()))
                 .active(student.isActive())
-                .addedTime(student.getAddedTime())
+                .addedTime(student.getAddedTime().toString())
                 .build();
     }
 }

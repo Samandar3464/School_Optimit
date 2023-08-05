@@ -3,6 +3,7 @@ package com.example.controller;
 import com.example.model.common.ApiResponse;
 import com.example.model.request.TeachingHoursRequest;
 import com.example.service.TeachingHoursService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,7 +18,7 @@ public class TeachingHoursController {
 
     @PostMapping("/save")
 //    @PreAuthorize("hasAnyRole('SUPER_ADMIN') or hasAnyAuthority('SAVE_TARIFF')")
-    public ApiResponse save(@RequestBody TeachingHoursRequest teachingHoursRequest) {
+    public ApiResponse save(@RequestBody @Valid TeachingHoursRequest teachingHoursRequest) {
         return teachingHoursService.create(teachingHoursRequest);
     }
 
@@ -46,7 +47,7 @@ public class TeachingHoursController {
 
     @PutMapping("/update")
 //    @PreAuthorize("hasAnyRole('SUPER_ADMIN') or hasAnyAuthority('UPDATE_TARIFF')")
-    public ApiResponse update(@RequestBody TeachingHoursRequest teachingHoursRequest) {
+    public ApiResponse update(@RequestBody @Valid TeachingHoursRequest teachingHoursRequest) {
         return teachingHoursService.update(teachingHoursRequest);
     }
 

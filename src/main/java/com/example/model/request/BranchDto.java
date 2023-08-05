@@ -1,6 +1,7 @@
 package com.example.model.request;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
@@ -18,6 +19,6 @@ public class BranchDto {
     @NotBlank
     private String address;
 
-    @NotBlank
+    @Min(value = 1)
     private Integer businessId;
 }

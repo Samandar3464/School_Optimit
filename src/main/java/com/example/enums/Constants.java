@@ -74,7 +74,7 @@ public class Constants {
     public static final String STAFF_ATTENDANCE_NOT_FOUND = "STAFF_ATTENDANCE_NOT_FOUND";
     public static final String AMOUNT_NOT_ENOUGH = "AMOUNT_NOT_ENOUGH";
     public static final String REASON_NOT_FOUND = "REASON NOT FOUND";
-    public static final String STUDENT_BALANCE_NOT_FOUND = "ACCOUNT NOT FOUND";
+    public static final String STUDENT_ACCOUNT_NOT_FOUND = "ACCOUNT NOT FOUND";
     public static final String ACCOUNT_ALREADY_EXIST = "ACCOUNT ALREADY EXIST";
     public static final String MEASUREMENT_NOT_FOUND = "MEASUREMENT NOT FOUND";
     public static final String MEASUREMENT_ALREADY_EXIST = "MEASUREMENT ALREADY EXIST";
@@ -113,4 +113,16 @@ public class Constants {
     public static final String STUDENT_HOMEWORK_NOT_FOUND = "STUDENT_HOMEWORK_NOT_FOUND";
     public static final String STUDENT_HOMEWORK_ALREADY_EXISTS = "STUDENT_HOMEWORK_ALREADY_EXISTS";
 
+    public static final String MAIN_BALANCE_NOT_FOUND = "MAIN_BALANCE_NOT_FOUND";
+    public static final String MAIN_BALANCE_ALREADY_EXISTS = "MAIN_BALANCE_ALREADY_EXISTS";
+    public static final String TRANSACTION_HISTORY_NOT_FOUND = "TRANSACTION_HISTORY_NOT_FOUND";
+
+    public static final String PLASTIC_BALANCE_NOT_ENOUGH_SUMMA = "PLASTIC_BALANCE_NOT_ENOUGH_SUMMA";
+    public static final String CASH_BALANCE_NOT_ENOUGH_SUMMA = "CASH_BALANCE_NOT_ENOUGH_SUMMA";
+    public static final String DO_NOT_CHANGE = "DO_NOT_CHANGE";
+    public static final String STUDENT_TRANSACTION_NOT_FOUND = "STUDENT_TRANSACTION_NOT_FOUND";
+    public static final String STUDENT_BALANCE_NOT_ENOUGH = "STUDENT_BALANCE_NOT_ENOUGH";
+    public static final String STUDENT_ACCOUNT_ALREADY_EXIST = "STUDENT_ACCOUNT_ALREADY_EXIST";
+    public static final String STUDENT_ALREADY_PAYED_FOR_YEAR = "STUDENT_ALREADY_PAYED_FOR_YEAR";
+    public static final String STUDENT_BALANCE_NOT_ENOUGH_TO_WITHDRAW_DEBT = "STUDENT_BALANCE_NOT_ENOUGH_TO_WITHDRAW_DEBT";
 }

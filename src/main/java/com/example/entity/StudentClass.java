@@ -28,7 +28,7 @@ public class StudentClass {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @OneToOne
+    @ManyToOne
     private Level level;
 
     @Column(nullable = false)

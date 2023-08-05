@@ -24,7 +24,8 @@ public class PermissionService implements BaseService<Permission, Integer> {
         if (permissionRepository.findByName(permission.getName()).isPresent()) {
             throw new RecordAlreadyExistException(PERMISSION_ALREADY_EXIST);
         }
-        return new ApiResponse(permissionRepository.save(permission), true);
+        permissionRepository.save(permission);
+        return new ApiResponse(SUCCESSFULLY, true);
     }
 
     @Override

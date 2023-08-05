@@ -1,6 +1,7 @@
 package com.example.repository;
 
 import com.example.entity.Subject;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
@@ -10,5 +11,5 @@ public interface SubjectRepository extends JpaRepository<Subject,Integer> {
     Optional<Subject> findByName(String name);
     Optional<Subject> findByIdAndActiveTrue(Integer id);
 
-    List<Subject> findAllByBranchId(Integer branchId);
+    List<Subject> findAllByBranchId(Integer branchId, Sort sort);
 }

@@ -120,7 +120,7 @@ public class User implements UserDetails {
                 .surname(userRegisterDto.getSurname())
                 .fatherName(userRegisterDto.getFatherName())
                 .phoneNumber(userRegisterDto.getPhoneNumber())
-//                .birthDate(userRegisterDto.getBirthDate())
+                .birthDate(userRegisterDto.getBirthDate())
                 .workDays(userRegisterDto.getWorkDays())
                 .inn(userRegisterDto.getInn())
                 .inps(userRegisterDto.getInps())

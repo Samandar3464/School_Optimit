@@ -1,15 +1,11 @@
 package com.example.model.response;
 
 import com.example.entity.*;
-import com.example.model.request.AchievementDto;
-import com.example.model.request.StudentClassDto;
-import com.example.model.request.WorkExperienceDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
 import java.util.List;
 
 
@@ -24,6 +20,8 @@ public class UserResponseDto {
     private int inn;
 
     private int inps;
+
+    private int workDays;
 
     private String name;
 
@@ -64,6 +62,7 @@ public class UserResponseDto {
                 .inps(user.getInps())
                 .subjects(user.getSubjects())
                 .role(user.getRole())
+                .workDays(user.getWorkDays())
                 .phoneNumber(user.getPhoneNumber())
                 .birthDate(user.getBirthDate().toString())
                 .gender(user.getGender().toString())

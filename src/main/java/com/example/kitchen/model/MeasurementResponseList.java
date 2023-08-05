@@ -1,7 +1,5 @@
 package com.example.kitchen.model;
 
-import com.example.kitchen.entity.Measurement;
-import com.example.kitchen.entity.Product;
 import com.example.kitchen.entity.Warehouse;
 import lombok.*;
 

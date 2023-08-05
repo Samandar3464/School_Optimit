@@ -1,7 +1,7 @@
 package com.example.controller;
 
 import com.example.model.common.ApiResponse;
-import com.example.model.request.WorkExperienceDto;
+import com.example.model.request.WorkExperienceRequest;
 import com.example.service.WorkExperienceService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -17,7 +17,7 @@ public class WorkExperienceController {
     private final WorkExperienceService workExperienceService;
 
     @PostMapping("save")
-    public ApiResponse save(@RequestBody @Valid WorkExperienceDto workExperience) {
+    public ApiResponse save(@RequestBody @Valid WorkExperienceRequest workExperience) {
         return workExperienceService.create(workExperience);
     }
 
@@ -37,7 +37,7 @@ public class WorkExperienceController {
     }
 
     @PutMapping("update")
-    public ApiResponse update(@RequestBody WorkExperienceDto workExperience) {
+    public ApiResponse update(@RequestBody WorkExperienceRequest workExperience) {
         return workExperienceService.update(workExperience);
     }
 
@@ -45,5 +45,4 @@ public class WorkExperienceController {
     public ApiResponse delete(@PathVariable Integer id) {
         return workExperienceService.delete(id);
     }
-
 }

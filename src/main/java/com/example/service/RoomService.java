@@ -3,6 +3,7 @@ package com.example.service;
 import com.example.entity.Branch;
 import com.example.entity.Room;
 import com.example.entity.RoomType;
+import com.example.enums.Constants;
 import com.example.exception.RecordNotFoundException;
 import com.example.model.common.ApiResponse;
 import com.example.model.request.RoomRequestDto;
@@ -14,9 +15,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.ResponseStatus;
+
+import java.util.List;
 
 import static com.example.enums.Constants.*;
 
@@ -86,5 +90,11 @@ public class RoomService implements BaseService<RoomRequestDto, Integer> {
         Page<Room> all = roomRepository.findAllByBranchIdAndActiveTrue(branchId, pageable);
         return new ApiResponse(new RoomResponseListForAdmin(
                 all.getContent(), all.getTotalElements(), all.getTotalPages(), all.getNumber()), true);
+    }
+
+    @ResponseStatus(HttpStatus.OK)
+    public ApiResponse getRoomListByBranchId(Integer branchId) {
+        List<Room> all = roomRepository.findAllByBranchIdAndActiveTrue(branchId,Sort.by(Sort.Direction.DESC,"id"));
+        return new ApiResponse(SUCCESSFULLY, true, all);
     }
 }

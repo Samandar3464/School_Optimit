@@ -1,6 +1,7 @@
 package com.example.kitchen.entity;
 
 import com.example.entity.Branch;
+import com.example.enums.MeasurementType;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
@@ -19,15 +20,23 @@ public class Drink {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
+    private double unitPrice;
+
+    private int count;
+
+    private int literQuantity;
+
+    private String description;
+
+    private boolean active;
+
     private String name;
 
-    @ManyToMany
-    @JsonIgnore
-    private List<Product> productList;
+    private MeasurementType measurementType;
 
-    @JsonIgnore
     @ManyToOne
     private Branch branch;
 
-    private boolean active;
+    @ManyToOne
+    private Warehouse warehouse;
 }

@@ -9,6 +9,7 @@ import com.example.model.request.StudentHomeworkRequest;
 import com.example.model.response.StudentHomeworkResponse;
 import com.example.repository.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -56,7 +57,7 @@ public class StudentHomeworkService implements BaseService<StudentHomeworkReques
     }
 
     public ApiResponse getListByActive() {
-        List<StudentHomework> all = studentHomeworkRepository.findAllByActiveTrue();
+        List<StudentHomework> all = studentHomeworkRepository.findAllByActiveTrue( Sort.by(Sort.Direction.DESC,"id"));
         return new ApiResponse(Constants.SUCCESSFULLY, true, StudentHomeworkResponse.toAllResponse(all));
     }
 

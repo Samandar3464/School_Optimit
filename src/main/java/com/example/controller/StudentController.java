@@ -2,7 +2,7 @@ package com.example.controller;
 
 import com.example.model.common.ApiResponse;
 import com.example.model.request.FamilyLoginDto;
-import com.example.model.request.StudentDto;
+import com.example.model.request.StudentRequest;
 import com.example.service.StudentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -15,8 +15,8 @@ public class StudentController {
     private final StudentService service;
 
     @PostMapping("/create")
-    public ApiResponse create(@ModelAttribute StudentDto studentDto) {
-        return service.create(studentDto);
+    public ApiResponse create(@ModelAttribute StudentRequest studentRequest) {
+        return service.create(studentRequest);
     }
 
     @GetMapping("/getById/{id}")
@@ -25,8 +25,8 @@ public class StudentController {
     }
 
     @PutMapping("/update")
-    public ApiResponse update(@ModelAttribute StudentDto studentDto) {
-        return service.update(studentDto);
+    public ApiResponse update(@ModelAttribute StudentRequest studentRequest) {
+        return service.update(studentRequest);
     }
 
     @DeleteMapping("/delete/{id}")
@@ -37,13 +37,13 @@ public class StudentController {
     @GetMapping("/getAll")
     public ApiResponse getAll(@RequestParam(name = "page", defaultValue = "0") int page,
                               @RequestParam(name = "size", defaultValue = "5") int size,
-                              @RequestParam(name = "id") int id) {
-        return service.getList(page, size,id);
+                              @RequestParam(name = "branchId") int branchId) {
+        return service.getList(page, size, branchId);
     }
 
     @GetMapping("/getAllByClassId/{id}/{branchId}")
-    public ApiResponse getAllByClassName(@PathVariable Integer id,@PathVariable Integer branchId) {
-        return service.getListByClassNumber(id,branchId);
+    public ApiResponse getAllByClassName(@PathVariable Integer id, @PathVariable Integer branchId) {
+        return service.getListByClassNumber(id, branchId);
     }
 
     @GetMapping("/getAllNeActiveStudents/{branchId}")

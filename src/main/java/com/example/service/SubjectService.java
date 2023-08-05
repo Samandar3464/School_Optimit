@@ -11,6 +11,7 @@ import com.example.model.response.TopicResponseDto;
 import com.example.repository.BranchRepository;
 import com.example.repository.SubjectRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -63,7 +64,7 @@ public class SubjectService implements BaseService<SubjectRequestDto, Integer> {
     }
 
     public ApiResponse getAllSubjectByBranchId(Integer branchId) {
-        return new ApiResponse(subjectRepository.findAllByBranchId(branchId), true);
+        return new ApiResponse(subjectRepository.findAllByBranchId(branchId, Sort.by(Sort.Direction.DESC,"id")), true);
     }
 
     public Subject checkById(Integer id) {

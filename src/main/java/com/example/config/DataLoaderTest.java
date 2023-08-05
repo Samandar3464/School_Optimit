@@ -3,8 +3,8 @@ package com.example.config;
 
 import com.example.entity.*;
 import com.example.enums.Gender;
-import com.example.kitchen.repository.MeasurementRepository;
 import com.example.repository.*;
+import com.example.service.MainBalanceService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
@@ -13,7 +13,6 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Collections;
 import java.util.List;
 
 @Component
@@ -28,12 +27,15 @@ public class DataLoaderTest implements CommandLineRunner {
     private final RoleRepository roleRepository;
     private final RoomTypeRepository roomTypeRepository;
     private final RoomRepository roomRepository;
+    private final MainBalanceRepository mainBalanceRepository;
     private final StudentClassRepository studentClassRepository;
+    private final StudentRepository studentRepository;
     private final TypeOfWorkRepository typeOfWorkRepository;
     private final SubjectRepository subjectRepository;
-    private final BalanceRepository balanceRepository;
     private final LevelRepository levelRepository;
     private final SubjectLevelRepository subjectLevelRepository;
+    private final MainBalanceService mainBalanceService;
+
 
     @Value("${spring.sql.init.mode}")
     private String initMode;
@@ -54,6 +56,7 @@ public class DataLoaderTest implements CommandLineRunner {
                     .build();
             Business savedBusiness = businessRepository.save(business);
 
+
             Branch branch = Branch.builder()
                     .name("Demo branch")
                     .address("Demo")
@@ -67,7 +70,6 @@ public class DataLoaderTest implements CommandLineRunner {
             teacher1.setBranch(saveBranch);
 
             Role savedRole = roleRepository.save(teacher1);
-
 
             User teacher = User.builder()
                     .name(" teacher")
@@ -87,14 +89,6 @@ public class DataLoaderTest implements CommandLineRunner {
 
 
 
-            Balance balance = Balance.builder()
-                    .balance(1000000000)
-                    .branch(saveBranch)
-                    .shotNumber(123123123L)
-                    .build();
-
-            Balance savedBalance = balanceRepository.save(balance);
-
             RoomType roomType = RoomType.builder()
                     .name("O'quv xona")
                     .active(true)
@@ -113,6 +107,9 @@ public class DataLoaderTest implements CommandLineRunner {
 
             Level savedLavel = levelRepository.getById(6);
 
+            mainBalanceRepository.save(new MainBalance(1,0,0,0,1,LocalDate.now(),true,saveBranch));
+
+
             StudentClass studentClass = StudentClass.builder()
                     .className("1-A sinf")
                     .level(savedLavel)
@@ -125,7 +122,9 @@ public class DataLoaderTest implements CommandLineRunner {
                     .classLeader(savedTeacher)
                     .build();
 
-            studentClassRepository.save(studentClass);
+            StudentClass savedStudentClass = studentClassRepository.save(studentClass);
+
+            studentRepository.save(new Student(1,"aaa","a","a","907403767","111111",LocalDate.now(),"wefs",true,3_000_000,"1",LocalDateTime.now(),null,null,null,savedStudentClass,null,saveBranch,null));
 
             TypeOfWork typeOfWork = TypeOfWork.builder()
                     .branch(saveBranch)

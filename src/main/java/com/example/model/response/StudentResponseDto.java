@@ -28,6 +28,7 @@ public class StudentResponseDto {
     @JsonSerialize(using = LocalDateSerializer.class)
     @JsonDeserialize(using = LocalDateDeserializer.class)
     private LocalDate birthDate;
+
     public static StudentResponseDto from(Student student){
         return StudentResponseDto.builder()
                 .id(student.getId())
