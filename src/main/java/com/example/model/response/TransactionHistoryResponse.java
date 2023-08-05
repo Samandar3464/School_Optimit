@@ -1,8 +1,10 @@
 package com.example.model.response;
 
+import com.example.entity.Branch;
 import com.example.entity.TransactionHistory;
 import com.example.enums.ExpenseType;
 import com.example.enums.PaymentType;
+import com.example.repository.MainBalanceRepository;
 import lombok.Builder;
 import lombok.Data;
 
@@ -18,19 +20,27 @@ public class TransactionHistoryResponse {
 
     private double moneyAmount;
 
+    private String accountNumber;
+
     private String comment;
 
     private String date;
 
     private boolean active;
 
+    private boolean paidInFull;
+
     private ExpenseType expenseType;
 
     private PaymentType paymentType;
 
-    private Integer takerId;
+    private UserResponseDto taker;
 
-    private Integer branchId;
+    private StudentResponse student;
+
+    private MainBalanceResponse mainBalanceResponse;
+
+    private Branch branch;
 
     public static TransactionHistoryResponse toResponse(TransactionHistory transactionHistory) {
         return TransactionHistoryResponse
@@ -39,9 +49,13 @@ public class TransactionHistoryResponse {
                 .moneyAmount(transactionHistory.getMoneyAmount())
                 .expenseType(transactionHistory.getExpenseType())
                 .active(transactionHistory.isActive())
+                .accountNumber(transactionHistory.getStudent().getAccountNumber())
+                .paidInFull(transactionHistory.isPaidInFull())
                 .paymentType(transactionHistory.getPaymentType())
-                .branchId(transactionHistory.getBranch().getId())
-                .takerId(transactionHistory.getTaker() == null ? null : transactionHistory.getTaker().getId())
+                .branch(transactionHistory.getBranch())
+                .mainBalanceResponse(MainBalanceResponse.toResponse(transactionHistory.getMainBalance()))
+                .taker(transactionHistory.getTaker() == null ? null : UserResponseDto.from(transactionHistory.getTaker()))
+                .student(transactionHistory.getStudent() == null ? null : StudentResponse.from(transactionHistory.getStudent()))
                 .comment(transactionHistory.getComment())
                 .date(transactionHistory.getDate().toString())
                 .build();

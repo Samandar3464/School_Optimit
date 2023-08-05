@@ -1,6 +1,6 @@
 package com.example.entity;
 
-import com.example.model.request.WorkExperienceDto;
+import com.example.model.request.WorkExperienceRequest;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.OnDelete;
@@ -32,13 +32,13 @@ public class WorkExperience {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private User employee;
 
-    public static WorkExperience toWorkExperience(WorkExperienceDto workExperienceDto) {
+    public static WorkExperience toWorkExperience(WorkExperienceRequest workExperienceRequest) {
         return WorkExperience
                 .builder()
-                .placeOfWork(workExperienceDto.getPlaceOfWork())
-                .position(workExperienceDto.getPosition())
-                .startDate(workExperienceDto.getStartDate())
-                .endDate(workExperienceDto.getEndDate())
+                .placeOfWork(workExperienceRequest.getPlaceOfWork())
+                .position(workExperienceRequest.getPosition())
+                .startDate(workExperienceRequest.getStartDate())
+                .endDate(workExperienceRequest.getEndDate())
                 .build();
     }
 }

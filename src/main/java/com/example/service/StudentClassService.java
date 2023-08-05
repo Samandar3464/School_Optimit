@@ -5,8 +5,10 @@ import com.example.exception.RecordNotFoundException;
 import com.example.exception.UserNotFoundException;
 import com.example.model.common.ApiResponse;
 import com.example.model.request.StudentClassDto;
+import com.example.model.response.StudentClassResponse;
 import com.example.repository.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -51,7 +53,7 @@ public class StudentClassService implements BaseService<StudentClassDto, Integer
     @ResponseStatus(HttpStatus.OK)
     public ApiResponse getById(Integer integer) {
         StudentClass studentClass = studentClassRepository.findById(integer).orElseThrow(() -> new RecordNotFoundException(CLASS_NOT_FOUND));
-        return new ApiResponse(studentClass, true);
+        return new ApiResponse(SUCCESSFULLY, true, StudentClassResponse.toResponse(studentClass));
     }
 
     @Override
@@ -78,7 +80,7 @@ public class StudentClassService implements BaseService<StudentClassDto, Integer
         studentClass.setStartDate(studentClassDto.getStartDate());
         studentClass.setEndDate(studentClassDto.getEndDate());
         studentClassRepository.save(studentClass);
-        return new ApiResponse(SUCCESSFULLY, true);
+        return new ApiResponse(SUCCESSFULLY, true, StudentClassResponse.toResponse(studentClass));
     }
 
     @Override
@@ -92,13 +94,15 @@ public class StudentClassService implements BaseService<StudentClassDto, Integer
 
     @ResponseStatus(HttpStatus.OK)
     public ApiResponse getAllActiveClasses(Integer branchId) {
-        List<StudentClass> allByActiveTrue = studentClassRepository.findAllByActiveTrueAndBranchId(branchId);
-        return new ApiResponse(allByActiveTrue, true);
+        List<StudentClass> allByActiveTrue = studentClassRepository.findAllByActiveTrueAndBranchId(branchId, Sort.by(Sort.Direction.DESC,"id"));
+        List<StudentClassResponse> allResponse = StudentClassResponse.toAllResponse(allByActiveTrue);
+        return new ApiResponse(allResponse, true);
     }
 
     @ResponseStatus(HttpStatus.OK)
     public ApiResponse getAllNeActiveClassesByYear(LocalDate startDate, LocalDate endDate, int id) {
-        List<StudentClass> allByStartDateAfterAndEndDateBeforeAndActiveFalse = studentClassRepository.findAllByBranchIdAndStartDateAfterAndEndDateBeforeAndActiveFalse(id, startDate, endDate);
-        return new ApiResponse(allByStartDateAfterAndEndDateBeforeAndActiveFalse, true);
+        List<StudentClass> all = studentClassRepository.findAllByBranchIdAndStartDateAfterAndEndDateBeforeAndActiveFalse(id, startDate, endDate, Sort.by(Sort.Direction.DESC,"id"));
+        List<StudentClassResponse> allResponse = StudentClassResponse.toAllResponse(all);
+        return new ApiResponse(allResponse, true);
     }
 }

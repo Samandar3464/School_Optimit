@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -90,7 +91,7 @@ public class ScoreService implements BaseService<ScoreRequestDto, UUID> {
         int dayOfWeek = LocalDate.now().atStartOfDay().getDayOfWeek().getValue();
         LocalDateTime startWeek = LocalDateTime.now().minusDays(dayOfWeek);
         LocalDateTime endWeek = startWeek.plusDays(7);
-        List<Score> all = scoreRepository.findAllByJournalIdAndTeacherIdAndSubjectIdAndCreatedDateBetween(scoreDto.getJournalId(), scoreDto.getTeacherId(), scoreDto.getSubjectId(), startWeek, endWeek);
+        List<Score> all = scoreRepository.findAllByJournalIdAndTeacherIdAndSubjectIdAndCreatedDateBetween(scoreDto.getJournalId(), scoreDto.getTeacherId(), scoreDto.getSubjectId(), startWeek, endWeek, Sort.by(Sort.Direction.DESC,"id"));
         List<ScoreResponseForStudent> scoreResponseForStudents = new ArrayList<>();
         all.forEach(score -> scoreResponseForStudents.add(ScoreResponseForStudent.from(score)));
         return new ApiResponse(scoreResponseForStudents, true);
@@ -106,6 +107,4 @@ public class ScoreService implements BaseService<ScoreRequestDto, UUID> {
         all.getContent().forEach(score -> scoreResponseForStudents.add(ScoreResponseForStudent.from(score)));
         return new ApiResponse(new ScoreResponseList(scoreResponseForStudents, all.getTotalElements(), all.getTotalPages(), all.getNumber()), true);
     }
-
-
 }

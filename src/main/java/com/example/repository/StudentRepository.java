@@ -4,22 +4,26 @@ import com.example.entity.Family;
 import com.example.entity.Student;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
 public interface StudentRepository extends JpaRepository<Student, Integer> {
 
-    List<Student> findAllByStudentClassIdAndBranchIdAndActiveTrue(Integer studentClassId, Integer branchId);
+    List<Student> findAllByStudentClassIdAndBranchIdAndActiveTrue(Integer studentClassId, Integer branchId, Sort sort);
 
     Page<Student> findAllByBranchIdAndActiveTrue(Pageable pageable, Integer id);
 
-    List<Student> findAllByBranchIdAndActiveFalseOrderByAddedTimeAsc(Integer branchId);
+    List<Student> findAllByBranchIdAndActiveFalseOrderByAddedTimeAsc(Integer branchId,Sort sort);
 
-    boolean existsByUsername(String username);
 
-    List<Student> findByFamilyIn(List<Family> family);
+    List<Student> findByFamilyIn(Collection<List<Family>> family, Sort sort);
 
-    Optional<Student> findByUsernameAndPassword(String username, String password);
+    Optional<Student> findByIdAndActiveTrue(Integer id);
+    Optional<Student> findByAccountNumberAndActiveTrue(String accountNumber);
+
+    Optional<Student> findByPhoneNumberAndPassword(String username, String password);
 }

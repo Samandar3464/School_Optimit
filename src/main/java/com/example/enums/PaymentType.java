@@ -1,8 +1,8 @@
 package com.example.enums;
 
 public enum PaymentType {
-    NAQD,
-    KARTA,
+    CASH,
+    CARD,
     HISOBDAN_HISOBGA,
     ELEKTRON
 }

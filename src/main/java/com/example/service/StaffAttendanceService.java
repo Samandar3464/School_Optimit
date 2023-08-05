@@ -13,6 +13,7 @@ import com.example.repository.SalaryRepository;
 import com.example.repository.StaffAttendanceRepository;
 import com.example.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -34,8 +35,9 @@ public class StaffAttendanceService implements BaseService<StaffAttendanceReques
         if (attendanceRepository.findByUserIdAndDate(staffAttendanceRequest.getUserId(), staffAttendanceRequest.getDate()).isPresent()) {
             throw new RecordAlreadyExistException(Constants.STAFF_ATTENDANCE_ALREADY_EXISTS_FOR_THIS_DATE);
         }
-        setAndSave(staffAttendanceRequest, staffAttendance);
+        set(staffAttendanceRequest, staffAttendance);
         dailyWageSetting(staffAttendance);
+        attendanceRepository.save(staffAttendance);
         return new ApiResponse(Constants.SUCCESSFULLY, true);
     }
 
@@ -46,12 +48,12 @@ public class StaffAttendanceService implements BaseService<StaffAttendanceReques
     }
 
     public ApiResponse getAllByUserId(Integer id) {
-        List<StaffAttendanceResponse> all = StaffAttendanceResponse.toAllResponse(attendanceRepository.findAllByUserId(id));
+        List<StaffAttendanceResponse> all = StaffAttendanceResponse.toAllResponse(attendanceRepository.findAllByUserId(id, Sort.by(Sort.Direction.DESC,"id")));
         return new ApiResponse(Constants.SUCCESSFULLY, true, all);
     }
 
     public ApiResponse getAllByBranchId(Integer id) {
-        List<StaffAttendanceResponse> all = StaffAttendanceResponse.toAllResponse(attendanceRepository.findAllByBranchId(id));
+        List<StaffAttendanceResponse> all = StaffAttendanceResponse.toAllResponse(attendanceRepository.findAllByBranchId(id, Sort.by(Sort.Direction.DESC,"id")));
         return new ApiResponse(Constants.SUCCESSFULLY, true, all);
     }
 
@@ -63,7 +65,8 @@ public class StaffAttendanceService implements BaseService<StaffAttendanceReques
         }
         StaffAttendance staffAttendance = StaffAttendance.toStaffAttendance(staffAttendanceRequest);
         staffAttendance.setId(staffAttendanceRequest.getId());
-        setAndSave(staffAttendanceRequest, staffAttendance);
+        set(staffAttendanceRequest, staffAttendance);
+        attendanceRepository.save(staffAttendance);
         return new ApiResponse(Constants.SUCCESSFULLY, true, StaffAttendanceResponse.toResponse(staffAttendance));
     }
 
@@ -76,7 +79,7 @@ public class StaffAttendanceService implements BaseService<StaffAttendanceReques
     }
 
     private void dailyWageSetting(StaffAttendance staffAttendance) {
-        Salary salary = salaryRepository.findByUserIdAndActiveTrue(staffAttendance.getUser().getId()).orElseThrow(() -> new RecordNotFoundException(Constants.SALARY_NOT_FOUND));
+        Salary salary = salaryRepository.findByUserPhoneNumberAndActiveTrue(staffAttendance.getUser().getPhoneNumber()).orElseThrow(() -> new RecordNotFoundException(Constants.SALARY_NOT_FOUND));
         double dailyWage = (salary.getFix() + salary.getClassLeaderSalary()) / salary.getUser().getWorkDays();
         dailyWage = Math.round(dailyWage * 100) / 100D;
         salary.setSalary(salary.getSalary() + dailyWage);
@@ -85,7 +88,7 @@ public class StaffAttendanceService implements BaseService<StaffAttendanceReques
 
     private void checkAndDeleteDailyWage(StaffAttendance staffAttendance) {
         if (staffAttendance.getDate().equals(LocalDate.now())) {
-            Salary salary = salaryRepository.findByUserIdAndActiveTrue(staffAttendance.getUser().getId()).orElseThrow(() -> new RecordNotFoundException(Constants.SALARY_NOT_FOUND));
+            Salary salary = salaryRepository.findByUserPhoneNumberAndActiveTrue(staffAttendance.getUser().getPhoneNumber()).orElseThrow(() -> new RecordNotFoundException(Constants.SALARY_NOT_FOUND));
             double dailyWage = (salary.getFix() + salary.getClassLeaderSalary()) / salary.getUser().getWorkDays();
             dailyWage = Math.round(dailyWage * 100) / 100D;
             if (salary.getSalary() > dailyWage) {
@@ -98,9 +101,8 @@ public class StaffAttendanceService implements BaseService<StaffAttendanceReques
         }
     }
 
-    private void setAndSave(StaffAttendanceRequest staffAttendanceRequest, StaffAttendance staffAttendance) {
+    private void set(StaffAttendanceRequest staffAttendanceRequest, StaffAttendance staffAttendance) {
         staffAttendance.setUser(userRepository.findById(staffAttendanceRequest.getUserId()).orElseThrow(() -> new RecordNotFoundException(Constants.USER_NOT_FOUND)));
         staffAttendance.setBranch(branchRepository.findById(staffAttendanceRequest.getBranchId()).orElseThrow(() -> new RecordNotFoundException(Constants.BRANCH_NOT_FOUND)));
-        attendanceRepository.save(staffAttendance);
     }
 }

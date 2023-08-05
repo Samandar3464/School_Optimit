@@ -38,6 +38,4 @@ public class AchievementController {
     public ApiResponse getAllByUserId(@PathVariable Integer userId) {
         return achievementService.getAllByUserId(userId);
     }
-
-
 }

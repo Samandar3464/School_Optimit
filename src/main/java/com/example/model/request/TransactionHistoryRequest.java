@@ -1,5 +1,6 @@
 package com.example.model.request;
 
+import com.example.entity.Salary;
 import com.example.enums.ExpenseType;
 import com.example.enums.PaymentType;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
@@ -10,26 +11,25 @@ import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 @Builder
 public class TransactionHistoryRequest {
 
     private Integer id;
 
-    @Min(value = 1,message = "must be money Amount")
-    private double moneyAmount;
+    private String moneyAmount;
 
     @NotBlank(message = "must be comment")
     private String comment;
-
-    @JsonSerialize(using = LocalDateTimeSerializer.class)
-    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
-    private LocalDateTime date;
 
     @Enumerated(EnumType.STRING)
     private ExpenseType expenseType;
@@ -37,11 +37,28 @@ public class TransactionHistoryRequest {
     @Enumerated(EnumType.STRING)
     private PaymentType paymentType;
 
-    private Integer takerId;
+    private boolean paidInFull;
 
-    @Min(value = 1,message = "must be mainBalanceId")
+    private String phoneNumber;
+
+    private String  accountNumber;
+
+    @Min(value = 1, message = "must be mainBalanceId")
     private Integer mainBalanceId;
 
-    @Min(value = 1,message = "must be branchId")
+    @Min(value = 1, message = "must be branchId")
     private Integer branchId;
+
+    public static TransactionHistoryRequest toTransactionHistoryRequest(String phoneNumber, double money, PaymentType paymentType, ExpenseType expenseType, Salary salary, String message) {
+        return TransactionHistoryRequest
+                .builder()
+                .moneyAmount(String.valueOf(money))
+                .paymentType(paymentType)
+                .phoneNumber(phoneNumber)
+                .branchId(salary.getBranch().getId())
+                .expenseType(expenseType)
+                .comment(message)
+                .mainBalanceId(salary.getMainBalance().getId())
+                .build();
+    }
 }

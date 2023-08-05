@@ -23,7 +23,6 @@ public class Room {
     @ManyToOne
     private RoomType roomType;
 
-    @JsonIgnore
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Branch branch;

@@ -1,6 +1,5 @@
-package com.example.model.request;
+package com.example.model.response;
 
-import com.example.entity.User;
 import com.example.entity.WorkExperience;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -19,42 +18,40 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class WorkExperienceDto {
+public class WorkExperienceResponse {
 
     private Integer id;
 
-
-    @NotBlank(message = "ninonoinn")
     private String placeOfWork;
 
     private String position;
 
-    @JsonSerialize(using = LocalDateSerializer.class)
-    @JsonDeserialize(using = LocalDateDeserializer.class)
-    private LocalDate startDate;
+    private String startDate;
 
-    @JsonSerialize(using = LocalDateSerializer.class)
-    @JsonDeserialize(using = LocalDateDeserializer.class)
-    private LocalDate endDate;
+    private String endDate;
 
     private Integer employeeId;
 
-    public static WorkExperienceDto toWorkExperienceDto(WorkExperience workExperience) {
-        return WorkExperienceDto
+    private String employeeFullName;
+
+    public static WorkExperienceResponse toResponse(WorkExperience workExperience) {
+        return WorkExperienceResponse
                 .builder()
                 .id(workExperience.getId())
                 .placeOfWork(workExperience.getPlaceOfWork())
-                .startDate(workExperience.getStartDate())
-                .endDate(workExperience.getEndDate())
+                .startDate(workExperience.getStartDate().toString())
+                .endDate(workExperience.getEndDate().toString())
                 .position(workExperience.getPosition())
+                .employeeId(workExperience.getEmployee().getId())
+                .employeeFullName(workExperience.getEmployee().getName()+" "+workExperience.getEmployee().getSurname())
                 .build();
     }
 
 
-    public static List<WorkExperienceDto> toAllResponse(List<WorkExperience> workExperiences) {
-        List<WorkExperienceDto> workExperienceDtoList = new ArrayList<>();
+    public static List<WorkExperienceResponse> toAllResponse(List<WorkExperience> workExperiences) {
+        List<WorkExperienceResponse> workExperienceDtoList = new ArrayList<>();
         workExperiences.forEach(workExperience -> {
-            workExperienceDtoList.add(toWorkExperienceDto(workExperience));
+            workExperienceDtoList.add(toResponse(workExperience));
         });
         return workExperienceDtoList;
     }

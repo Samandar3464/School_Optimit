@@ -1,6 +1,11 @@
 package com.example.model.request;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import jakarta.persistence.Column;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,7 +20,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 
-public class StudentDto {
+public class StudentRequest {
 
     private Integer id;
 
@@ -28,6 +33,8 @@ public class StudentDto {
     @Column(nullable = false)
     private String fatherName;
 
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
+    @JsonDeserialize(using = LocalDateDeserializer.class)
     private LocalDate birthDate;
 
     @Column(nullable = false)
@@ -47,9 +54,12 @@ public class StudentDto {
 
     private boolean active;
 
+    private Integer paymentAmount;
+
     private MultipartFile medDocPhoto;
 
-    private String username;  // phoneNumber
+    @Size(min = 9,max = 9)
+    private String phoneNumber;  // phoneNumber
 
     private String password;
 

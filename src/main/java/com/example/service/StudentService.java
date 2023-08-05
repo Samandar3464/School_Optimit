@@ -4,7 +4,7 @@ import com.example.entity.*;
 import com.example.exception.*;
 import com.example.model.common.ApiResponse;
 import com.example.model.request.FamilyLoginDto;
-import com.example.model.request.StudentDto;
+import com.example.model.request.StudentRequest;
 import com.example.model.response.StudentResponse;
 import com.example.model.response.StudentResponseListForAdmin;
 import com.example.repository.BranchRepository;
@@ -15,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,7 +29,7 @@ import static com.example.enums.Constants.*;
 
 @Service
 @RequiredArgsConstructor
-public class StudentService implements BaseService<StudentDto, Integer> {
+public class StudentService implements BaseService<StudentRequest, Integer> {
 
     private final StudentRepository studentRepository;
     private final AttachmentService attachmentService;
@@ -38,31 +39,29 @@ public class StudentService implements BaseService<StudentDto, Integer> {
 
     @Override
     @ResponseStatus(HttpStatus.CREATED)
-    @Transactional(rollbackFor = {FileNotFoundException.class, UserNotFoundException.class,
-            FileInputException.class, OriginalFileNameNullException.class, InputException.class, RecordNotFoundException.class})
-    public ApiResponse create(StudentDto studentDto) {
-        if (studentRepository.existsByUsername(studentDto.getUsername())) {
-            throw new UserAlreadyExistException(PHONE_NUMBER_ALREADY_REGISTERED);
+    @Transactional(rollbackFor = {FileNotFoundException.class, UserNotFoundException.class, FileInputException.class, OriginalFileNameNullException.class, InputException.class, RecordNotFoundException.class})
+    public ApiResponse create(StudentRequest studentRequest) {
+        if (studentRepository.findByPhoneNumberAndPassword(studentRequest.getPhoneNumber(), studentRequest.getPassword()).isPresent()) {
+            throw new RecordNotFoundException(PHONE_NUMBER_ALREADY_REGISTERED);
         }
-        Branch branch = branchRepository.findById(studentDto.getBranchId()).orElseThrow(() -> new RecordNotFoundException(BRANCH_NOT_FOUND));
-        Student save = studentRepository.save(from(studentDto, branch));
+        Branch branch = branchRepository.findById(studentRequest.getBranchId()).orElseThrow(() -> new RecordNotFoundException(BRANCH_NOT_FOUND));
+        Student save = studentRepository.save(from(studentRequest, branch));
         return new ApiResponse(from(save), true);
     }
 
     @Override
     @ResponseStatus(HttpStatus.OK)
     public ApiResponse getById(Integer integer) {
-        Student student = studentRepository.findById(integer).orElseThrow(() -> new UserNotFoundException(STUDENT_NOT_FOUND));
-        return new ApiResponse(from(student), true);
+        Student student = studentRepository.findByIdAndActiveTrue(integer).orElseThrow(() -> new UserNotFoundException(STUDENT_NOT_FOUND));
+        return new ApiResponse(getStudentResponse(student), true);
     }
 
     @Override
     @ResponseStatus(HttpStatus.OK)
-    @Transactional(rollbackFor = {FileNotFoundException.class, UserNotFoundException.class,
-            FileInputException.class, OriginalFileNameNullException.class, InputException.class, RecordNotFoundException.class})
-    public ApiResponse update(StudentDto studentDto) {
-        Student student = studentRepository.findById(studentDto.getId()).orElseThrow(() -> new UserNotFoundException(STUDENT_NOT_FOUND));
-        studentRepository.save(update(studentDto, student));
+    @Transactional(rollbackFor = {FileNotFoundException.class, UserNotFoundException.class, FileInputException.class, OriginalFileNameNullException.class, InputException.class, RecordNotFoundException.class})
+    public ApiResponse update(StudentRequest studentRequest) {
+        Student student = studentRepository.findByIdAndActiveTrue(studentRequest.getId()).orElseThrow(() -> new UserNotFoundException(STUDENT_NOT_FOUND));
+        studentRepository.save(update(studentRequest, student));
         return new ApiResponse(SUCCESSFULLY, true);
     }
 
@@ -70,10 +69,10 @@ public class StudentService implements BaseService<StudentDto, Integer> {
     @Override
     @ResponseStatus(HttpStatus.OK)
     public ApiResponse delete(Integer integer) {
-        Student student = studentRepository.findById(integer).orElseThrow(() -> new UserNotFoundException(STUDENT_NOT_FOUND));
+        Student student = studentRepository.findByIdAndActiveTrue(integer).orElseThrow(() -> new UserNotFoundException(STUDENT_NOT_FOUND));
         student.setActive(false);
         studentRepository.save(student);
-        return new ApiResponse(DELETED, true);
+        return new ApiResponse(DELETED, true, StudentResponse.from(student));
     }
 
     @ResponseStatus(HttpStatus.OK)
@@ -81,40 +80,49 @@ public class StudentService implements BaseService<StudentDto, Integer> {
         Pageable pageable = PageRequest.of(page, size);
         Page<Student> students = studentRepository.findAllByBranchIdAndActiveTrue(pageable, branchId);
         List<StudentResponse> studentResponseList = new ArrayList<>();
-        students.forEach(student -> studentResponseList.add(StudentResponse.from(student)));
+        students.forEach(student -> studentResponseList.add(getStudentResponse(student)));
         return new ApiResponse(new StudentResponseListForAdmin(studentResponseList, students.getTotalElements(), students.getTotalPages(), students.getNumber()), true);
+    }
+
+    private StudentResponse getStudentResponse(Student student) {
+        StudentResponse studentResponse = StudentResponse.from(student);
+        studentResponse.setPhoto(student.getPhoto() == null ? null : attachmentService.getUrl(student.getPhoto()));
+        studentResponse.setDocPhoto(student.getDocPhoto() == null ? null : attachmentService.getUrlList(student.getDocPhoto()));
+        studentResponse.setMedDocPhoto(student.getMedDocPhoto() == null ? null : attachmentService.getUrl(student.getMedDocPhoto()));
+        studentResponse.setReference(student.getReference() == null ? null : attachmentService.getUrl(student.getReference()));
+        return studentResponse;
     }
 
     @ResponseStatus(HttpStatus.OK)
     public ApiResponse getListByClassNumber(Integer classId, int branchId) {
-        List<Student> students = studentRepository.findAllByStudentClassIdAndBranchIdAndActiveTrue(classId, branchId);
+        List<Student> students = studentRepository.findAllByStudentClassIdAndBranchIdAndActiveTrue(classId, branchId, Sort.by(Sort.Direction.DESC, "id"));
         List<StudentResponse> studentResponseList = new ArrayList<>();
-        students.forEach(student -> studentResponseList.add(StudentResponse.from(student)));
+        students.forEach(student -> studentResponseList.add(getStudentResponse(student)));
         return new ApiResponse(studentResponseList, true);
     }
 
     @ResponseStatus(HttpStatus.OK)
     public ApiResponse getAllNeActiveStudents(int branchId) {
-        List<Student> neActiveStudents = studentRepository.findAllByBranchIdAndActiveFalseOrderByAddedTimeAsc(branchId);
+        List<Student> neActiveStudents = studentRepository.findAllByBranchIdAndActiveFalseOrderByAddedTimeAsc(branchId, Sort.by(Sort.Direction.DESC, "id"));
         List<StudentResponse> studentResponseList = new ArrayList<>();
-        neActiveStudents.forEach(student -> studentResponseList.add(StudentResponse.from(student)));
+        neActiveStudents.forEach(student -> studentResponseList.add(getStudentResponse(student)));
         return new ApiResponse(studentResponseList, true);
     }
 
     @ResponseStatus(HttpStatus.OK)
     public ApiResponse studentLogIn(FamilyLoginDto dto) {
-        Student student = studentRepository.findByUsernameAndPassword(dto.getPhoneNumber(), dto.getPassword()).orElseThrow(() -> new RecordNotFoundException(STUDENT_NOT_FOUND));
+        Student student = studentRepository.findByPhoneNumberAndPassword(dto.getPhoneNumber(), dto.getPassword()).orElseThrow(() -> new RecordNotFoundException(STUDENT_NOT_FOUND));
         Journal journal = journalRepository.findByStudentClassIdAndActiveTrue(student.getStudentClass().getId()).orElseThrow(() -> new RecordNotFoundException(JOURNAL_NOT_FOUND));
 
         return new ApiResponse(journal.getSubjectList(), true);
     }
 
-    private Student from(StudentDto student, Branch branch) {
+    private Student from(StudentRequest student, Branch branch) {
         Student from = Student.from(student);
         from.setStudentClass(studentClassRepository.findById(student.getStudentClassId())
                 .orElseThrow(() -> new RecordNotFoundException(CLASS_NOT_FOUND)));
         from.setPhoto(attachmentService.saveToSystem(student.getPhoto()));
-        from.setReference(attachmentService.saveToSystem(student.getPhoto()));
+        from.setReference(attachmentService.saveToSystem(student.getReference()));
         from.setMedDocPhoto(attachmentService.saveToSystem(student.getMedDocPhoto()));
         from.setDocPhoto(attachmentService.saveToSystemListFile(student.getDocPhoto()));
         from.setBranch(branch);
@@ -132,43 +140,26 @@ public class StudentService implements BaseService<StudentDto, Integer> {
         return from;
     }
 
-    private Student update(StudentDto studentDto, Student student) {
-
-        if (!studentDto.getStudentClassId().equals(student.getStudentClass().getId())) {
-            StudentClass studentClass = studentClassRepository.findById(studentDto.getStudentClassId())
-                    .orElseThrow(() -> new RecordNotFoundException(CLASS_NOT_FOUND));
-            student.setStudentClass(studentClass);
-        }
-        if (studentDto.getPhoto() != null) {
-            Attachment photo = attachmentService.saveToSystem(studentDto.getPhoto());
-            attachmentService.deleteNewName(student.getPhoto());
-            student.setPhoto(photo);
-        }
-        if (studentDto.getReference() != null) {
-            Attachment reference = attachmentService.saveToSystem(studentDto.getReference());
-            attachmentService.deleteNewName(student.getReference());
-            student.setReference(reference);
-        }
-        if (studentDto.getDocPhoto() != null) {
-            List<Attachment> docPhotos = attachmentService.saveToSystemListFile(studentDto.getDocPhoto());
-            attachmentService.deleteListFilesByNewName(student.getDocPhoto());
-            student.setDocPhoto(docPhotos);
-        }
-
-        return Student.builder()
-                .id(student.getId())
-                .firstName(studentDto.getFirstName())
-                .lastName(studentDto.getLastName())
-                .fatherName(studentDto.getFatherName())
-                .birthDate(studentDto.getBirthDate())
-                .docNumber(studentDto.getDocNumber())
-                .docPhoto(student.getDocPhoto())
-                .reference(student.getReference())
-                .photo(student.getPhoto())
-                .studentClass(student.getStudentClass())
-                .active(studentDto.isActive())
-                .build();
+    private Student update(StudentRequest studentRequest, Student student) {
+        attachmentService.deleteNewName(student.getPhoto());
+        attachmentService.deleteNewName(student.getReference());
+        attachmentService.deleteNewName(student.getMedDocPhoto());
+        attachmentService.deleteListFilesByNewName(student.getDocPhoto());
+        student.setPhoneNumber(studentRequest.getPhoneNumber());
+        student.setPassword(studentRequest.getPassword());
+        student.setMedDocPhoto(attachmentService.saveToSystem(studentRequest.getMedDocPhoto()));
+        student.setPhoto(attachmentService.saveToSystem(studentRequest.getPhoto()));
+        student.setDocPhoto(attachmentService.saveToSystemListFile(studentRequest.getDocPhoto()));
+        student.setReference(attachmentService.saveToSystem(studentRequest.getReference()));
+        student.setStudentClass(studentClassRepository.findById(studentRequest.getStudentClassId()).orElseThrow(() -> new RecordNotFoundException(CLASS_NOT_FOUND)));
+        student.setBranch(branchRepository.findById(studentRequest.getBranchId()).orElseThrow(() -> new RecordNotFoundException(BRANCH_NOT_FOUND)));
+        student.setFirstName(studentRequest.getFirstName());
+        student.setLastName(studentRequest.getLastName());
+        student.setFatherName(studentRequest.getFatherName());
+        student.setBirthDate(studentRequest.getBirthDate());
+        student.setPaymentAmount(student.getPaymentAmount());
+        student.setDocNumber(studentRequest.getDocNumber());
+        student.setActive(studentRequest.isActive());
+        return student;
     }
-
-
 }

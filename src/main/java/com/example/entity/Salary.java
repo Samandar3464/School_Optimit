@@ -48,6 +48,10 @@ public class Salary {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Branch branch;
 
+    @ManyToOne
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    private MainBalance mainBalance;
+
     public static Salary toSalary(SalaryRequest salaryRequest) {
         return Salary
                 .builder()

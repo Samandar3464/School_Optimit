@@ -8,6 +8,7 @@ import com.example.model.request.ReasonRequestDto;
 import com.example.model.response.ReasonResponse;
 import com.example.repository.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,9 +31,6 @@ public class ReasonService implements BaseService<ReasonRequestDto, Integer> {
     private final BranchRepository branchRepository;
     private final ScoreRepository scoreRepository;
     private final StudentBalanceRepository studentBalanceRepository;
-    private final BalanceRepository balanceRepository;
-    private final ExpenseForStudentRepository expenseForStudentRepository;
-    private final PaymentTypeRepository paymentTypeRepository;
 
     @Override
     @ResponseStatus(HttpStatus.CREATED)
@@ -49,24 +47,17 @@ public class ReasonService implements BaseService<ReasonRequestDto, Integer> {
         LocalDate endDate = dto.getEndDate();
         LocalDateTime start = LocalDateTime.of(startDate.getYear(), startDate.getMonth(), startDate.getDayOfMonth(), 00, 00);
         LocalDateTime end = LocalDateTime.of(endDate.getYear(), endDate.getMonth(), endDate.getDayOfMonth(), 23, 59);
-        List<Score> all = scoreRepository.findAllByStudentIdAndCreatedDateBetween(student.getId(), start, end);
+        List<Score> all = scoreRepository.findAllByStudentIdAndCreatedDateBetween(student.getId(), start, end, Sort.by(Sort.Direction.DESC,"id"));
 
         all.forEach(score -> score.setScoreOrAttendance('s'));
 
-        StudentBalance studentBalance = studentBalanceRepository.findByStudentId(student.getId())
-                .orElseThrow(() -> new RecordNotFoundException(STUDENT_BALANCE_NOT_FOUND));
-        studentBalance.setBalance(studentBalance.getBalance() + dto.getDays() * 30000);
+        StudentAccount studentAccount = studentBalanceRepository.findByStudentId(student.getId())
+                .orElseThrow(() -> new RecordNotFoundException(STUDENT_ACCOUNT_NOT_FOUND));
+        studentAccount.setBalance(studentAccount.getBalance() + dto.getDays() * 30000);
 
-        Balance balance = balanceRepository.findByBranchId(branch.getId())
-                .orElseThrow(() -> new RecordNotFoundException(BALANCE_NOT_FOUND));
-        balance.setBalance(balance.getBalance() - dto.getDays() * 30000);
 
-        ExpenseForStudent expenseForStudent = ExpenseForStudent.from(dto.getDays() * 30000, RETURN_MONEY_FOR_MEAL, student, branch, paymentTypeRepository.findById(3).get());
-
-        expenseForStudentRepository.save(expenseForStudent);
         scoreRepository.saveAll(all);
-        studentBalanceRepository.save(studentBalance);
-        balanceRepository.save(balance);
+        studentBalanceRepository.save(studentAccount);
         return new ApiResponse(SUCCESSFULLY, true);
     }
 
@@ -95,7 +86,7 @@ public class ReasonService implements BaseService<ReasonRequestDto, Integer> {
 
     @ResponseStatus(HttpStatus.OK)
     public ApiResponse getByStudentId(Integer integer) {
-        List<Reason> reasonList = reasonRepository.findAllByStudentIdAndActiveTrueOrderByCreateDateAsc(integer);
+        List<Reason> reasonList = reasonRepository.findAllByStudentIdAndActiveTrueOrderByCreateDateAsc(integer, Sort.by(Sort.Direction.DESC,"id"));
         List<ReasonResponse> reasonResponseList = new ArrayList<>();
         reasonList.forEach(reason -> reasonResponseList.add(ReasonResponse.from(reason, attachmentService.getUrl(reason.getImage()))));
         return new ApiResponse(reasonResponseList, true);
@@ -103,7 +94,7 @@ public class ReasonService implements BaseService<ReasonRequestDto, Integer> {
 
     @ResponseStatus(HttpStatus.OK)
     public ApiResponse getByBranchId(Integer integer) {
-        List<Reason> reasonList = reasonRepository.findAllByBranchIdAndActiveTrueOrderByCreateDateAsc(integer);
+        List<Reason> reasonList = reasonRepository.findAllByBranchIdAndActiveTrueOrderByCreateDateAsc(integer,Sort.by(Sort.Direction.DESC,"id"));
         List<ReasonResponse> reasonResponseList = new ArrayList<>();
         reasonList.forEach(reason -> reasonResponseList.add(ReasonResponse.from(reason, attachmentService.getUrl(reason.getImage()))));
         return new ApiResponse(reasonResponseList, true);

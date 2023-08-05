@@ -1,7 +1,9 @@
 package com.example.service;
 
 import com.example.entity.MainBalance;
+import com.example.entity.Student;
 import com.example.entity.TransactionHistory;
+import com.example.entity.User;
 import com.example.enums.Constants;
 import com.example.enums.ExpenseType;
 import com.example.enums.PaymentType;
@@ -11,9 +13,11 @@ import com.example.model.request.TransactionHistoryRequest;
 import com.example.model.response.TransactionHistoryResponse;
 import com.example.repository.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -22,14 +26,15 @@ public class TransactionHistoryService implements BaseService<TransactionHistory
     private final MainBalanceRepository mainBalanceRepository;
     private final BranchRepository branchRepository;
     private final UserRepository userRepository;
+    private final StudentRepository studentRepository;
     private final TransactionHistoryRepository transactionHistoryRepository;
 
     @Override
     public ApiResponse create(TransactionHistoryRequest request) {
         TransactionHistory transactionHistory = TransactionHistory.toEntity(request);
         setTransactionHistory(request, transactionHistory);
-        transactionHistoryRepository.save(transactionHistory);
         transactionWithBalance(transactionHistory);
+        transactionHistoryRepository.save(transactionHistory);
         return new ApiResponse(Constants.SUCCESSFULLY, true, TransactionHistoryResponse.toResponse(transactionHistory));
     }
 
@@ -40,12 +45,12 @@ public class TransactionHistoryService implements BaseService<TransactionHistory
     }
 
     public ApiResponse findAllByBranch_IdAndActiveTrue(Integer branchId) {
-        List<TransactionHistory> transactionHistories = transactionHistoryRepository.findAllByBranch_IdAndActiveTrue(branchId);
+        List<TransactionHistory> transactionHistories = transactionHistoryRepository.findAllByBranch_IdAndActiveTrue(branchId, Sort.by(Sort.Direction.DESC, "id"));
         return new ApiResponse(Constants.SUCCESSFULLY, true, TransactionHistoryResponse.toAllResponse(transactionHistories));
     }
 
     public ApiResponse findAllByActiveTrue() {
-        List<TransactionHistory> transactionHistories = transactionHistoryRepository.findAllByActiveTrue();
+        List<TransactionHistory> transactionHistories = transactionHistoryRepository.findAllByActiveTrue(Sort.by(Sort.Direction.DESC, "id"));
         return new ApiResponse(Constants.SUCCESSFULLY, true, TransactionHistoryResponse.toAllResponse(transactionHistories));
     }
 
@@ -55,10 +60,10 @@ public class TransactionHistoryService implements BaseService<TransactionHistory
         TransactionHistory newTransactionHistory = TransactionHistory.toEntity(request);
         newTransactionHistory.setId(request.getId());
         setTransactionHistory(request, newTransactionHistory);
-        transactionHistoryRepository.save(newTransactionHistory);
 
         rollBackTransaction(oldTransaction);
         transactionWithBalance(newTransactionHistory);
+        transactionHistoryRepository.save(newTransactionHistory);
         return new ApiResponse(Constants.SUCCESSFULLY, true, TransactionHistoryResponse.toResponse(newTransactionHistory));
     }
 
@@ -66,16 +71,16 @@ public class TransactionHistoryService implements BaseService<TransactionHistory
     public ApiResponse delete(Integer integer) {
         TransactionHistory transactionHistory = getTransactionHistory(integer);
         transactionHistory.setActive(false);
-        transactionHistoryRepository.save(transactionHistory);
         rollBackTransaction(transactionHistory);
+        transactionHistoryRepository.save(transactionHistory);
         return new ApiResponse(Constants.SUCCESSFULLY, true, TransactionHistoryResponse.toResponse(transactionHistory));
     }
 
-    private void transactionWithBalance(TransactionHistory transactionHistory) {
+    public void transactionWithBalance(TransactionHistory transactionHistory) {
 
-        MainBalance mainBalance = getMainBalance(transactionHistory.getMainBalanceId());
+        MainBalance mainBalance = transactionHistory.getMainBalance();
 
-        if (transactionHistory.getExpenseType().equals(ExpenseType.SALARY) || transactionHistory.getExpenseType().equals(ExpenseType.ADDITIONAL_EXPENSE)) {
+        if (transactionHistory.getExpenseType().equals(ExpenseType.SALARY) || transactionHistory.getExpenseType().equals(ExpenseType.ADDITIONAL_EXPENSE) || transactionHistory.getExpenseType().equals(ExpenseType.STUDENT_EXPENSE)) {
 
             withdrawMoneyFromTheBalance(transactionHistory, mainBalance);
 
@@ -90,51 +95,48 @@ public class TransactionHistoryService implements BaseService<TransactionHistory
 
     private void withdrawMoneyFromTheBalance(TransactionHistory transactionHistory, MainBalance mainBalance) {
 
-        if (transactionHistory.getExpenseType().equals(ExpenseType.SALARY) || transactionHistory.getExpenseType().equals(ExpenseType.ADDITIONAL_EXPENSE)) {
+        if (mainBalance.getBalance() >= transactionHistory.getMoneyAmount()) {
 
-            if (mainBalance.getBalance() >= transactionHistory.getMoneyAmount()) {
+            if (transactionHistory.getPaymentType().equals(com.example.enums.PaymentType.CASH)) {
 
-                if (transactionHistory.getPaymentType().equals(com.example.enums.PaymentType.NAQD)) {
+                if (mainBalance.getCashBalance() >= transactionHistory.getMoneyAmount()) {
 
-                    if (mainBalance.getCashBalance() >= transactionHistory.getMoneyAmount()) {
-
-                        mainBalance.setCashBalance(mainBalance.getCashBalance() - transactionHistory.getMoneyAmount());
-
-                    } else {
-
-                        throw new RecordNotFoundException(Constants.CASH_BALANCE_NOT_ENOUGH_SUMMA);
-
-                    }
+                    mainBalance.setCashBalance(mainBalance.getCashBalance() - transactionHistory.getMoneyAmount());
 
                 } else {
 
-                    if (mainBalance.getPlasticBalance() >= transactionHistory.getMoneyAmount()) {
-
-                        mainBalance.setPlasticBalance(mainBalance.getPlasticBalance() - transactionHistory.getMoneyAmount());
-
-                    } else {
-
-                        throw new RecordNotFoundException(Constants.PLASTIC_BALANCE_NOT_ENOUGH_SUMMA);
-
-                    }
+                    throw new RecordNotFoundException(Constants.CASH_BALANCE_NOT_ENOUGH_SUMMA);
 
                 }
 
-                mainBalance.setBalance(mainBalance.getBalance() - transactionHistory.getMoneyAmount());
-
             } else {
 
-                throw new RecordNotFoundException(Constants.BALANCE_NOT_ENOUGH_SUMMA);
+                if (mainBalance.getPlasticBalance() >= transactionHistory.getMoneyAmount()) {
+
+                    mainBalance.setPlasticBalance(mainBalance.getPlasticBalance() - transactionHistory.getMoneyAmount());
+
+                } else {
+
+                    throw new RecordNotFoundException(Constants.PLASTIC_BALANCE_NOT_ENOUGH_SUMMA);
+
+                }
 
             }
+
+            mainBalance.setBalance(mainBalance.getBalance() - transactionHistory.getMoneyAmount());
+
+        } else {
+
+            throw new RecordNotFoundException(Constants.BALANCE_NOT_ENOUGH_SUMMA);
+
         }
     }
 
     private void transferMoneyToTheBalance(TransactionHistory transactionHistory, MainBalance mainBalance) {
 
-        if (transactionHistory.getExpenseType().equals(ExpenseType.PAYMENT) || transactionHistory.getExpenseType().equals(ExpenseType.ADDITIONAL_PAYMENT)) {
+        if (transactionHistory.getExpenseType().equals(ExpenseType.PAYMENT) || transactionHistory.getExpenseType().equals(ExpenseType.ADDITIONAL_PAYMENT) || transactionHistory.getExpenseType().equals(ExpenseType.STUDENT_PAYMENT)) {
 
-            if (transactionHistory.getPaymentType().equals(com.example.enums.PaymentType.NAQD)) {
+            if (transactionHistory.getPaymentType().equals(com.example.enums.PaymentType.CASH)) {
 
                 mainBalance.setCashBalance(mainBalance.getCashBalance() + transactionHistory.getMoneyAmount());
 
@@ -149,11 +151,11 @@ public class TransactionHistoryService implements BaseService<TransactionHistory
         }
     }
 
-    private void rollBackTransaction(TransactionHistory oldTransaction) {
+    public void rollBackTransaction(TransactionHistory oldTransaction) {
 
-        MainBalance mainBalance = getMainBalance(oldTransaction.getMainBalanceId());
+        MainBalance mainBalance = oldTransaction.getMainBalance();
 
-        if (oldTransaction.getExpenseType().equals(ExpenseType.SALARY) || oldTransaction.getExpenseType().equals(ExpenseType.ADDITIONAL_EXPENSE)) {
+        if (oldTransaction.getExpenseType().equals(ExpenseType.SALARY) || oldTransaction.getExpenseType().equals(ExpenseType.ADDITIONAL_EXPENSE) || oldTransaction.getExpenseType().equals(ExpenseType.STUDENT_EXPENSE)) {
 
             rollBackMoneyToBalance(oldTransaction, mainBalance);
 
@@ -168,9 +170,9 @@ public class TransactionHistoryService implements BaseService<TransactionHistory
 
     private void rollBackMoneyFromBalance(TransactionHistory oldTransaction, MainBalance mainBalance) {
 
-        if (oldTransaction.getExpenseType().equals(ExpenseType.PAYMENT) || oldTransaction.getExpenseType().equals(ExpenseType.ADDITIONAL_PAYMENT)) {
+        if (oldTransaction.getExpenseType().equals(ExpenseType.PAYMENT) || oldTransaction.getExpenseType().equals(ExpenseType.ADDITIONAL_PAYMENT) || oldTransaction.getExpenseType().equals(ExpenseType.STUDENT_PAYMENT)) {
 
-            if (oldTransaction.getPaymentType().equals(PaymentType.NAQD)) {
+            if (oldTransaction.getPaymentType().equals(PaymentType.CASH)) {
 
                 if (mainBalance.getCashBalance() >= oldTransaction.getMoneyAmount()) {
 
@@ -210,33 +212,28 @@ public class TransactionHistoryService implements BaseService<TransactionHistory
 
     private void rollBackMoneyToBalance(TransactionHistory oldTransaction, MainBalance mainBalance) {
 
-        if (oldTransaction.getExpenseType().equals(ExpenseType.SALARY) || oldTransaction.getExpenseType().equals(ExpenseType.ADDITIONAL_EXPENSE)) {
+        if (oldTransaction.getPaymentType().equals(PaymentType.CASH)) {
 
-            if (oldTransaction.getPaymentType().equals(PaymentType.NAQD)) {
+            mainBalance.setCashBalance(mainBalance.getCashBalance() + oldTransaction.getMoneyAmount());
 
-                mainBalance.setCashBalance(mainBalance.getCashBalance() + oldTransaction.getMoneyAmount());
+        } else {
 
-            } else {
-
-                mainBalance.setPlasticBalance(mainBalance.getPlasticBalance() + oldTransaction.getMoneyAmount());
-
-            }
-
-            mainBalance.setBalance(mainBalance.getBalance() + oldTransaction.getMoneyAmount());
+            mainBalance.setPlasticBalance(mainBalance.getPlasticBalance() + oldTransaction.getMoneyAmount());
 
         }
+
+        mainBalance.setBalance(mainBalance.getBalance() + oldTransaction.getMoneyAmount());
+
     }
 
     private void setTransactionHistory(TransactionHistoryRequest request, TransactionHistory transactionHistory) {
-        transactionHistory.setBranch(branchRepository.findById(request.getBranchId()).orElseThrow(() -> new RecordNotFoundException(Constants.BRANCH_NOT_FOUND)));
-        transactionHistory.setTaker(request.getTakerId() == null ? null : userRepository.findById(request.getTakerId()).orElseThrow(() -> new RecordNotFoundException(Constants.USER_NOT_FOUND)));
+        transactionHistory.setMainBalance(mainBalanceRepository.findByIdAndActiveTrue(request.getMainBalanceId()).orElseThrow(() -> new RecordNotFoundException(Constants.MAIN_BALANCE_NOT_FOUND)));
+        transactionHistory.setBranch(branchRepository.findByIdAndDeleteFalse(request.getBranchId()).orElseThrow(() -> new RecordNotFoundException(Constants.BRANCH_NOT_FOUND)));
+        transactionHistory.setTaker(request.getPhoneNumber() == null ? null : userRepository.findByPhoneNumberAndBlockedFalse(request.getPhoneNumber()).orElseThrow(() -> new RecordNotFoundException(Constants.USER_NOT_FOUND)));
+        transactionHistory.setStudent(request.getAccountNumber() == null ? null : studentRepository.findByAccountNumberAndActiveTrue(request.getAccountNumber()).orElseThrow(() -> new RecordNotFoundException(Constants.STUDENT_NOT_FOUND)));
     }
 
     private TransactionHistory getTransactionHistory(Integer integer) {
         return transactionHistoryRepository.findByIdAndActiveTrue(integer).orElseThrow(() -> new RecordNotFoundException(Constants.TRANSACTION_HISTORY_NOT_FOUND));
-    }
-
-    private MainBalance getMainBalance(Integer integer) {
-        return mainBalanceRepository.findByIdAndActiveTrue(integer).orElseThrow(() -> new RecordNotFoundException(Constants.MAIN_BALANCE_NOT_FOUND));
     }
 }

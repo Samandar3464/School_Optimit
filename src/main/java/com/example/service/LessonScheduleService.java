@@ -9,6 +9,7 @@ import com.example.model.response.ErrorResponseSchedule;
 import com.example.model.response.LessonScheduleResponse;
 import com.example.repository.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -140,7 +141,7 @@ public class LessonScheduleService implements BaseService<List<LessonScheduleDto
         LocalDateTime startWeek = LocalDateTime.now().minusDays(dayOfWeek);
         LocalDateTime endWeek = startWeek.plusDays(7);
         List<LessonSchedule> lessonScheduleList = lessonScheduleRepository
-                .findAllByBranchIdAndActiveTrueAndStartTimeBetween(integer, startWeek, endWeek);
+                .findAllByBranchIdAndActiveTrueAndStartTimeBetween(integer, startWeek, endWeek, Sort.by(Sort.Direction.DESC,"id"));
         List<LessonScheduleResponse> lessonScheduleResponseList = new ArrayList<>();
         lessonScheduleList.forEach(schedule -> lessonScheduleResponseList.add(LessonScheduleResponse.from(schedule)));
         return new ApiResponse(lessonScheduleResponseList, true);

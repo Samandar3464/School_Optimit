@@ -12,6 +12,7 @@ import com.example.repository.LevelRepository;
 import com.example.repository.SubjectLevelRepository;
 import com.example.repository.SubjectRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 
@@ -68,7 +69,7 @@ public class SubjectLevelService implements BaseService<SubjectLevelDto, Integer
     }
 
     public ApiResponse getAllByBranchId(Integer branchId) {
-        return new ApiResponse(subjectLevelRepository.findAllByBranchId(branchId), true);
+        return new ApiResponse(subjectLevelRepository.findAllByBranchId(branchId, Sort.by(Sort.Direction.DESC,"id")), true);
     }
 
     public SubjectLevel getBySubjectIdAndLevelId(Integer subjectId, Integer levelId) {

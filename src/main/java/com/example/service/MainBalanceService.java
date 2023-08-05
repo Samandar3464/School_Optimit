@@ -1,18 +1,19 @@
 package com.example.service;
 
+import com.example.entity.Branch;
 import com.example.entity.MainBalance;
-import com.example.entity.PaymentType;
 import com.example.enums.Constants;
 import com.example.exception.RecordNotFoundException;
 import com.example.model.common.ApiResponse;
 import com.example.model.request.MainBalanceRequest;
-import com.example.model.request.TransactionHistoryRequest;
 import com.example.model.response.MainBalanceResponse;
 import com.example.repository.BranchRepository;
 import com.example.repository.MainBalanceRepository;
-import com.example.repository.PaymentTypeRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -24,23 +25,29 @@ public class MainBalanceService implements BaseService<MainBalanceRequest, Integ
     @Override
     public ApiResponse create(MainBalanceRequest mainBalanceRequest) {
         MainBalance mainBalance = MainBalance.toEntity(mainBalanceRequest);
-        mainBalance.setBranch(branchRepository.findById(mainBalanceRequest.getBranchId()).orElseThrow(() -> new RecordNotFoundException(Constants.BRANCH_NOT_FOUND)));
+        mainBalance.setBranch(getBranch(mainBalanceRequest.getBranchId()));
         mainBalanceRepository.save(mainBalance);
         return new ApiResponse(Constants.SUCCESSFULLY, true);
     }
 
     @Override
-    public ApiResponse getById(Integer integer) {
-        MainBalance mainBalance = getMainBalance(integer);
+    public ApiResponse getById(Integer id) {
+        MainBalance mainBalance = mainBalanceRepository.findByIdAndActiveTrue(id).orElseThrow(() -> new RecordNotFoundException(Constants.MAIN_BALANCE_NOT_FOUND));
         return new ApiResponse(Constants.SUCCESSFULLY, true, MainBalanceResponse.toResponse(mainBalance));
+    }
+
+    public ApiResponse getByBranchId(Integer branchId) {
+        List<MainBalance> all = mainBalanceRepository.findAllByBranch_IdAndActiveTrue(branchId, Sort.by(Sort.Direction.DESC,"id"));
+        List<MainBalanceResponse> allResponse = MainBalanceResponse.toAllResponse(all);
+        return new ApiResponse(Constants.SUCCESSFULLY, true, allResponse);
     }
 
     @Override
     public ApiResponse update(MainBalanceRequest mainBalanceRequest) {
         getMainBalance(mainBalanceRequest.getId());
         MainBalance mainBalance = MainBalance.toEntity(mainBalanceRequest);
+        mainBalance.setBranch(getBranch(mainBalanceRequest.getBranchId()));
         mainBalance.setId(mainBalanceRequest.getId());
-        mainBalance.setBranch(branchRepository.findById(mainBalanceRequest.getBranchId()).orElseThrow(() -> new RecordNotFoundException(Constants.BRANCH_NOT_FOUND)));
         mainBalanceRepository.save(mainBalance);
         return new ApiResponse(Constants.SUCCESSFULLY, true, MainBalanceResponse.toResponse(mainBalance));
     }
@@ -55,5 +62,9 @@ public class MainBalanceService implements BaseService<MainBalanceRequest, Integ
 
     private MainBalance getMainBalance(Integer integer) {
         return mainBalanceRepository.findByIdAndActiveTrue(integer).orElseThrow(() -> new RecordNotFoundException(Constants.MAIN_BALANCE_NOT_FOUND));
+    }
+
+    private Branch getBranch(Integer branchId) {
+        return branchRepository.findByIdAndDeleteFalse(branchId).orElseThrow(() -> new RecordNotFoundException(Constants.BRANCH_NOT_FOUND));
     }
 }

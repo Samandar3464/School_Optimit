@@ -24,9 +24,11 @@ public class SalaryRequest {
     @JsonDeserialize(using = LocalDateDeserializer.class)
     private LocalDate date;
 
-    private Integer userId;
+    private String phoneNumber;
 
     private Integer branchId;
+
+    private Integer mainBalanceId;
 
     private double fix;
 

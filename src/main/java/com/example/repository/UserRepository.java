@@ -4,6 +4,7 @@ package com.example.repository;
 import com.example.entity.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
@@ -15,6 +16,7 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     Optional<User> findByPhoneNumberAndBlockedFalse(String phoneNumber);
 
     Page<User> findAllByBranch_IdAndBlockedFalse(Integer branch_id, Pageable pageable);
+    List<User> findAllByBranch_IdAndBlockedFalse(Integer branch_id,Sort sort);
 
     Optional<User> findByPhoneNumberAndVerificationCode(String phoneNumber, Integer verificationCode);
 

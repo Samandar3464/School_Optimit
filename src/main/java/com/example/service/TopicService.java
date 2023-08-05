@@ -13,6 +13,7 @@ import com.example.repository.LevelRepository;
 import com.example.repository.SubjectRepository;
 import com.example.repository.TopicRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -106,7 +107,7 @@ public class TopicService implements BaseService<TopicRequestDto, UUID> {
 
     @Transactional(rollbackFor = {Exception.class})
     public boolean deleteALLBySubjectIdAndLevelId(Integer subjectId, Integer levelId) {
-        List<Topic> allBySubjectId = topicRepository.findAllBySubjectIdAndLevelId(subjectId,levelId);
+        List<Topic> allBySubjectId = topicRepository.findAllBySubjectIdAndLevelId(subjectId,levelId, Sort.by(Sort.Direction.DESC,"id"));
         allBySubjectId.forEach(topic -> {
             topic.getLessonFiles().forEach(attachmentService::deleteNewName);
             topicRepository.deleteById(topic.getId());
@@ -115,7 +116,7 @@ public class TopicService implements BaseService<TopicRequestDto, UUID> {
     }
 
     public List<TopicResponseDto> findALLBySubjectId(Integer subjectId, Integer levelId) {
-        List<Topic> allBySubjectId = topicRepository.findAllBySubjectIdAndLevelId(subjectId,levelId);
+        List<Topic> allBySubjectId = topicRepository.findAllBySubjectIdAndLevelId(subjectId,levelId, Sort.by(Sort.Direction.DESC,"id"));
         List<TopicResponseDto> topicResponseDtoList = new ArrayList<>();
         allBySubjectId.forEach(topic -> {
             topicResponseDtoList.add(TopicResponseDto.from(topic, attachmentService.getUrlList(topic.getLessonFiles()), topic.getUseFullLinks().split("newLink")));

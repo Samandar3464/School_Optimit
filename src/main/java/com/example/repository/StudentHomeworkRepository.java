@@ -1,6 +1,7 @@
 package com.example.repository;
 
 import com.example.entity.StudentHomework;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.time.LocalDate;
@@ -12,5 +13,5 @@ public interface StudentHomeworkRepository extends JpaRepository<StudentHomework
 
   Optional<StudentHomework> findByIdAndActiveTrue(Integer integer);
 
-  List<StudentHomework> findAllByActiveTrue();
+  List<StudentHomework> findAllByActiveTrue(Sort sort);
 }

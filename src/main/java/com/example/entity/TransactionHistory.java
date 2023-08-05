@@ -28,14 +28,20 @@ public class TransactionHistory {
 
     private boolean active;
 
-    private Integer mainBalanceId;
+    private boolean paidInFull;
 
     private ExpenseType expenseType;
 
     private PaymentType paymentType;
 
     @ManyToOne
+    private MainBalance mainBalance;
+
+    @ManyToOne
     private User taker;
+
+    @ManyToOne
+    private Student student;
 
     @OneToOne
     private Branch branch;
@@ -44,12 +50,12 @@ public class TransactionHistory {
         return TransactionHistory
                 .builder()
                 .active(true)
-                .date(transactionHistoryRequest.getDate())
+                .date(LocalDateTime.now())
                 .comment(transactionHistoryRequest.getComment())
+                .paidInFull(transactionHistoryRequest.isPaidInFull())
                 .paymentType(transactionHistoryRequest.getPaymentType())
-                .moneyAmount(transactionHistoryRequest.getMoneyAmount())
+                .moneyAmount(Double.parseDouble(transactionHistoryRequest.getMoneyAmount()))
                 .expenseType(transactionHistoryRequest.getExpenseType())
-                .mainBalanceId(transactionHistoryRequest.getMainBalanceId())
                 .build();
     }
 }

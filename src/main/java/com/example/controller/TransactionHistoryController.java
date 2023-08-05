@@ -35,7 +35,7 @@ public class TransactionHistoryController {
     }
 
     @PutMapping("/update")
-    public ApiResponse update(@RequestBody TransactionHistoryRequest transactionHistoryRequest){
+    public ApiResponse update(@RequestBody @Valid TransactionHistoryRequest transactionHistoryRequest){
         return transactionHistoryService.update(transactionHistoryRequest);
     }
 

@@ -8,6 +8,7 @@ import com.example.model.request.JournalRequestDto;
 import com.example.model.response.JournalResponseDto;
 import com.example.repository.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -54,7 +55,7 @@ public class JournalService implements BaseService<JournalRequestDto, Integer> {
     @Override
     public ApiResponse getById(Integer integer) {
         Journal journal = journalRepository.findById(integer).orElseThrow(() -> new RecordNotFoundException(JOURNAL_NOT_FOUND));
-        List<Score> scoreList = scoreRepository.findAllByJournalId(journal.getId());
+        List<Score> scoreList = scoreRepository.findAllByJournalId(journal.getId(), Sort.by(Sort.Direction.DESC,"id"));
 //        List<Attendance> attendanceList = attendanceRepository.findAllByJournalId(journal.getId());
         JournalResponseDto journalResponseDto = JournalResponseDto.builder()
                 .journal(journal)
@@ -65,7 +66,7 @@ public class JournalService implements BaseService<JournalRequestDto, Integer> {
     }
     @ResponseStatus(HttpStatus.OK)
     public ApiResponse getAllByIdBranchId(Integer integer) {
-        List<Journal> journalList = journalRepository.findAllByBranchIdAndActiveTrue(integer);
+        List<Journal> journalList = journalRepository.findAllByBranchIdAndActiveTrue(integer, Sort.by(Sort.Direction.DESC,"id"));
         return new ApiResponse(journalList, true);
     }
 

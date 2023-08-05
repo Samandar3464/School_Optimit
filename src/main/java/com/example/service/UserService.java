@@ -19,6 +19,7 @@ import com.example.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -170,6 +171,13 @@ public class UserService implements BaseService<UserRegisterDto, Integer> {
         List<UserResponseDto> userResponseDtoList = new ArrayList<>();
         all.forEach(obj -> userResponseDtoList.add(toUserResponse(obj)));
         return new ApiResponse(new UserResponseListForAdmin(userResponseDtoList, all.getTotalElements(), all.getTotalPages(), all.getNumber()), true);
+    }
+
+    public ApiResponse getUserListByBranchId(Integer branchId) {
+        List<User> all = userRepository.findAllByBranch_IdAndBlockedFalse(branchId, Sort.by(Sort.Direction.DESC,"id"));
+        List<UserResponseDto> responseDtoList = new ArrayList<>();
+        all.forEach(obj -> responseDtoList.add(toUserResponse(obj)));
+        return new ApiResponse(responseDtoList, true);
     }
 
     @ResponseStatus(HttpStatus.OK)

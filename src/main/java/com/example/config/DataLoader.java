@@ -3,7 +3,6 @@ package com.example.config;
 
 import com.example.entity.*;
 import com.example.enums.Gender;
-import com.example.kitchen.repository.MeasurementRepository;
 import com.example.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -13,7 +12,6 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Collections;
 import java.util.List;
 
 @Component
@@ -24,18 +22,8 @@ public class DataLoader implements CommandLineRunner {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
-    private final PaymentTypeRepository paymentTypeRepository;
     private final LevelRepository levelRepository;
-    private final BusinessRepository businessRepository;
-    private final BranchRepository branchRepository;
-    private final MeasurementRepository measurementRepository;
-    private final RoomTypeRepository roomTypeRepository;
-    private final RoomRepository roomRepository;
-    private final StudentClassRepository studentClassRepository;
-    private final TypeOfWorkRepository typeOfWorkRepository;
-    private final SubjectRepository subjectRepository;
-    private final BalanceRepository balanceRepository;
-    private  final SubjectLevelRepository subjectLevelRepository;
+
 
     @Value("${spring.sql.init.mode}")
     private String initMode;
@@ -45,13 +33,6 @@ public class DataLoader implements CommandLineRunner {
 
 
         if (initMode.equals("always")) {
-
-            PaymentType xisobdanXisobga = PaymentType.builder().name("XISOBDAN_XISOBGA").build();
-            PaymentType karta = PaymentType.builder().name("KARTA").build();
-            PaymentType elektron = PaymentType.builder().name("ELEKTRON").build();
-            PaymentType naqt = PaymentType.builder().name("NAQT").build();
-
-            paymentTypeRepository.saveAll(List.of(karta, elektron, xisobdanXisobga, naqt));
 
 
             Level level1 = new Level(1, 1);
@@ -67,6 +48,7 @@ public class DataLoader implements CommandLineRunner {
             Level level11 = new Level(11, 11);
 
             levelRepository.saveAll(List.of(level1, level2, level3, level4, level5, level6, level7, level8, level9, level10, level11));
+
 
             Permission p1 = permissionRepository.save(new Permission(1, "ROLE_ACCESS"));
             Permission p2 = permissionRepository.save(new Permission(2, "ADD"));
