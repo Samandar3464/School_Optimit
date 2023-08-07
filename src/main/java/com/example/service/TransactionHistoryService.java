@@ -56,13 +56,16 @@ public class TransactionHistoryService implements BaseService<TransactionHistory
 
     @Override
     public ApiResponse update(TransactionHistoryRequest request) {
+
         TransactionHistory oldTransaction = getTransactionHistory(request.getId());
         TransactionHistory newTransactionHistory = TransactionHistory.toEntity(request);
+
         newTransactionHistory.setId(request.getId());
         setTransactionHistory(request, newTransactionHistory);
 
         rollBackTransaction(oldTransaction);
         transactionWithBalance(newTransactionHistory);
+
         transactionHistoryRepository.save(newTransactionHistory);
         return new ApiResponse(Constants.SUCCESSFULLY, true, TransactionHistoryResponse.toResponse(newTransactionHistory));
     }

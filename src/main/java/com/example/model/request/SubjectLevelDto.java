@@ -18,7 +18,5 @@ public class SubjectLevelDto {
 
     private int teachingHour;
 
-    private double priceForPerHour;
-
     private Integer branchId;
 }

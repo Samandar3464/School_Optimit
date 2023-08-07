@@ -146,7 +146,6 @@ public class DataLoaderTest implements CommandLineRunner {
                     .level(savedLavel)
                     .branch(saveBranch)
                     .teachingHour(10)
-                    .priceForPerHour(100000)
                     .build();
 
             subjectLevelRepository.save(subjectLevel);

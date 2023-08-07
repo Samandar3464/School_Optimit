@@ -28,11 +28,10 @@ public class Subject {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Branch branch;
 
-    public static Subject from(SubjectRequestDto subjectRequestDto,Branch branch) {
+    public static Subject toEntity(SubjectRequestDto subjectRequestDto) {
         return Subject
                 .builder()
                 .name(subjectRequestDto.getName())
-                .branch(branch)
                 .active(true)
                 .build();
     }

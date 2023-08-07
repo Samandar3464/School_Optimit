@@ -1,13 +1,10 @@
-//package com.example.kitchen.repository;
-//
-//import com.example.kitchen.entity.Drink;
-//import org.springframework.data.jpa.repository.JpaRepository;
-//
-//import java.util.List;
-//
-//public interface DrinkRepository extends JpaRepository<Drink, Integer> {
-//
-//    List<Drink> findAllByBranchIdAndActiveTrue(Integer branchId);
-//
-//    boolean existsByName(String name);
-//}
+package com.example.kitchen.repository;
+
+import com.example.kitchen.entity.DrinksInWareHouse;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.util.Optional;
+
+public interface DrinkRepository extends JpaRepository<DrinksInWareHouse,Integer> {
+//    Optional<DrinksInWareHouse> findByNameAndActiveTrueAndLiterQuantityAndWarehouseId(String name, int literQuantity, Integer warehouse_id);
+}

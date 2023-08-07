@@ -30,93 +30,139 @@ public class TeachingHoursService implements BaseService<TeachingHoursRequest, I
     @Override
     public ApiResponse create(TeachingHoursRequest teachingHoursRequest) {
         TeachingHours teachingHours = TeachingHours.toTeachingHours(teachingHoursRequest);
-        if (teachingHoursRepository.findByTeacherIdAndDateAndLessonHoursAndActiveTrue(teachingHoursRequest.getTeacherId(), teachingHoursRequest.getDate(), teachingHours.getLessonHours()).isPresent()) {
+        if (teachingHoursRepository.findByTeacherIdAndDateAndLessonHoursAndActiveTrue(teachingHoursRequest.getTeacherId(), teachingHoursRequest.getDate(), teachingHoursRequest.getLessonHours()).isPresent()) {
             throw new RecordAlreadyExistException(Constants.TEACHING_HOURS_ALREADY_EXIST_THIS_DATE);
         }
         set(teachingHoursRequest, teachingHours);
-        addPriceToSalary(teachingHours);
         teachingHoursRepository.save(teachingHours);
-        return new ApiResponse(Constants.SUCCESSFULLY, true);
+        setSalary(teachingHours);
+        return new ApiResponse(Constants.SUCCESSFULLY, true, TeachingHoursResponse.toResponse(teachingHours));
     }
 
 
     @Override
     public ApiResponse getById(Integer integer) {
         TeachingHours teachingHours = teachingHoursRepository.findByIdAndActiveTrue(integer).orElseThrow(() -> new RecordNotFoundException(Constants.TEACHING_HOURS_NOT_FOUND));
-        return new ApiResponse(TeachingHoursResponse.teachingHoursDTO(teachingHours), true);
+        return new ApiResponse(Constants.SUCCESSFULLY, true, TeachingHoursResponse.toResponse(teachingHours));
     }
 
     public ApiResponse getAll() {
-        List<TeachingHoursResponse> all = TeachingHoursResponse.toAllResponse(teachingHoursRepository.findAll());
-        return new ApiResponse(Constants.SUCCESSFULLY, true, all);
+        List<TeachingHoursResponse> response = TeachingHoursResponse.toAllResponse(teachingHoursRepository.findAllByActiveTrue());
+        return new ApiResponse(Constants.SUCCESSFULLY, true, response);
     }
 
     public ApiResponse getByTeacherIdAndActiveTrue(Integer id) {
-        List<TeachingHoursResponse> all = TeachingHoursResponse.toAllResponse(teachingHoursRepository.findAllByTeacherIdAndActiveTrue(id, Sort.by(Sort.Direction.DESC,"id")));
-        return new ApiResponse(Constants.SUCCESSFULLY, true, all);
+        List<TeachingHoursResponse> response = TeachingHoursResponse.toAllResponse(teachingHoursRepository.findAllByTeacherIdAndActiveTrue(id, Sort.by(Sort.Direction.DESC, "id")));
+        return new ApiResponse(Constants.SUCCESSFULLY, true, response);
     }
 
     public ApiResponse getByTeacherIdAndDate(Integer teacherId, LocalDate startDay, LocalDate finishDay) {
-        List<TeachingHoursResponse> all = TeachingHoursResponse.toAllResponse(teachingHoursRepository.findAllByTeacherIdAndActiveTrueAndDateBetween(teacherId, startDay, finishDay, Sort.by(Sort.Direction.DESC,"id")));
-        return new ApiResponse(Constants.SUCCESSFULLY, true, all);
+        List<TeachingHoursResponse> response = TeachingHoursResponse.toAllResponse(teachingHoursRepository.findAllByTeacherIdAndActiveTrueAndDateBetween(teacherId, startDay, finishDay, Sort.by(Sort.Direction.DESC, "id")));
+        return new ApiResponse(Constants.SUCCESSFULLY, true, response);
     }
 
     @Override
     public ApiResponse update(TeachingHoursRequest teachingHoursRequest) {
-        TeachingHours teachingHours = teachingHoursRepository.findByTeacherIdAndDateAndLessonHoursAndActiveTrue(teachingHoursRequest.getTeacherId(), teachingHoursRequest.getOldDate(), teachingHoursRequest.getOldLessonHours()).orElseThrow(() -> new RecordNotFoundException(Constants.TEACHING_HOURS_NOT_FOUND));
-        double oldPrice = teachingHours.getTypeOfWork().getPrice();
-
-        teachingHours.setLessonHours(teachingHoursRequest.getLessonHours());
-        teachingHours.setDate(teachingHoursRequest.getDate());
-        set(teachingHoursRequest, teachingHours);
-        teachingHoursRepository.save(teachingHours);
-
-        double debtOrExtra = teachingHours.getTypeOfWork().getPrice() - oldPrice;
-        Salary salary = salaryRepository.findByUserPhoneNumberAndActiveTrue(teachingHours.getTeacher().getPhoneNumber()).orElseThrow(() -> new RecordNotFoundException(Constants.SALARY_NOT_FOUND));
-        hourlyWageSetting(debtOrExtra, salary);
-        salaryRepository.save(salary);
-        return new ApiResponse(Constants.SUCCESSFULLY, true, TeachingHoursResponse.teachingHoursDTO(teachingHours));
+        TeachingHours oldTransaction = teachingHoursRepository.findByIdAndActiveTrue(teachingHoursRequest.getId()).orElseThrow(() -> new RecordNotFoundException(Constants.TEACHING_HOURS_NOT_FOUND));
+        if (!oldTransaction.getDate().equals(LocalDate.now())) {
+            throw new RecordNotFoundException(Constants.DO_NOT_CHANGE);
+        }
+        TeachingHours newTeachingHours = TeachingHours.toTeachingHours(teachingHoursRequest);
+        newTeachingHours.setId(teachingHoursRequest.getId());
+        set(teachingHoursRequest, newTeachingHours);
+        hourlyWageSetting(newTeachingHours, oldTransaction.getTypeOfWork().getPrice());
+        teachingHoursRepository.save(newTeachingHours);
+        return new ApiResponse(Constants.SUCCESSFULLY, true, TeachingHoursResponse.toResponse(newTeachingHours));
     }
 
-    private static void hourlyWageSetting(double debtOrExtra, Salary salary) {
+    private void hourlyWageSetting(TeachingHours teachingHours, double oldMoney) {
+
+        Salary salary = salaryRepository.findByUserPhoneNumberAndActiveTrue(teachingHours.getTeacher().getPhoneNumber()).orElseThrow(() -> new RecordNotFoundException(Constants.SALARY_NOT_FOUND));
+
+        double debtOrExtra = teachingHours.getTypeOfWork().getPrice() - oldMoney;
+
         if (debtOrExtra < 0) {
-            debtOrExtra = Math.abs(debtOrExtra);
-            if (salary.getSalary() > debtOrExtra) {
-                salary.setSalary(salary.getSalary() - debtOrExtra);
-            } else {
-                salary.setAmountDebt(salary.getAmountDebt() + (debtOrExtra - salary.getSalary()));
-                salary.setSalary(0);
-            }
-        } else {
-            salary.setSalary(salary.getSalary() + debtOrExtra);
-        }
-    }
 
-    private void addPriceToSalary(TeachingHours teachingHours) {
-        Salary salary = salaryRepository.findByUserPhoneNumberAndActiveTrue(teachingHours.getTeacher().getPhoneNumber()).orElseThrow(() -> new RecordNotFoundException(Constants.SALARY_NOT_FOUND));
-        if (salary.getAmountDebt() > 0) {
-            if (salary.getSalary() > salary.getAmountDebt()) {
-                salary.setSalary(salary.getSalary() - salary.getAmountDebt());
-                salary.setAmountDebt(0);
+            debtOrExtra = Math.abs(debtOrExtra);
+
+            if (salary.getSalary() > debtOrExtra) {
+
+                salary.setSalary(salary.getSalary() - debtOrExtra);
+
             } else {
-                salary.setAmountDebt(salary.getAmountDebt() - salary.getSalary());
+
+                salary.setAmountDebt(salary.getAmountDebt() + (debtOrExtra - salary.getSalary()));
+
                 salary.setSalary(0);
+
             }
+
         } else {
-            salary.setSalary(salary.getSalary() + teachingHours.getTypeOfWork().getPrice());
+
+            salary.setSalary(salary.getSalary() + debtOrExtra);
+
         }
+
         salaryRepository.save(salary);
     }
 
     @Override
     public ApiResponse delete(Integer integer) {
         TeachingHours teachingHours = teachingHoursRepository.findById(integer).orElseThrow(() -> new RecordNotFoundException(Constants.TEACHING_HOURS_NOT_FOUND));
-        teachingHours.setActive(false);
-        teachingHoursRepository.save(teachingHours);
+        if (teachingHours.getDate().equals(LocalDate.now())) {
+            teachingHours.setActive(false);
+            setForDelete(teachingHours);
+            teachingHoursRepository.save(teachingHours);
+        } else {
+            throw new RecordNotFoundException(Constants.DO_NOT_CHANGE);
+        }
+        return new ApiResponse(Constants.DELETED, true, TeachingHoursResponse.toResponse(teachingHours));
+    }
+
+    private void setForDelete(TeachingHours teachingHours) {
+
         Salary salary = salaryRepository.findByUserPhoneNumberAndActiveTrue(teachingHours.getTeacher().getPhoneNumber()).orElseThrow(() -> new RecordNotFoundException(Constants.SALARY_NOT_FOUND));
-        hourlyWageSetting(-teachingHours.getTypeOfWork().getPrice(), salary);
+
+        if (salary.getSalary() > teachingHours.getTypeOfWork().getPrice()) {
+
+            salary.setSalary(salary.getSalary() - teachingHours.getTypeOfWork().getPrice());
+
+        } else {
+
+            salary.setAmountDebt(salary.getAmountDebt() + teachingHours.getTypeOfWork().getPrice());
+
+            salary.setAmountDebt(salary.getAmountDebt() - salary.getSalary());
+
+        }
         salaryRepository.save(salary);
-        return new ApiResponse(Constants.DELETED, true, teachingHours);
+    }
+
+    private void setSalary(TeachingHours teachingHours) {
+
+        Salary salary = salaryRepository.findByUserPhoneNumberAndActiveTrue(teachingHours.getTeacher().getPhoneNumber()).orElseThrow(() -> new RecordNotFoundException(Constants.SALARY_NOT_FOUND));
+
+        salary.setSalary(salary.getSalary() + teachingHours.getTypeOfWork().getPrice());
+
+        if (salary.getAmountDebt() > 0) {
+
+            if (salary.getSalary() > salary.getAmountDebt()) {
+
+                salary.setSalary(salary.getSalary() - salary.getAmountDebt());
+
+                salary.setAmountDebt(0);
+
+            } else {
+
+                salary.setAmountDebt(salary.getAmountDebt() - salary.getSalary());
+
+                salary.setSalary(0);
+
+            }
+
+        }
+
+        salaryRepository.save(salary);
+
     }
 
     private void set(TeachingHoursRequest teachingHoursRequest, TeachingHours teachingHours) {

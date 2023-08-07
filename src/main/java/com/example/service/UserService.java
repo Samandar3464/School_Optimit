@@ -3,6 +3,7 @@ package com.example.service;
 import com.example.config.jwtConfig.JwtGenerate;
 import com.example.entity.Attachment;
 import com.example.entity.User;
+import com.example.enums.Constants;
 import com.example.exception.RecordAlreadyExistException;
 import com.example.exception.RecordNotFoundException;
 import com.example.exception.UserNotFoundException;
@@ -68,7 +69,7 @@ public class UserService implements BaseService<UserRegisterDto, Integer> {
     @Override
     public ApiResponse getById(Integer id) {
         User user = getUserById(id);
-        return new ApiResponse(toUserResponse(user), true);
+        return new ApiResponse(SUCCESSFULLY, true,toUserResponse(user));
     }
 
     @Override

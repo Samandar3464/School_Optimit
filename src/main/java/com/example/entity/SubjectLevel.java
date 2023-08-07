@@ -28,8 +28,6 @@ public class SubjectLevel {
 
     private int teachingHour;
 
-    private double priceForPerHour;
-
     @ManyToOne
     @JsonIgnore
     @OnDelete(action = OnDeleteAction.CASCADE)

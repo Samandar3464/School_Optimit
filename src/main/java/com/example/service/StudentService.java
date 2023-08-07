@@ -56,6 +56,7 @@ public class StudentService implements BaseService<StudentRequest, Integer> {
         return new ApiResponse(getStudentResponse(student), true);
     }
 
+
     @Override
     @ResponseStatus(HttpStatus.OK)
     @Transactional(rollbackFor = {FileNotFoundException.class, UserNotFoundException.class, FileInputException.class, OriginalFileNameNullException.class, InputException.class, RecordNotFoundException.class})
