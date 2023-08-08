@@ -39,7 +39,7 @@ public class PurchasedDrinksResponse {
 
     private Warehouse warehouse;
 
-    public static PurchasedDrinksResponse toEntity(PurchasedDrinks purchasedDrinks) {
+    public static PurchasedDrinksResponse toResponse(PurchasedDrinks purchasedDrinks) {
         return PurchasedDrinksResponse
                 .builder()
                 .id(purchasedDrinks.getId())

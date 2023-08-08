@@ -15,5 +15,5 @@ public class WareHouseRequest {
 
     private String name;
 
-    private Integer branch;
+    private Integer branchId;
 }

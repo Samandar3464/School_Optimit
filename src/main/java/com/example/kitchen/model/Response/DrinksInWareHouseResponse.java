@@ -28,7 +28,7 @@ public class DrinksInWareHouseResponse {
 
     private Warehouse warehouse;
 
-    public static DrinksInWareHouseResponse toEntity(DrinksInWareHouse drinksInWareHouse) {
+    public static DrinksInWareHouseResponse toResponse(DrinksInWareHouse drinksInWareHouse) {
         return DrinksInWareHouseResponse
                 .builder()
                 .id(drinksInWareHouse.getId())

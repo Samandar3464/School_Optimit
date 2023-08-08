@@ -40,7 +40,7 @@ public class PurchasedProductsResponse {
 
     private Warehouse warehouse;
 
-    public static PurchasedProductsResponse toEntity(PurchasedProducts purchasedProducts){
+    public static PurchasedProductsResponse toResponse(PurchasedProducts purchasedProducts){
         return PurchasedProductsResponse
                 .builder()
                 .id(purchasedProducts.getId())

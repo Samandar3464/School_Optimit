@@ -35,7 +35,7 @@ public class DailyConsumedDrinksResponse {
 
     private Warehouse warehouse;
 
-    public static DailyConsumedDrinksResponse toEntity(DailyConsumedDrinks dailyConsumedDrinks) {
+    public static DailyConsumedDrinksResponse toResponse(DailyConsumedDrinks dailyConsumedDrinks) {
         return DailyConsumedDrinksResponse
                 .builder()
                 .id(dailyConsumedDrinks.getId())

@@ -29,7 +29,7 @@ public class ProductsInWareHouseResponse {
 
     private Warehouse warehouse;
 
-    public static ProductsInWareHouseResponse toEntity(ProductsInWareHouse productsInWareHouse){
+    public static ProductsInWareHouseResponse toResponse(ProductsInWareHouse productsInWareHouse){
         return ProductsInWareHouseResponse
                 .builder()
                 .id(productsInWareHouse.getId())
