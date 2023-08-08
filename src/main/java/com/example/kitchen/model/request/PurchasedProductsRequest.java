@@ -1,14 +1,17 @@
 package com.example.kitchen.model.request;
 
-import com.example.entity.Branch;
-import com.example.entity.User;
 import com.example.enums.MeasurementType;
-import com.example.kitchen.entity.Warehouse;
-import jakarta.persistence.ManyToOne;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
-
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 public class PurchasedProductsRequest {
+
     private Integer id;
 
     private String name;
@@ -21,13 +24,11 @@ public class PurchasedProductsRequest {
 
     private String description;
 
-    private LocalDateTime localDateTime;
-
     private MeasurementType measurementType;
 
-    private User employee;
+    private Integer employeeId;
 
-    private Branch branch;
+    private Integer branchId;
 
-    private Warehouse warehouse;
+    private Integer warehouseId;
 }

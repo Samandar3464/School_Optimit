@@ -1,17 +1,16 @@
-package com.example.kitchen.model.response;
+package com.example.kitchen.model.request;
 
-import com.example.entity.Branch;
 import com.example.enums.MeasurementType;
-import com.example.kitchen.entity.Warehouse;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class DailyProductsResponse {
+public class ProductsInWareHouseRequest {
 
     private Integer id;
 
@@ -19,13 +18,11 @@ public class DailyProductsResponse {
 
     private double quantity;
 
-    private String description;
-
-    private String localDateTime;
+    private double totalPrice;
 
     private MeasurementType measurementType;
 
-    private Branch branch;
+    private Integer branchId;
 
-    private Warehouse warehouse;
+    private Integer warehouseId;
 }

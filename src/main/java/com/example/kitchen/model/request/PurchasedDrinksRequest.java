@@ -8,17 +8,23 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class DailyDrinksRequest {
+public class PurchasedDrinksRequest {
 
     private Integer id;
 
     private String name;
 
-    private String description;
+    private int count;
+
+    private double unitPrice;
+
+    private double totalPrice;
 
     private int literQuantity;
 
-    private int count;
+    private String description;
+
+    private Integer employeeId;
 
     private Integer branchId;
 

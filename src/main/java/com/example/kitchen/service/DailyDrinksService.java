@@ -3,8 +3,6 @@ package com.example.kitchen.service;
 import com.example.enums.Constants;
 import com.example.exception.RecordNotFoundException;
 import com.example.kitchen.entity.DailyConsumedDrinks;
-import com.example.kitchen.model.request.DailyDrinksRequest;
-import com.example.kitchen.model.response.DailyDrinksResponse;
 import com.example.kitchen.repository.DailyDrinksRepository;
 import com.example.kitchen.repository.WareHouseRepository;
 import com.example.model.common.ApiResponse;

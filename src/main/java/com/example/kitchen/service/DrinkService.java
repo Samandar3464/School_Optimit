@@ -3,7 +3,6 @@ package com.example.kitchen.service;
 import com.example.enums.Constants;
 import com.example.exception.RecordNotFoundException;
 import com.example.kitchen.entity.DrinksInWareHouse;
-import com.example.kitchen.model.request.DrinkRequest;
 //import com.example.kitchen.model.response.DrinkResponse;
 import com.example.kitchen.repository.DrinkRepository;
 import com.example.kitchen.repository.WareHouseRepository;
@@ -11,8 +10,6 @@ import com.example.model.common.ApiResponse;
 import com.example.repository.BranchRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -24,9 +21,9 @@ public class DrinkService implements BaseService<DrinkRequest, Integer> {
 
     @Override
     public ApiResponse create(DrinkRequest drinkRequest) {
-//        Optional<DrinksInWareHouse> drinkOptional = drinkRepository.findByNameAndActiveTrueAndLiterQuantityAndWarehouseId(drinkRequest.getName(), drinkRequest.getLiterQuantity(), drinkRequest.getUnitPrice(), drinkRequest.getWarehouseId());
+//        Optional<DrinksInWareHouseResponse> drinkOptional = drinkRepository.findByNameAndActiveTrueAndLiterQuantityAndWarehouseId(drinkRequest.getName(), drinkRequest.getLiterQuantity(), drinkRequest.getUnitPrice(), drinkRequest.getWarehouseId());
 //        if (drinkOptional.isPresent()) {
-//            DrinksInWareHouse drinksInWareHouse = drinkOptional.get();
+//            DrinksInWareHouseResponse drinksInWareHouse = drinkOptional.get();
 //            drinksInWareHouse.setCount(drinksInWareHouse.getCount() + drinkRequest.getCount());
 ////            drinksInWareHouse.setTotalPrice(drinksInWareHouse.getTotalPrice() + drinksInWareHouse.getTotalPrice());
 //        }

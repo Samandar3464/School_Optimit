@@ -1,6 +1,7 @@
 package com.example.kitchen.entity;
 
 import com.example.entity.Branch;
+import com.example.kitchen.model.request.WareHouseRequest;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
@@ -21,9 +22,16 @@ public class Warehouse {
 
     private String name;
 
-    @JsonIgnore
+    private boolean active;
+
     @ManyToOne
     private Branch branch;
 
-    private boolean active;
+    public static Warehouse toEntity(WareHouseRequest request){
+     return Warehouse
+             .builder()
+             .name(request.getName())
+             .active(true)
+             .build();
+    }
 }

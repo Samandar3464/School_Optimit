@@ -1,11 +1,9 @@
 package com.example.kitchen.entity;
 
 import com.example.entity.Branch;
-import com.example.kitchen.model.request.DrinkRequest;
+import com.example.kitchen.model.request.DrinksInWareHouseRequest;
 import jakarta.persistence.*;
 import lombok.*;
-
-import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -23,6 +21,8 @@ public class DrinksInWareHouse {
 
     private int count;
 
+    private double totalPrice;
+
     private int literQuantity;
 
     private boolean active;
@@ -33,13 +33,14 @@ public class DrinksInWareHouse {
     @ManyToOne
     private Warehouse warehouse;
 
-    public static DrinksInWareHouse toEntity(DrinkRequest drinkRequest) {
+    public static DrinksInWareHouse toEntity(DrinksInWareHouseRequest request) {
         return DrinksInWareHouse
                 .builder()
-                .count(drinkRequest.getCount())
-                .literQuantity(drinkRequest.getLiterQuantity())
                 .active(true)
-                .name(drinkRequest.getName())
+                .name(request.getName())
+                .count(request.getCount())
+                .totalPrice(request.getTotalPrice())
+                .literQuantity(request.getLiterQuantity())
                 .build();
     }
 }

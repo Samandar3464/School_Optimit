@@ -1,6 +1,5 @@
 package com.example.kitchen.controller;
 
-import com.example.kitchen.model.request.DailyProductsRequest;
 import com.example.kitchen.service.DailyProductsService;
 import com.example.model.common.ApiResponse;
 import lombok.RequiredArgsConstructor;

@@ -29,6 +29,8 @@ public class PurchasedProducts {
 
     private double totalPrice;
 
+    private boolean active;
+
     private String description;
 
     private LocalDateTime localDateTime;
@@ -47,6 +49,14 @@ public class PurchasedProducts {
     public static PurchasedProducts toEntity(PurchasedProductsRequest request){
         return PurchasedProducts
                 .builder()
+                .name(request.getName())
+                .quantity(request.getQuantity())
+                .unitPrice(request.getUnitPrice())
+                .totalPrice(request.getTotalPrice())
+                .description(request.getDescription())
+                .measurementType(request.getMeasurementType())
+                .localDateTime(LocalDateTime.now())
+                .active(true)
                 .build();
     }
 }

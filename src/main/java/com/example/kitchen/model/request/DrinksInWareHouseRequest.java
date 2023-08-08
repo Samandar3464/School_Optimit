@@ -1,6 +1,5 @@
 package com.example.kitchen.model.request;
 
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -10,23 +9,19 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class DrinkRequest {
+public class DrinksInWareHouseRequest {
 
     private Integer id;
 
-    private int count;
+    private String name;
 
-    private double unitPrice;
+    private int count;
 
     private double totalPrice;
 
     private int literQuantity;
 
-    private String description;
+    private Integer branch;
 
-    private String name;
-
-    private Integer branchId;
-
-    private Integer warehouseId;
+    private Integer warehouse;
 }
