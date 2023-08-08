@@ -40,8 +40,8 @@ public class SalaryService implements BaseService<SalaryRequest, String> {
 
     private void setSalaryForCreate(SalaryRequest salaryRequest, Salary salary) {
         if (studentClassRepository.findByClassLeaderPhoneNumberAndActiveTrue(salaryRequest.getPhoneNumber()).isPresent()) {
-            salary.setClassLeaderSalary(500000);
-            salary.setSalary(salary.getSalary() + 500000);
+            salary.setClassLeaderSalary(salaryRequest.getClassLeaderSalary());
+            salary.setSalary(salary.getSalary() + salary.getClassLeaderSalary());
         }
         setSalary(salaryRequest, salary);
     }

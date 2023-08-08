@@ -10,6 +10,7 @@ import java.util.Optional;
 public interface TransactionHistoryRepository extends JpaRepository<TransactionHistory,Integer> {
     Optional<TransactionHistory> findByIdAndActiveTrue(Integer integer);
     Optional<TransactionHistory> findByStudentIdAndActiveTrue(Integer integer);
+    Optional<TransactionHistory> findFirstByStudentIdAndActiveTrue(Integer integer,Sort sort);
     List<TransactionHistory> findAllByBranch_IdAndActiveTrue(Integer branchId, Sort sort);
     List<TransactionHistory> findAllByActiveTrue(Sort sort);
 }

@@ -34,8 +34,8 @@ public class TeachingHoursService implements BaseService<TeachingHoursRequest, I
             throw new RecordAlreadyExistException(Constants.TEACHING_HOURS_ALREADY_EXIST_THIS_DATE);
         }
         set(teachingHoursRequest, teachingHours);
-        teachingHoursRepository.save(teachingHours);
         setSalary(teachingHours);
+        teachingHoursRepository.save(teachingHours);
         return new ApiResponse(Constants.SUCCESSFULLY, true, TeachingHoursResponse.toResponse(teachingHours));
     }
 
