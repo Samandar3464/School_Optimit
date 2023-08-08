@@ -1,15 +1,19 @@
 package com.example.kitchen.service;
 
+import com.example.kitchen.model.request.DailyConsumedDrinksRequest;
+import com.example.kitchen.repository.DailyConsumedDrinksRepository;
 import com.example.model.common.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class DailyProductsService implements BaseService<DailyProductsRequest,Integer>{
+public class DailyConsumedDrinksService implements BaseService<DailyConsumedDrinksRequest, Integer> {
+
+    private final DailyConsumedDrinksRepository dailyConsumedDrinksRepository;
 
     @Override
-    public ApiResponse create(DailyProductsRequest dailyProductsRequest) {
+    public ApiResponse create(DailyConsumedDrinksRequest request) {
         return null;
     }
 
@@ -19,7 +23,7 @@ public class DailyProductsService implements BaseService<DailyProductsRequest,In
     }
 
     @Override
-    public ApiResponse update(DailyProductsRequest dailyProductsRequest) {
+    public ApiResponse update(DailyConsumedDrinksRequest request) {
         return null;
     }
 
