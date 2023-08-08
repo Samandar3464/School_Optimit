@@ -59,12 +59,14 @@ public class WorkExperienceService implements BaseService<WorkExperienceRequest,
 
     @ResponseStatus(HttpStatus.OK)
     public ApiResponse getAllById(List<Integer> workExperiences) {
-        return new ApiResponse(Constants.SUCCESSFULLY, true, WorkExperienceResponse.toAllResponse(workExperienceRepository.findAllById(workExperiences)));
+        List<WorkExperienceResponse> allResponse = WorkExperienceResponse.toAllResponse(workExperienceRepository.findAllById(workExperiences));
+        return new ApiResponse(Constants.SUCCESSFULLY, true, allResponse);
     }
 
     @ResponseStatus(HttpStatus.OK)
     public ApiResponse getAllByUserId(Integer id) {
-        return new ApiResponse(Constants.SUCCESSFULLY, true, WorkExperienceResponse.toAllResponse(workExperienceRepository.findAllByEmployeeId(id, Sort.by(Sort.Direction.DESC,"id"))));
+        List<WorkExperienceResponse> all = WorkExperienceResponse.toAllResponse(workExperienceRepository.findAllByEmployeeId(id, Sort.by(Sort.Direction.DESC, "id")));
+        return new ApiResponse(Constants.SUCCESSFULLY, true, all);
     }
 
     private void checkIfExist(WorkExperienceRequest workExperienceRequest) {

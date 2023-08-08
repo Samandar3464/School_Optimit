@@ -9,6 +9,7 @@ import java.util.Optional;
 
 public interface StudentAccountRepository extends JpaRepository<StudentAccount,Integer> {
     Optional<StudentAccount> findByAccountNumberAndActiveTrue(String accountNumber);
+    Optional<StudentAccount> findByStudentIdAndActiveTrue(Integer student_id);
     Optional<StudentAccount> findByIdAndActiveTrue(Integer id);
     List<StudentAccount> findAllByBranch_IdAndActiveTrue(Integer id, Sort sort);
 

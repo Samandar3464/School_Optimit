@@ -27,18 +27,18 @@ public class TypeOfWorkService implements BaseService<TypeOfWorkRequest, Integer
         TypeOfWork typeOfWork = TypeOfWork.toTypeOfWork(typeOfWorkRequest);
         typeOfWork.setBranch(branchRepository.findById(typeOfWorkRequest.getBranchId()).orElseThrow(() -> new RecordNotFoundException(Constants.BRANCH_NOT_FOUND)));
         typeOfWorkRepository.save(typeOfWork);
-        return new ApiResponse(Constants.SUCCESSFULLY, true);
+        return new ApiResponse(Constants.SUCCESSFULLY, true, typeOfWork);
     }
 
     @Override
     public ApiResponse getById(Integer id) {
-        return new ApiResponse(checkById(id), true);
+        return new ApiResponse(Constants.SUCCESSFULLY, true, checkById(id));
     }
 
     @ResponseStatus(HttpStatus.OK)
     public ApiResponse getAllByBranchId(Integer branchId) {
-        List<TypeOfWork> all = typeOfWorkRepository.findAllByBranch_Id(branchId, Sort.by(Sort.Direction.DESC,"id"));
-        return new ApiResponse(all, true);
+        List<TypeOfWork> all = typeOfWorkRepository.findAllByBranch_Id(branchId, Sort.by(Sort.Direction.DESC, "id"));
+        return new ApiResponse(Constants.SUCCESSFULLY, true, all);
     }
 
     @Override
@@ -48,7 +48,7 @@ public class TypeOfWorkService implements BaseService<TypeOfWorkRequest, Integer
         typeOfWork.setBranch(branchRepository.findById(typeOfWorkRequest.getBranchId()).orElseThrow(() -> new RecordNotFoundException(Constants.BRANCH_NOT_FOUND)));
         typeOfWork.setId(typeOfWorkRequest.getId());
         typeOfWorkRepository.save(typeOfWork);
-        return new ApiResponse(Constants.SUCCESSFULLY, true);
+        return new ApiResponse(Constants.SUCCESSFULLY, true, typeOfWork);
     }
 
     @Override

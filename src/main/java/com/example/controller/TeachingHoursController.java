@@ -30,14 +30,18 @@ public class TeachingHoursController {
     @GetMapping("/getByTeacherIdAndDate/{id}/{startDay}/{finishDay}")
     public ApiResponse getByTeacherIdAndDate(@PathVariable Integer id,
                                              @PathVariable LocalDate startDay,
-                                             @PathVariable LocalDate finishDay
+                                             @PathVariable LocalDate finishDay,
+                                             @RequestParam(name = "page", defaultValue = "0") int page,
+                                             @RequestParam(name = "size", defaultValue = "5") int size
     ) {
-        return teachingHoursService.getByTeacherIdAndDate(id, startDay,finishDay);
+        return teachingHoursService.getByTeacherIdAndDate(id, startDay, finishDay, page, size);
     }
 
     @GetMapping("/getByTeacherId/{id}")
-    public ApiResponse getByTeacherId(@PathVariable Integer id) {
-        return teachingHoursService.getByTeacherIdAndActiveTrue(id);
+    public ApiResponse getByTeacherId(@PathVariable Integer id,
+                                      @RequestParam(name = "page", defaultValue = "0") int page,
+                                      @RequestParam(name = "size", defaultValue = "5") int size) {
+        return teachingHoursService.getByTeacherIdAndActiveTrue(id, page, size);
     }
 
     @GetMapping("/getAll")

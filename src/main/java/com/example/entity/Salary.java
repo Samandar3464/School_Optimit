@@ -66,4 +66,13 @@ public class Salary {
                 .classLeaderSalary(salaryRequest.getClassLeaderSalary())
                 .build();
     }
+
+    public static Salary toCreate(SalaryRequest salaryRequest) {
+        return Salary
+                .builder()
+                .fix(salaryRequest.getFix())
+                .active(true)
+                .date(salaryRequest.getDate())
+                .build();
+    }
 }

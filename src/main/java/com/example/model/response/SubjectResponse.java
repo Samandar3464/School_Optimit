@@ -12,5 +12,5 @@ import java.util.List;
 @NoArgsConstructor
 public class SubjectResponse {
     private Subject subject;
-    private List<TopicResponseDto> topicResponseDtoList;
+    private List<TopicResponse> topicResponseList;
 }

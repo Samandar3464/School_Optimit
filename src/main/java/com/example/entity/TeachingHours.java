@@ -35,12 +35,11 @@ public class TeachingHours {
     private Subject subject;
 
     @ManyToOne
-    @JsonIgnore
     @OnDelete(action = OnDeleteAction.CASCADE)
     private User teacher;
 
     @ManyToOne
-    @JsonIgnore
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private StudentClass studentClass;
 
     private boolean active;

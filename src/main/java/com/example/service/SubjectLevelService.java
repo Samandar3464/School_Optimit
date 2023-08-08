@@ -1,8 +1,5 @@
 package com.example.service;
 
-import com.example.entity.Branch;
-import com.example.entity.Level;
-import com.example.entity.Subject;
 import com.example.entity.SubjectLevel;
 import com.example.exception.RecordNotFoundException;
 import com.example.model.common.ApiResponse;
@@ -14,7 +11,6 @@ import com.example.repository.SubjectRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-
 
 import static com.example.enums.Constants.*;
 
@@ -29,18 +25,17 @@ public class SubjectLevelService implements BaseService<SubjectLevelDto, Integer
 
     @Override
     public ApiResponse create(SubjectLevelDto dto) {
-        Subject subject = subjectRepository.findById(dto.getSubjectId()).orElseThrow(() -> new RecordNotFoundException(SUBJECT_NOT_FOUND));
-        Level level = levelRepository.findById(dto.getLevelId()).orElseThrow(() -> new RecordNotFoundException(LEVEL_NOT_FOUND));
-        Branch branch = branchRepository.findById(dto.getBranchId()).orElseThrow(() -> new RecordNotFoundException(BRANCH_NOT_FOUND));
-        SubjectLevel subjectLevel = SubjectLevel.builder()
-                .subject(subject)
-                .level(level)
-                .teachingHour(dto.getTeachingHour())
-                .priceForPerHour(dto.getPriceForPerHour())
-                .branch(branch)
-                .build();
+        SubjectLevel subjectLevel = new SubjectLevel();
+        setSubjectLevel(dto, subjectLevel);
         subjectLevelRepository.save(subjectLevel);
-        return new ApiResponse(SUCCESSFULLY, true);
+        return new ApiResponse(SUCCESSFULLY, true, subjectLevel);
+    }
+
+    private void setSubjectLevel(SubjectLevelDto dto, SubjectLevel subjectLevel) {
+        subjectLevel.setTeachingHour(dto.getTeachingHour());
+        subjectLevel.setSubject(subjectRepository.findById(dto.getSubjectId()).orElseThrow(() -> new RecordNotFoundException(SUBJECT_NOT_FOUND)));
+        subjectLevel.setLevel(levelRepository.findById(dto.getLevelId()).orElseThrow(() -> new RecordNotFoundException(LEVEL_NOT_FOUND)));
+        subjectLevel.setBranch(branchRepository.findById(dto.getBranchId()).orElseThrow(() -> new RecordNotFoundException(BRANCH_NOT_FOUND)));
     }
 
     @Override
@@ -52,24 +47,20 @@ public class SubjectLevelService implements BaseService<SubjectLevelDto, Integer
     @Override
     public ApiResponse update(SubjectLevelDto dto) {
         SubjectLevel subjectLevel = subjectLevelRepository.findById(dto.getId()).orElseThrow(() -> new RecordNotFoundException(SUBJECT_LEVEL_NOT_FOUND));
-        Subject subject = subjectRepository.findById(dto.getSubjectId()).orElseThrow(() -> new RecordNotFoundException(SUBJECT_NOT_FOUND));
-        Level level = levelRepository.findById(dto.getLevelId()).orElseThrow(() -> new RecordNotFoundException(LEVEL_NOT_FOUND));
-        subjectLevel.setLevel(level);
-        subjectLevel.setSubject(subject);
-        subjectLevel.setPriceForPerHour(dto.getPriceForPerHour());
+        setSubjectLevel(dto, subjectLevel);
         subjectLevelRepository.save(subjectLevel);
-        return new ApiResponse(SUCCESSFULLY, true);
+        return new ApiResponse(SUCCESSFULLY, true, subjectLevel);
     }
 
     @Override
     public ApiResponse delete(Integer integer) {
-        subjectLevelRepository.findById(integer).orElseThrow(() -> new RecordNotFoundException(SUBJECT_LEVEL_NOT_FOUND));
+        SubjectLevel subjectLevel = subjectLevelRepository.findById(integer).orElseThrow(() -> new RecordNotFoundException(SUBJECT_LEVEL_NOT_FOUND));
         subjectLevelRepository.deleteById(integer);
-        return new ApiResponse(DELETED, true);
+        return new ApiResponse(DELETED, true, subjectLevel);
     }
 
     public ApiResponse getAllByBranchId(Integer branchId) {
-        return new ApiResponse(subjectLevelRepository.findAllByBranchId(branchId, Sort.by(Sort.Direction.DESC,"id")), true);
+        return new ApiResponse(subjectLevelRepository.findAllByBranchId(branchId, Sort.by(Sort.Direction.DESC, "id")), true);
     }
 
     public SubjectLevel getBySubjectIdAndLevelId(Integer subjectId, Integer levelId) {

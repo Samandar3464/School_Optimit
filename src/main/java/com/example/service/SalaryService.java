@@ -32,16 +32,16 @@ public class SalaryService implements BaseService<SalaryRequest, String> {
         if (salaryRepository.findByUserPhoneNumberAndActiveTrue(salaryRequest.getPhoneNumber()).isPresent()) {
             throw new RecordAlreadyExistException(Constants.SALARY_ALREADY_EXISTS);
         }
-        Salary salary = Salary.toSalary(salaryRequest);
+        Salary salary = Salary.toCreate(salaryRequest);
         setSalaryForCreate(salaryRequest, salary);
         salaryRepository.save(salary);
-        return new ApiResponse(Constants.SUCCESSFULLY, true);
+        return new ApiResponse(Constants.SUCCESSFULLY, true, SalaryResponse.toResponse(salary));
     }
 
     private void setSalaryForCreate(SalaryRequest salaryRequest, Salary salary) {
         if (studentClassRepository.findByClassLeaderPhoneNumberAndActiveTrue(salaryRequest.getPhoneNumber()).isPresent()) {
-            salary.setClassLeaderSalary(500000);
-            salary.setSalary(salary.getSalary() + 500000);
+            salary.setClassLeaderSalary(salaryRequest.getClassLeaderSalary());
+            salary.setSalary(salary.getSalary() + salary.getClassLeaderSalary());
         }
         setSalary(salaryRequest, salary);
     }
@@ -59,15 +59,12 @@ public class SalaryService implements BaseService<SalaryRequest, String> {
         if (salary1.getDate().getDayOfMonth() != salary.getDate().getDayOfMonth()) {
             throw new RecordNotFoundException(Constants.DO_NOT_CHANGE);
         }
-        setSalaryForUpdateMethod(salaryRequest, salary);
+        salary.setId(salaryRequest.getId());
+        setSalary(salaryRequest, salary);
         salaryRepository.save(salary);
         return new ApiResponse(Constants.SUCCESSFULLY, true, SalaryResponse.toResponse(salary));
     }
 
-    private void setSalaryForUpdateMethod(SalaryRequest salaryRequest, Salary salary) {
-        salary.setId(salaryRequest.getId());
-        setSalary(salaryRequest, salary);
-    }
 
     @Override
     public ApiResponse delete(String phoneNumber) {
@@ -78,11 +75,17 @@ public class SalaryService implements BaseService<SalaryRequest, String> {
     }
 
     public ApiResponse giveCashAdvance(String phoneNumber, double cashSalary, PaymentType paymentType) {
+
         Salary salary = findByUserPhoneNumberAndActiveTrue(phoneNumber);
-        ApiResponse response = transactionForGiveCashAdvanceMethod(phoneNumber, cashSalary, paymentType, salary);
-        if (response != null) return response;
+
         setSalaryForGiveCashAdvanceMethod(cashSalary, salary);
+
+        ApiResponse response = transactionForGiveCashAdvanceMethod(phoneNumber, cashSalary, paymentType, salary);
+
+        if (response != null) return response;
+
         salaryRepository.save(salary);
+
         return new ApiResponse(Constants.SUCCESSFULLY, true, SalaryResponse.toResponse(salary));
     }
 
@@ -98,22 +101,36 @@ public class SalaryService implements BaseService<SalaryRequest, String> {
     }
 
     private void setSalaryForGiveCashAdvanceMethod(double cashSalary, Salary salary) {
+
         salary.setCashAdvance(salary.getCashAdvance() + cashSalary);
+
         salary.setGivenSalary(salary.getGivenSalary() + cashSalary);
+
         if (salary.getSalary() >= cashSalary) {
+
             salary.setSalary(salary.getSalary() - cashSalary);
+
         } else {
+
             throw new RecordNotFoundException(Constants.SALARY_NOT_ENOUGH);
+
         }
     }
 
     public ApiResponse givePartlySalary(String phoneNumber, double partlySalary, PaymentType paymentType) {
+
         Salary salary = findByUserPhoneNumberAndActiveTrue(phoneNumber);
-        ApiResponse response = transactionForGivePartlySalaryMethod(phoneNumber, partlySalary, paymentType, salary);
-        if (response != null) return response;
+
         setSalaryForGivePartlySalaryMethod(partlySalary, salary);
+
+        ApiResponse response = transactionForGivePartlySalaryMethod(phoneNumber, partlySalary, paymentType, salary);
+
+        if (response != null) return response;
+
         salaryRepository.save(salary);
+
         createNewSalary(salary);
+
         return new ApiResponse(Constants.SUCCESSFULLY, true, SalaryResponse.toResponse(salary));
     }
 
@@ -129,16 +146,23 @@ public class SalaryService implements BaseService<SalaryRequest, String> {
     }
 
     private void setSalaryForGivePartlySalaryMethod(double partlySalary, Salary salary) {
+
         salary.setPartlySalary(salary.getPartlySalary() + partlySalary);
+
         salary.setGivenSalary(salary.getGivenSalary() + partlySalary);
+
         if (salary.getSalary() >= partlySalary) {
+
             salary.setSalary(salary.getSalary() - partlySalary);
+
         } else {
+
             throw new RecordNotFoundException(Constants.SALARY_NOT_ENOUGH);
+
         }
+
         salary.setActive(false);
     }
-
 
     public ApiResponse giveSalary(String phoneNumber, boolean debtCollection, PaymentType paymentType) {
 
@@ -151,7 +175,7 @@ public class SalaryService implements BaseService<SalaryRequest, String> {
         }
         double salaryWithoutDebt = salary.getSalary() - salary.getAmountDebt();
 
-        if (salaryWithoutDebt >= 0) {
+        if (salaryWithoutDebt > 0) {
 
             ApiResponse response = getTransactionResponse(phoneNumber, salaryWithoutDebt, paymentType, salary, "Hodimga oylik berildi");
 
@@ -188,14 +212,23 @@ public class SalaryService implements BaseService<SalaryRequest, String> {
     }
 
     private void setSalaryForGiveDebtToEmployeeMethod(double debtAmount, Salary salary) {
+
         double money = salary.getSalary() - debtAmount;
+
         if (money >= 0) {
+
             salary.setSalary(money);
+
         } else {
+
             salary.setSalary(0);
+
             salary.setAmountDebt(salary.getAmountDebt() + Math.abs(money));
+
         }
+
         salary.setGivenSalary(salary.getGivenSalary() + debtAmount);
+
     }
 
     public ApiResponse debtRepayment(String phoneNumber) {
