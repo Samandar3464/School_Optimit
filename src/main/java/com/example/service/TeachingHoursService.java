@@ -8,8 +8,11 @@ import com.example.exception.RecordNotFoundException;
 import com.example.model.common.ApiResponse;
 import com.example.model.request.TeachingHoursRequest;
 import com.example.model.response.TeachingHoursResponse;
+import com.example.model.response.TeachingHoursResponseForPage;
 import com.example.repository.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
@@ -51,14 +54,16 @@ public class TeachingHoursService implements BaseService<TeachingHoursRequest, I
         return new ApiResponse(Constants.SUCCESSFULLY, true, response);
     }
 
-    public ApiResponse getByTeacherIdAndActiveTrue(Integer id) {
-        List<TeachingHoursResponse> response = TeachingHoursResponse.toAllResponse(teachingHoursRepository.findAllByTeacherIdAndActiveTrue(id, Sort.by(Sort.Direction.DESC, "id")));
-        return new ApiResponse(Constants.SUCCESSFULLY, true, response);
+    public ApiResponse getByTeacherIdAndActiveTrue(Integer id, int page, int size) {
+        Page<TeachingHours> all = teachingHoursRepository.findAllByTeacherIdAndActiveTrue(id, PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "id")));
+        List<TeachingHoursResponse> response = TeachingHoursResponse.toAllResponse(all.getContent());
+        return new ApiResponse(Constants.SUCCESSFULLY, true, new TeachingHoursResponseForPage(response, all.getTotalElements(), all.getTotalPages(), all.getNumber()));
     }
 
-    public ApiResponse getByTeacherIdAndDate(Integer teacherId, LocalDate startDay, LocalDate finishDay) {
-        List<TeachingHoursResponse> response = TeachingHoursResponse.toAllResponse(teachingHoursRepository.findAllByTeacherIdAndActiveTrueAndDateBetween(teacherId, startDay, finishDay, Sort.by(Sort.Direction.DESC, "id")));
-        return new ApiResponse(Constants.SUCCESSFULLY, true, response);
+    public ApiResponse getByTeacherIdAndDate(Integer teacherId, LocalDate startDay, LocalDate finishDay, int page, int size) {
+        Page<TeachingHours> all = teachingHoursRepository.findAllByTeacherIdAndActiveTrueAndDateBetween(teacherId, startDay, finishDay, PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "id")));
+        List<TeachingHoursResponse> response = TeachingHoursResponse.toAllResponse(all.getContent());
+        return new ApiResponse(Constants.SUCCESSFULLY, true, new TeachingHoursResponseForPage(response, all.getTotalElements(), all.getTotalPages(), all.getNumber()));
     }
 
     @Override

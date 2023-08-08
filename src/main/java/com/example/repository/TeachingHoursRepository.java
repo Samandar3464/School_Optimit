@@ -1,6 +1,8 @@
 package com.example.repository;
 
 import com.example.entity.TeachingHours;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -13,9 +15,9 @@ public interface TeachingHoursRepository extends JpaRepository<TeachingHours, In
 
     List<TeachingHours> findAllByActiveTrue();
 
-    List<TeachingHours> findAllByTeacherIdAndActiveTrue(Integer teacherId, Sort sort);
+    Page<TeachingHours> findAllByTeacherIdAndActiveTrue(Integer teacherId, Pageable pageable);
 
-    List<TeachingHours> findAllByTeacherIdAndActiveTrueAndDateBetween(Integer teacher_id, LocalDate date, LocalDate date2, Sort sort);
+    Page<TeachingHours> findAllByTeacherIdAndActiveTrueAndDateBetween(Integer teacher_id, LocalDate date, LocalDate date2, Pageable pageable);
 
     Optional<TeachingHours> findByIdAndActiveTrue(Integer integer);
 
