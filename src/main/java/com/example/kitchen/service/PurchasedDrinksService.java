@@ -49,8 +49,8 @@ public class PurchasedDrinksService implements BaseService<PurchasedDrinksReques
         rollBackPurchasedDrinks(findById(request.getId()));
         checkingWarehouseAndSetPurchasedDrinks(request);
         PurchasedDrinks purchasedDrinks = PurchasedDrinks.toEntity(request);
-        setPurchasedDrinks(request, purchasedDrinks);
         purchasedDrinks.setId(request.getId());
+        setPurchasedDrinks(request, purchasedDrinks);
         purchasedDrinksRepository.save(purchasedDrinks);
         return new ApiResponse(Constants.SUCCESSFULLY, true, PurchasedDrinksResponse.toResponse(purchasedDrinks));
     }
@@ -60,8 +60,8 @@ public class PurchasedDrinksService implements BaseService<PurchasedDrinksReques
     public ApiResponse delete(Integer integer) {
         PurchasedDrinks purchasedDrinks = findById(integer);
         purchasedDrinks.setActive(false);
-        purchasedDrinksRepository.save(purchasedDrinks);
         rollBackPurchasedDrinks(purchasedDrinks);
+        purchasedDrinksRepository.save(purchasedDrinks);
         return new ApiResponse(Constants.DELETED, true, PurchasedDrinksResponse.toResponse(purchasedDrinks));
     }
 
@@ -78,8 +78,8 @@ public class PurchasedDrinksService implements BaseService<PurchasedDrinksReques
         DrinksInWareHouse drinksInWareHouse = drinksInWareHouseRepository.findByNameAndLiterQuantityAndBranchIdAndWarehouseIdAndActiveTrue(purchasedDrinks.getName(), purchasedDrinks.getLiterQuantity(), purchasedDrinks.getBranch().getId(), purchasedDrinks.getWarehouse().getId()).orElseThrow(() -> new RecordNotFoundException(Constants.DRINKS_IN_WAREHOUSE_NOT_FOUND));
         drinksInWareHouse.setTotalPrice(drinksInWareHouse.getTotalPrice() - purchasedDrinks.getTotalPrice());
         drinksInWareHouse.setCount(drinksInWareHouse.getCount() - purchasedDrinks.getCount());
-        drinksInWareHouseRepository.save(drinksInWareHouse);
         checkingWarehouseIfValid(drinksInWareHouse);
+        drinksInWareHouseRepository.save(drinksInWareHouse);
     }
 
     private void setPurchasedDrinks(PurchasedDrinksRequest request, PurchasedDrinks purchasedDrinks) {
