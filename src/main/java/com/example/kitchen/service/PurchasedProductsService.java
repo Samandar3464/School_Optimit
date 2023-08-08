@@ -44,30 +44,34 @@ public class PurchasedProductsService implements BaseService<PurchasedProductsRe
     }
 
     @Override
+    @ExceptionHandler(RecordNotFoundException.class)
     public ApiResponse update(PurchasedProductsRequest request) {
         PurchasedProducts old = findById(request.getId());
         PurchasedProducts purchasedProducts = PurchasedProducts.toEntity(request);
         purchasedProducts.setId(request.getId());
         setPurchasedProducts(request, purchasedProducts);
-        updateInWarehouse(old, request);
+        rollBackPurchasedProducts(old);
+        checkingPurchasedProductsAndSetInWarehouse(request);
         purchasedProductsRepository.save(purchasedProducts);
         return new ApiResponse(Constants.SUCCESSFULLY, true, PurchasedProductsResponse.toResponse(purchasedProducts));
     }
 
     @Override
+    @ExceptionHandler(RecordNotFoundException.class)
     public ApiResponse delete(Integer integer) {
         PurchasedProducts purchasedProducts = findById(integer);
         purchasedProductsRepository.delete(purchasedProducts);
+        rollBackPurchasedProducts(purchasedProducts);
         return new ApiResponse(Constants.SUCCESSFULLY, true, PurchasedProductsResponse.toResponse(purchasedProducts));
     }
 
-    @ExceptionHandler(RecordNotFoundException.class)
-    private void updateInWarehouse(PurchasedProducts old, PurchasedProductsRequest request) {
+
+    private void rollBackPurchasedProducts(PurchasedProducts old) {
         ProductsInWareHouse productsInWareHouse = productsInWareHouseRepository.findByNameAndMeasurementTypeAndBranchIdAndWarehouseIdAndActiveTrue(old.getName(), old.getMeasurementType(), old.getBranch().getId(), old.getWarehouse().getId()).orElseThrow(() -> new RecordNotFoundException(Constants.PRODUCTS_IN_WAREHOUSE_NOT_FOUND));
         productsInWareHouse.setTotalPrice(productsInWareHouse.getTotalPrice() - old.getTotalPrice());
         productsInWareHouse.setQuantity(productsInWareHouse.getQuantity() - old.getQuantity());
         productsInWareHouseRepository.save(productsInWareHouse);
-        checkingPurchasedProductsAndSetInWarehouse(request);
+        checkingForValid(productsInWareHouse);
     }
 
     private void checkingPurchasedProductsAndSetInWarehouse(PurchasedProductsRequest request) {
@@ -76,8 +80,12 @@ public class PurchasedProductsService implements BaseService<PurchasedProductsRe
             productsInWareHouse.get().setTotalPrice(productsInWareHouse.get().getTotalPrice() + request.getTotalPrice());
             productsInWareHouse.get().setQuantity(productsInWareHouse.get().getQuantity() + request.getQuantity());
             productsInWareHouseRepository.save(productsInWareHouse.get());
+            checkingForValid(productsInWareHouse.get());
         }
-        if (productsInWareHouse.get().getQuantity() < 0 || productsInWareHouse.get().getTotalPrice() < 0) {
+    }
+
+    private static void checkingForValid(ProductsInWareHouse productsInWareHouse) {
+        if (productsInWareHouse.getQuantity() < 0 || productsInWareHouse.getTotalPrice() < 0) {
             throw new RecordNotFoundException(Constants.PRODUCT_NOT_ENOUGH_QUANTITY);
         }
     }

@@ -48,14 +48,14 @@ public class PurchasedDrinks {
     public static PurchasedDrinks toEntity(PurchasedDrinksRequest request) {
         return PurchasedDrinks
                 .builder()
-                .count(request.getCount())
-                .unitPrice(request.getUnitPrice())
-                .totalPrice(request.getTotalPrice())
-                .literQuantity(request.getLiterQuantity())
-                .description(request.getDescription())
                 .active(true)
                 .name(request.getName())
+                .count(request.getCount())
+                .unitPrice(request.getUnitPrice())
                 .localDateTime(LocalDateTime.now())
+                .totalPrice(request.getTotalPrice())
+                .description(request.getDescription())
+                .literQuantity(request.getLiterQuantity())
                 .build();
     }
 }

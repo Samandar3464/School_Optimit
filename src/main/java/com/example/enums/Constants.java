@@ -128,4 +128,7 @@ public class Constants {
     public static final String DAILY_DRINKS_NOT_FOUND = "DAILY_DRINKS_NOT_FOUND";
     public static final String PURCHASED_PRODUCTS_NOT_FOUND = "PURCHASED_PRODUCTS_NOT_FOUND";
     public static final String PRODUCTS_IN_WAREHOUSE_NOT_FOUND = "PRODUCTS_IN_WAREHOUSE_NOT_FOUND";
+    public static final String DRINKS_IN_WAREHOUSE_NOT_FOUND = "DRINKS_IN_WAREHOUSE_NOT_FOUND";
+    public static final String PURCHASED_DRINKS_NOT_FOUND = "PURCHASED_DRINKS_NOT_FOUND";
+    public static final String DRINKS_IN_WAREHOUSE_NOT_ENOUGH = "DRINKS_IN_WAREHOUSE_NOT_ENOUGH";
 }
