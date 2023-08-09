@@ -1,9 +1,12 @@
 package com.example.kitchen.service;
 
+import com.example.entity.Branch;
+import com.example.entity.User;
 import com.example.enums.Constants;
 import com.example.exception.RecordNotFoundException;
 import com.example.kitchen.entity.ProductsInWareHouse;
 import com.example.kitchen.entity.PurchasedProducts;
+import com.example.kitchen.entity.Warehouse;
 import com.example.kitchen.model.Response.PurchasedProductsResponse;
 import com.example.kitchen.model.request.PurchasedProductsRequest;
 import com.example.kitchen.repository.ProductsInWareHouseRepository;
@@ -69,7 +72,9 @@ public class PurchasedProductsService implements BaseService<PurchasedProductsRe
 
 
     private void rollBackPurchasedProducts(PurchasedProducts old) {
-        ProductsInWareHouse productsInWareHouse = productsInWareHouseRepository.findByNameAndMeasurementTypeAndBranchIdAndWarehouseIdAndActiveTrue(old.getName(), old.getMeasurementType(), old.getBranch().getId(), old.getWarehouse().getId()).orElseThrow(() -> new RecordNotFoundException(Constants.PRODUCTS_IN_WAREHOUSE_NOT_FOUND));
+        ProductsInWareHouse productsInWareHouse = productsInWareHouseRepository
+                .findByNameAndMeasurementTypeAndBranchIdAndWarehouseIdAndActiveTrue(old.getName(), old.getMeasurementType(), old.getBranch().getId(), old.getWarehouse().getId())
+                .orElseThrow(() -> new RecordNotFoundException(Constants.PRODUCTS_IN_WAREHOUSE_NOT_FOUND));
         productsInWareHouse.setTotalPrice(productsInWareHouse.getTotalPrice() - old.getTotalPrice());
         productsInWareHouse.setQuantity(productsInWareHouse.getQuantity() - old.getQuantity());
         checkingForValid(productsInWareHouse);
@@ -77,7 +82,9 @@ public class PurchasedProductsService implements BaseService<PurchasedProductsRe
     }
 
     private void checkingPurchasedProductsAndSetInWarehouse(PurchasedProductsRequest request) {
-        Optional<ProductsInWareHouse> productsInWareHouse = productsInWareHouseRepository.findByNameAndMeasurementTypeAndBranchIdAndWarehouseIdAndActiveTrue(request.getName(), request.getMeasurementType(), request.getBranchId(), request.getWarehouseId());
+        Optional<ProductsInWareHouse> productsInWareHouse = productsInWareHouseRepository
+                .findByNameAndMeasurementTypeAndBranchIdAndWarehouseIdAndActiveTrue(request.getName(), request.getMeasurementType(), request.getBranchId(), request.getWarehouseId());
+
         if (productsInWareHouse.isPresent()) {
             productsInWareHouse.get().setTotalPrice(productsInWareHouse.get().getTotalPrice() + request.getTotalPrice());
             productsInWareHouse.get().setQuantity(productsInWareHouse.get().getQuantity() + request.getQuantity());
@@ -92,12 +99,20 @@ public class PurchasedProductsService implements BaseService<PurchasedProductsRe
     }
 
     private void setPurchasedProducts(PurchasedProductsRequest request, PurchasedProducts purchasedProducts) {
-        purchasedProducts.setBranch(branchRepository.findByIdAndDeleteFalse(request.getBranchId()).orElseThrow(() -> new RecordNotFoundException(Constants.BRANCH_NOT_FOUND)));
-        purchasedProducts.setEmployee(userRepository.findByIdAndBlockedFalse(request.getEmployeeId()).orElseThrow(() -> new RecordNotFoundException(Constants.USER_NOT_FOUND)));
-        purchasedProducts.setWarehouse(wareHouseRepository.findByIdAndActiveTrue(request.getWarehouseId()).orElseThrow(() -> new RecordNotFoundException(Constants.WAREHOUSE_NOT_FOUND)));
+        Branch branch = branchRepository.findByIdAndDeleteFalse(request.getBranchId())
+                .orElseThrow(() -> new RecordNotFoundException(Constants.BRANCH_NOT_FOUND));
+        User user = userRepository.findByIdAndBlockedFalse(request.getEmployeeId())
+                .orElseThrow(() -> new RecordNotFoundException(Constants.USER_NOT_FOUND));
+        Warehouse warehouse = wareHouseRepository.findByIdAndActiveTrue(request.getWarehouseId())
+                .orElseThrow(() -> new RecordNotFoundException(Constants.WAREHOUSE_NOT_FOUND));
+
+        purchasedProducts.setBranch(branch);
+        purchasedProducts.setEmployee(user);
+        purchasedProducts.setWarehouse(warehouse);
     }
 
     private PurchasedProducts findById(Integer integer) {
-        return purchasedProductsRepository.findByIdAndActiveTrue(integer).orElseThrow(() -> new RecordNotFoundException(Constants.PURCHASED_PRODUCTS_NOT_FOUND));
+        return purchasedProductsRepository.findByIdAndActiveTrue(integer)
+                .orElseThrow(() -> new RecordNotFoundException(Constants.PURCHASED_PRODUCTS_NOT_FOUND));
     }
 }
