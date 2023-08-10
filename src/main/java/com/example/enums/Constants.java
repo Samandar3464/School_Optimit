@@ -131,4 +131,5 @@ public class Constants {
     public static final String DRINKS_IN_WAREHOUSE_NOT_FOUND = "DRINKS_IN_WAREHOUSE_NOT_FOUND";
     public static final String PURCHASED_DRINKS_NOT_FOUND = "PURCHASED_DRINKS_NOT_FOUND";
     public static final String DRINKS_IN_WAREHOUSE_NOT_ENOUGH = "DRINKS_IN_WAREHOUSE_NOT_ENOUGH";
+    public static final String CONSUMED_PRODUCTS_NOT_FOUND = "CONSUMED_PRODUCTS_NOT_FOUND";
 }

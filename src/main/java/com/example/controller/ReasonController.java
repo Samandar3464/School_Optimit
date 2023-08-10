@@ -18,9 +18,9 @@
 //    public ApiResponse create(@ModelAttribute ReasonRequestDto reasonRequestDto) {
 //        return reasonService.create(reasonRequestDto);
 //    }
-//    @GetMapping("/getById/{id}")
-//    public ApiResponse getById(@PathVariable Integer id) {
-//        return reasonService.getById(id);
+//    @GetMapping("/findByIdAndActiveTrue/{id}")
+//    public ApiResponse findByIdAndActiveTrue(@PathVariable Integer id) {
+//        return reasonService.findByIdAndActiveTrue(id);
 //    }
 //
 //    @DeleteMapping("/delete/{id}")

@@ -3,7 +3,6 @@ package com.example.kitchen.entity;
 import com.example.entity.Branch;
 import com.example.entity.User;
 import com.example.enums.MeasurementType;
-import com.example.kitchen.model.request.DailyConsumedProductsRequest;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -41,16 +40,4 @@ public class DailyConsumedProducts {
 
     @ManyToOne
     private Warehouse warehouse;
-
-    public static DailyConsumedProducts toEntity(DailyConsumedProductsRequest request){
-        return DailyConsumedProducts
-                .builder()
-                .name(request.getName())
-                .active(true)
-                .quantity(request.getQuantity())
-                .description(request.getDescription())
-                .localDateTime(LocalDateTime.now())
-                .measurementType(request.getMeasurementType())
-                .build();
-    }
 }

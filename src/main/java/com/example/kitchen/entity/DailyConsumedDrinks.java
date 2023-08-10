@@ -2,7 +2,6 @@ package com.example.kitchen.entity;
 
 import com.example.entity.Branch;
 import com.example.entity.User;
-import com.example.kitchen.model.request.DailyConsumedDrinksRequest;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -40,16 +39,4 @@ public class DailyConsumedDrinks {
 
     @ManyToOne
     private Warehouse warehouse;
-
-    public static DailyConsumedDrinks toEntity(DailyConsumedDrinksRequest request) {
-        return DailyConsumedDrinks
-                .builder()
-                .name(request.getName())
-                .description(request.getDescription())
-                .literQuantity(request.getLiterQuantity())
-                .count(request.getCount())
-                .localDateTime(LocalDateTime.now())
-                .active(true)
-                .build();
-    }
 }

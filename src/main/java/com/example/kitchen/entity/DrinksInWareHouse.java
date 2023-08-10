@@ -1,7 +1,6 @@
 package com.example.kitchen.entity;
 
 import com.example.entity.Branch;
-import com.example.kitchen.model.request.DrinksInWareHouseRequest;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -32,15 +31,4 @@ public class DrinksInWareHouse {
 
     @ManyToOne
     private Warehouse warehouse;
-
-    public static DrinksInWareHouse toEntity(DrinksInWareHouseRequest request) {
-        return DrinksInWareHouse
-                .builder()
-                .active(true)
-                .name(request.getName())
-                .count(request.getCount())
-                .totalPrice(request.getTotalPrice())
-                .literQuantity(request.getLiterQuantity())
-                .build();
-    }
 }

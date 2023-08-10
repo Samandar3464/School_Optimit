@@ -7,25 +7,23 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/v1/wareHouse/")
+@RequestMapping("/api/v1/wareHouses")
 @RequiredArgsConstructor
-public class WareHouseController implements BaseController<WareHouseRequest, Integer> {
+public class WareHouseController {
 
     private final WareHouseService wareHouseService;
 
-    @Override
-    @PostMapping("create")
+    @PostMapping
     public ApiResponse create(@RequestBody WareHouseRequest wareHouseRequest) {
         return wareHouseService.create(wareHouseRequest);
     }
 
-    @Override
-    @GetMapping("getById/{id}")
-    public ApiResponse getById(@PathVariable Integer id) {
-        return wareHouseService.getById(id);
+    @GetMapping("{wareHouseId}")
+    public ApiResponse getById(@PathVariable Integer wareHouseId) {
+        return wareHouseService.getById(wareHouseId);
     }
 
-    @GetMapping("getAll")
+    @GetMapping("getAllWareHouses")
     public ApiResponse getAll(@RequestParam(name = "page", defaultValue = "0") int page,
                               @RequestParam(value = "size", defaultValue = "5") int size) {
         return wareHouseService.getAll(page, size);
@@ -38,15 +36,13 @@ public class WareHouseController implements BaseController<WareHouseRequest, Int
         return wareHouseService.getAllByBranchId(branchId, page, size);
     }
 
-    @Override
-    @PutMapping("update")
+    @PutMapping
     public ApiResponse update(@RequestBody WareHouseRequest wareHouseRequest) {
         return wareHouseService.update(wareHouseRequest);
     }
 
-    @Override
-    @DeleteMapping("delete/{id}")
-    public ApiResponse delete(@PathVariable Integer id) {
-        return wareHouseService.delete(id);
+    @DeleteMapping("{wareHouseId}")
+    public ApiResponse delete(@PathVariable Integer wareHouseId) {
+        return wareHouseService.delete(wareHouseId);
     }
 }

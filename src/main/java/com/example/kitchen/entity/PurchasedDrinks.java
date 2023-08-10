@@ -2,7 +2,6 @@ package com.example.kitchen.entity;
 
 import com.example.entity.Branch;
 import com.example.entity.User;
-import com.example.kitchen.model.request.PurchasedDrinksRequest;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -44,18 +43,4 @@ public class PurchasedDrinks {
 
     @ManyToOne
     private Warehouse warehouse;
-
-    public static PurchasedDrinks toEntity(PurchasedDrinksRequest request) {
-        return PurchasedDrinks
-                .builder()
-                .active(true)
-                .name(request.getName())
-                .count(request.getCount())
-                .unitPrice(request.getUnitPrice())
-                .localDateTime(LocalDateTime.now())
-                .totalPrice(request.getTotalPrice())
-                .description(request.getDescription())
-                .literQuantity(request.getLiterQuantity())
-                .build();
-    }
 }
