@@ -2,7 +2,6 @@ package com.example.kitchen.service;
 
 import com.example.entity.Branch;
 import com.example.enums.Constants;
-import com.example.enums.MeasurementType;
 import com.example.exception.RecordNotFoundException;
 import com.example.kitchen.entity.DailyConsumedProducts;
 import com.example.kitchen.entity.ProductsInWareHouse;
@@ -52,7 +51,6 @@ public class ProductsInWareHouseService {
 
         if (productsInWareHouseOptional.isPresent()) {
             ProductsInWareHouse productsInWareHouse = productsInWareHouseOptional.get();
-            productsInWareHouse.setTotalPrice(productsInWareHouse.getTotalPrice() + request.getTotalPrice());
             productsInWareHouse.setQuantity(productsInWareHouse.getQuantity() + request.getQuantity());
             productsInWareHouseRepository.save(productsInWareHouse);
         } else {
@@ -78,7 +76,6 @@ public class ProductsInWareHouseService {
                         old.getWarehouse().getId())
                 .orElseThrow(() -> new RecordNotFoundException(Constants.PRODUCTS_IN_WAREHOUSE_NOT_FOUND));
 
-        productsInWareHouse.setTotalPrice(productsInWareHouse.getTotalPrice() - old.getTotalPrice());
         productsInWareHouse.setQuantity(productsInWareHouse.getQuantity() - old.getQuantity());
         return productsInWareHouseRepository.save(productsInWareHouse);
     }
@@ -86,25 +83,25 @@ public class ProductsInWareHouseService {
     public ApiResponse findByIdAndActiveTrue(Integer productInWarehouseId) {
         ProductsInWareHouse productsInWareHouse =
                 productsInWareHouseRepository.findByIdAndActiveTrue(productInWarehouseId)
-                .orElseThrow(() -> new RecordNotFoundException(Constants.PRODUCTS_IN_WAREHOUSE_NOT_FOUND));
+                        .orElseThrow(() -> new RecordNotFoundException(Constants.PRODUCTS_IN_WAREHOUSE_NOT_FOUND));
         ProductsInWareHouseResponse wareHouseResponse =
                 modelMapper.map(productsInWareHouse, ProductsInWareHouseResponse.class);
         return new ApiResponse(Constants.SUCCESSFULLY, true, wareHouseResponse);
     }
 
-    public ApiResponse findAllByWarehouseIdAndActiveTrue(int page, int size, Integer wareHouseID) {
+    public ApiResponse findAllByWarehouseIdAndActiveTrue(Integer wareHouseID, int page, int size) {
+        List<ProductsInWareHouseResponse> wareHouseResponses = new ArrayList<>();
         Page<ProductsInWareHouse> all = productsInWareHouseRepository
                 .findAllByWarehouseIdAndActiveTrue(wareHouseID, PageRequest.of(page, size));
-        List<ProductsInWareHouseResponse> wareHouseResponses = new ArrayList<>();
         all.map(productsInWareHouse ->
                 wareHouseResponses.add(modelMapper.map(productsInWareHouse, ProductsInWareHouseResponse.class)));
         return new ApiResponse(Constants.SUCCESSFULLY, true, wareHouseResponses);
     }
 
     public ApiResponse getAllByBranchId(Integer branchId, int page, int size) {
+        List<ProductsInWareHouseResponse> wareHouseResponses = new ArrayList<>();
         Page<ProductsInWareHouse> all = productsInWareHouseRepository
                 .findAllByBranchIdAndActiveTrue(branchId, PageRequest.of(page, size));
-        List<ProductsInWareHouseResponse> wareHouseResponses = new ArrayList<>();
         all.map(productsInWareHouse ->
                 wareHouseResponses.add(modelMapper.map(productsInWareHouse, ProductsInWareHouseResponse.class)));
         return new ApiResponse(Constants.SUCCESSFULLY, true, wareHouseResponses);
@@ -130,9 +127,7 @@ public class ProductsInWareHouseService {
                         request.getWarehouseId())
                 .orElseThrow(() -> new RecordNotFoundException(Constants.CONSUMED_PRODUCTS_NOT_FOUND));
 
-        double unitPrice = productsInWareHouse.getTotalPrice() / productsInWareHouse.getQuantity();
         productsInWareHouse.setQuantity(productsInWareHouse.getQuantity() - request.getQuantity());
-        productsInWareHouse.setTotalPrice(productsInWareHouse.getTotalPrice() - (request.getQuantity() * unitPrice));
         checkingForValid(productsInWareHouse);
         if (productsInWareHouse.getQuantity() == 0) {
             productsInWareHouse.setActive(false);
@@ -149,15 +144,12 @@ public class ProductsInWareHouseService {
                         consumedProducts.getWarehouse().getId())
                 .orElseThrow(() -> new RecordNotFoundException(Constants.CONSUMED_PRODUCTS_NOT_FOUND));
 
-        double unitPrice = productsInWareHouse.getTotalPrice() / productsInWareHouse.getQuantity();
         productsInWareHouse.setQuantity(productsInWareHouse.getQuantity() + consumedProducts.getQuantity());
-        productsInWareHouse.setTotalPrice(productsInWareHouse.getTotalPrice() + (consumedProducts.getQuantity() * unitPrice));
-        checkingForValid(productsInWareHouse);
         productsInWareHouseRepository.save(productsInWareHouse);
     }
 
     public void checkingForValid(ProductsInWareHouse productsInWareHouse) {
-        if (productsInWareHouse.getQuantity() < 0 || productsInWareHouse.getTotalPrice() < 0) {
+        if (productsInWareHouse.getQuantity() < 0) {
             throw new RecordNotFoundException(Constants.PRODUCT_NOT_ENOUGH_QUANTITY);
         }
     }

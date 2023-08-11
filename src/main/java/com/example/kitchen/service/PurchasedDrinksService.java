@@ -42,14 +42,16 @@ public class PurchasedDrinksService implements BaseService<PurchasedDrinksReques
         PurchasedDrinks purchasedDrinks = modelMapper.map(request, PurchasedDrinks.class);
         setPurchasedDrinks(request, purchasedDrinks);
         purchasedDrinksRepository.save(purchasedDrinks);
-        PurchasedDrinksResponse response = modelMapper.map(purchasedDrinks, PurchasedDrinksResponse.class);
+        PurchasedDrinksResponse response =
+                modelMapper.map(purchasedDrinks, PurchasedDrinksResponse.class);
         return new ApiResponse(Constants.SUCCESSFULLY, true, response);
     }
 
     @Override
     public ApiResponse getById(Integer id) {
         PurchasedDrinks purchasedDrinks = getByPurchasedDrinksId(id);
-        PurchasedDrinksResponse response = modelMapper.map(purchasedDrinks, PurchasedDrinksResponse.class);
+        PurchasedDrinksResponse response =
+                modelMapper.map(purchasedDrinks, PurchasedDrinksResponse.class);
         return new ApiResponse(Constants.SUCCESSFULLY, true, response);
     }
 
@@ -61,7 +63,8 @@ public class PurchasedDrinksService implements BaseService<PurchasedDrinksReques
         purchasedDrinks.setId(request.getId());
         setPurchasedDrinks(request, purchasedDrinks);
         purchasedDrinksRepository.save(purchasedDrinks);
-        PurchasedDrinksResponse response = modelMapper.map(purchasedDrinks, PurchasedDrinksResponse.class);
+        PurchasedDrinksResponse response =
+                modelMapper.map(purchasedDrinks, PurchasedDrinksResponse.class);
         return new ApiResponse(Constants.SUCCESSFULLY, true, response);
     }
 
@@ -76,11 +79,13 @@ public class PurchasedDrinksService implements BaseService<PurchasedDrinksReques
     @Transactional(rollbackFor = {Exception.class, RecordNotFoundException.class})
     public ApiResponse delete(Integer integer) {
         PurchasedDrinks purchasedDrinks = getByPurchasedDrinksId(integer);
-        DrinksInWareHouse drinksInWareHouse = drinksInWareHouseService.rollBackPurchasedDrinks(purchasedDrinks);
+        DrinksInWareHouse drinksInWareHouse = drinksInWareHouseService
+                .rollBackPurchasedDrinks(purchasedDrinks);
         checkingWarehouseIfValid(drinksInWareHouse);
         purchasedDrinks.setActive(false);
         purchasedDrinksRepository.save(purchasedDrinks);
-        PurchasedDrinksResponse response = modelMapper.map(purchasedDrinks, PurchasedDrinksResponse.class);
+        PurchasedDrinksResponse response =
+                modelMapper.map(purchasedDrinks, PurchasedDrinksResponse.class);
         return new ApiResponse(Constants.DELETED, true, response);
     }
 
@@ -100,7 +105,7 @@ public class PurchasedDrinksService implements BaseService<PurchasedDrinksReques
     }
 
     private void checkingWarehouseIfValid(DrinksInWareHouse drinksInWareHouse) {
-        if (drinksInWareHouse.getCount() < 0 || drinksInWareHouse.getTotalPrice() < 0) {
+        if (drinksInWareHouse.getCount() < 0) {
             throw new RecordNotFoundException(Constants.DRINKS_IN_WAREHOUSE_NOT_ENOUGH);
         }
     }
@@ -111,16 +116,18 @@ public class PurchasedDrinksService implements BaseService<PurchasedDrinksReques
     }
 
     public ApiResponse getAllByWarehouseId(Integer warehouseId, int page, int size) {
-        Page<PurchasedDrinks> all = purchasedDrinksRepository.findAllByWarehouseIdAndActiveTrue(warehouseId, PageRequest.of(page, size));
         List<PurchasedDrinksResponse> responses = new ArrayList<>();
-        all.map(purchasedDrinks -> responses.add(modelMapper.map(purchasedDrinks, PurchasedDrinksResponse.class)));
+        Page<PurchasedDrinks> all = purchasedDrinksRepository
+                .findAllByWarehouseIdAndActiveTrue(warehouseId, PageRequest.of(page, size));
+        all.map(purchasedDrinks ->
+                responses.add(modelMapper.map(purchasedDrinks, PurchasedDrinksResponse.class)));
         return new ApiResponse(Constants.SUCCESSFULLY, true, responses);
     }
 
     public ApiResponse getAllByBranchId(Integer branchId, int page, int size) {
+        List<PurchasedDrinksResponse> responses = new ArrayList<>();
         Page<PurchasedDrinks> all = purchasedDrinksRepository
                 .findAllByBranch_IdAndActiveTrue(branchId, PageRequest.of(page, size));
-        List<PurchasedDrinksResponse> responses = new ArrayList<>();
         all.map(purchasedDrinks ->
                 responses.add(modelMapper.map(purchasedDrinks, PurchasedDrinksResponse.class)));
         return new ApiResponse(Constants.SUCCESSFULLY, true, responses);

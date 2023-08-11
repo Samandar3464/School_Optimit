@@ -14,8 +14,6 @@ public class ProductsInWareHouseResponse {
 
     private double quantity;
 
-    private double totalPrice;
-
     private MeasurementType measurementType;
 
     private boolean active;

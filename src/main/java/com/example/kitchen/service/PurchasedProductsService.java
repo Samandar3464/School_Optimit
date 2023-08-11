@@ -45,6 +45,7 @@ public class PurchasedProductsService implements BaseService<PurchasedProductsRe
         purchasedProductsRepository.save(purchasedProducts);
         PurchasedProductsResponse response =
                 modelMapper.map(purchasedProducts, PurchasedProductsResponse.class);
+        response.setLocalDateTime(purchasedProducts.getLocalDateTime());
         return new ApiResponse(Constants.SUCCESSFULLY, true, response);
     }
 
@@ -53,6 +54,7 @@ public class PurchasedProductsService implements BaseService<PurchasedProductsRe
         PurchasedProducts purchasedProducts = getByPurchasedProductId(integer);
         PurchasedProductsResponse response =
                 modelMapper.map(purchasedProducts, PurchasedProductsResponse.class);
+        response.setLocalDateTime(purchasedProducts.getLocalDateTime());
         return new ApiResponse(Constants.SUCCESSFULLY, true, response);
     }
 
@@ -86,10 +88,9 @@ public class PurchasedProductsService implements BaseService<PurchasedProductsRe
 
         ProductsInWareHouse productsInWareHouse =
                 productsInWareHouseService.rollBackPurchasedProducts(purchasedProducts);
-        productsInWareHouseService.checkingForValid(productsInWareHouse);
-
         PurchasedProductsResponse response =
                 modelMapper.map(purchasedProducts, PurchasedProductsResponse.class);
+        productsInWareHouseService.checkingForValid(productsInWareHouse);
         return new ApiResponse(Constants.SUCCESSFULLY, true, response);
     }
 
@@ -116,8 +117,11 @@ public class PurchasedProductsService implements BaseService<PurchasedProductsRe
         List<PurchasedProductsResponse> responses = new ArrayList<>();
         Page<PurchasedProducts> all = purchasedProductsRepository
                 .findAllByWarehouseIdAndActiveTrue(warehouseId, PageRequest.of(page, size));
-        all.map(purchasedProducts ->
-                responses.add(modelMapper.map(purchasedProducts, PurchasedProductsResponse.class)));
+        all.forEach(purchasedProducts -> {
+            PurchasedProductsResponse response = modelMapper.map(purchasedProducts, PurchasedProductsResponse.class);
+            response.setLocalDateTime(purchasedProducts.getLocalDateTime());
+            responses.add(response);
+        });
         return new ApiResponse(Constants.SUCCESSFULLY, true, responses);
     }
 
@@ -125,8 +129,11 @@ public class PurchasedProductsService implements BaseService<PurchasedProductsRe
         List<PurchasedProductsResponse> responses = new ArrayList<>();
         Page<PurchasedProducts> all = purchasedProductsRepository
                 .findAllByBranch_IdAndActiveTrue(branchId, PageRequest.of(page, size));
-        all.map(purchasedProducts ->
-                responses.add(modelMapper.map(purchasedProducts, PurchasedProductsResponse.class)));
+        all.forEach(purchasedProducts -> {
+            PurchasedProductsResponse response = modelMapper.map(purchasedProducts, PurchasedProductsResponse.class);
+            response.setLocalDateTime(purchasedProducts.getLocalDateTime());
+            responses.add(response);
+        });
         return new ApiResponse(Constants.SUCCESSFULLY, true, responses);
     }
 }

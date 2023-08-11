@@ -39,7 +39,7 @@ public class WareHouseService implements BaseService<WareHouseRequest, Integer> 
 
     private void setWarehouse(WareHouseRequest wareHouseRequest, Warehouse warehouse) {
         Branch branch = branchRepository.findByIdAndDeleteFalse(wareHouseRequest.getBranchId())
-                .orElseThrow(() -> new RecordNotFoundException(Constants.WAREHOUSE_NOT_FOUND));
+                .orElseThrow(() -> new RecordNotFoundException(Constants.BRANCH_NOT_FOUND));
         warehouse.setBranch(branch);
         warehouse.setActive(true);
     }

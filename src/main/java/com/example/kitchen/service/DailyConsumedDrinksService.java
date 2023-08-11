@@ -31,4 +31,12 @@ public class DailyConsumedDrinksService implements BaseService<DailyConsumedDrin
     public ApiResponse delete(Integer integer) {
         return null;
     }
+
+    public ApiResponse getAllByBranchId(Integer branchId, int page, int size) {
+        return null;
+    }
+
+    public ApiResponse getAllByWarehouseId(Integer warehouseId, int page, int size) {
+        return null;
+    }
 }

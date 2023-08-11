@@ -19,14 +19,14 @@ public class ProductsInWarehouseController {
 
     @GetMapping("getAllByWarehouseId/{warehouseId}")
     public ApiResponse getAllProductsInWarehouseByWarehouseId(@RequestParam(name = "page", defaultValue = "0") int page,
-                                           @RequestParam(value = "size", defaultValue = "5") int size,
-                                           @PathVariable Integer warehouseId) {
+                                                              @RequestParam(name = "size", defaultValue = "5") int size,
+                                                              @PathVariable Integer warehouseId) {
         return productsInWareHouseService.findAllByWarehouseIdAndActiveTrue(warehouseId, page, size);
     }
 
     @GetMapping("getAllByBranchId/{branchId}")
     public ApiResponse getAllByBranchIdId(@RequestParam(name = "page", defaultValue = "0") int page,
-                                          @RequestParam(value = "size", defaultValue = "5") int size,
+                                          @RequestParam(name = "size", defaultValue = "5") int size,
                                           @PathVariable Integer branchId) {
         return productsInWareHouseService.getAllByBranchId(branchId, page, size);
     }

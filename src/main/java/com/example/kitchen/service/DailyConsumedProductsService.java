@@ -15,10 +15,14 @@ import com.example.repository.BranchRepository;
 import com.example.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -35,7 +39,8 @@ public class DailyConsumedProductsService implements BaseService<DailyConsumedPr
     @Transactional(rollbackFor = {RecordNotFoundException.class, Exception.class})
     public ApiResponse create(DailyConsumedProductsRequest request) {
         productsInWareHouseService.consumedProducts(request);
-        DailyConsumedProducts consumedProducts = modelMapper.map(request, DailyConsumedProducts.class);
+        DailyConsumedProducts consumedProducts =
+                modelMapper.map(request, DailyConsumedProducts.class);
         setConsumedProducts(request, consumedProducts);
         dailyConsumedProductsRepository.save(consumedProducts);
         DailyConsumedProductsResponse response =
@@ -78,7 +83,8 @@ public class DailyConsumedProductsService implements BaseService<DailyConsumedPr
         productsInWareHouseService.rollBackConsumedProducts(old);
         productsInWareHouseService.consumedProducts(request);
 
-        DailyConsumedProducts consumedProducts = modelMapper.map(request, DailyConsumedProducts.class);
+        DailyConsumedProducts consumedProducts =
+                modelMapper.map(request, DailyConsumedProducts.class);
         setConsumedProducts(request, consumedProducts);
         consumedProducts.setId(request.getId());
         dailyConsumedProductsRepository.save(consumedProducts);
@@ -96,5 +102,23 @@ public class DailyConsumedProductsService implements BaseService<DailyConsumedPr
         DailyConsumedProductsResponse response =
                 modelMapper.map(dailyConsumedProducts, DailyConsumedProductsResponse.class);
         return new ApiResponse(Constants.DELETED, true, response);
+    }
+
+    public ApiResponse getAllByWarehouseId(Integer warehouseId, int page, int size) {
+        List<DailyConsumedProductsResponse> responses = new ArrayList<>();
+        Page<DailyConsumedProducts> all = dailyConsumedProductsRepository
+                .findAllByWarehouseIdAndActiveTrue(warehouseId, PageRequest.of(page, size));
+        all.map(dailyConsumedProducts ->
+                responses.add(modelMapper.map(dailyConsumedProducts, DailyConsumedProductsResponse.class)));
+        return new ApiResponse(Constants.SUCCESSFULLY, true, responses);
+    }
+
+    public ApiResponse getAllByBranchId(Integer branchId, int page, int size) {
+        List<DailyConsumedProductsResponse> responses = new ArrayList<>();
+        Page<DailyConsumedProducts> all = dailyConsumedProductsRepository
+                .findAllByBranchIdAndActiveTrue(branchId, PageRequest.of(page, size));
+        all.map(dailyConsumedProducts ->
+                responses.add(modelMapper.map(dailyConsumedProducts, DailyConsumedProductsResponse.class)));
+        return new ApiResponse(Constants.SUCCESSFULLY, true, responses);
     }
 }

@@ -13,8 +13,6 @@ public class DrinksInWareHouseResponse {
 
     private int count;
 
-    private double totalPrice;
-
     private int literQuantity;
 
     private boolean active;

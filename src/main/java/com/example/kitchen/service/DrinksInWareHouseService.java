@@ -50,7 +50,6 @@ public class DrinksInWareHouseService {
         if (drinksInWareHouseOptional.isPresent()) {
             DrinksInWareHouse drinksInWareHouse = drinksInWareHouseOptional.get();
             drinksInWareHouse.setCount(drinksInWareHouse.getCount() + request.getCount());
-            drinksInWareHouse.setTotalPrice(drinksInWareHouse.getTotalPrice() + request.getTotalPrice());
             drinksInWareHouseRepository.save(drinksInWareHouse);
         }else {
             saveDrinks(request);
@@ -66,7 +65,6 @@ public class DrinksInWareHouseService {
                         purchasedDrinks.getWarehouse().getId())
                 .orElseThrow(() -> new RecordNotFoundException(Constants.DRINKS_IN_WAREHOUSE_NOT_FOUND));
 
-        drinksInWareHouse.setTotalPrice(drinksInWareHouse.getTotalPrice() - purchasedDrinks.getTotalPrice());
         drinksInWareHouse.setCount(drinksInWareHouse.getCount() - purchasedDrinks.getCount());
        return drinksInWareHouseRepository.save(drinksInWareHouse);
     }
