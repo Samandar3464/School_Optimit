@@ -6,7 +6,7 @@ import com.example.enums.Constants;
 import com.example.exception.RecordNotFoundException;
 import com.example.kitchen.entity.DailyConsumedDrinks;
 import com.example.kitchen.entity.Warehouse;
-import com.example.kitchen.model.Response.DailyConsumedDrinksResponse;
+import com.example.kitchen.model.response.DailyConsumedDrinksResponse;
 import com.example.kitchen.model.request.DailyConsumedDrinksRequest;
 import com.example.kitchen.repository.DailyConsumedDrinksRepository;
 import com.example.kitchen.repository.WareHouseRepository;
@@ -101,7 +101,7 @@ public class DailyConsumedDrinksService implements BaseService<DailyConsumedDrin
     private DailyConsumedDrinksResponse getResponse(DailyConsumedDrinks dailyConsumedDrinks) {
         DailyConsumedDrinksResponse response =
                 modelMapper.map(dailyConsumedDrinks, DailyConsumedDrinksResponse.class);
-        response.setLocalDateTime(dailyConsumedDrinks.getLocalDateTime());
+        response.setLocalDateTime(dailyConsumedDrinks.getLocalDateTime().toString());
         return response;
     }
 

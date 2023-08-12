@@ -7,7 +7,7 @@ import com.example.kitchen.entity.DailyConsumedDrinks;
 import com.example.kitchen.entity.DrinksInWareHouse;
 import com.example.kitchen.entity.PurchasedDrinks;
 import com.example.kitchen.entity.Warehouse;
-import com.example.kitchen.model.Response.DrinksInWareHouseResponse;
+import com.example.kitchen.model.response.DrinksInWareHouseResponse;
 import com.example.kitchen.model.request.DailyConsumedDrinksRequest;
 import com.example.kitchen.model.request.DrinksInWareHouseRequest;
 import com.example.kitchen.model.request.PurchasedDrinksRequest;

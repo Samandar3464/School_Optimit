@@ -6,7 +6,7 @@ import com.example.enums.Constants;
 import com.example.exception.RecordNotFoundException;
 import com.example.kitchen.entity.PurchasedDrinks;
 import com.example.kitchen.entity.Warehouse;
-import com.example.kitchen.model.Response.PurchasedDrinksResponse;
+import com.example.kitchen.model.response.PurchasedDrinksResponse;
 import com.example.kitchen.model.request.PurchasedDrinksRequest;
 import com.example.kitchen.repository.PurchasedDrinksRepository;
 import com.example.kitchen.repository.WareHouseRepository;
@@ -20,6 +20,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -105,7 +106,7 @@ public class PurchasedDrinksService implements BaseService<PurchasedDrinksReques
 
     private PurchasedDrinksResponse getResponse(PurchasedDrinks purchasedDrinks) {
         PurchasedDrinksResponse response = modelMapper.map(purchasedDrinks, PurchasedDrinksResponse.class);
-        response.setLocalDateTime(purchasedDrinks.getLocalDateTime());
+        response.setLocalDateTime(purchasedDrinks.getLocalDateTime().toString());
         return response;
     }
 
@@ -121,6 +122,7 @@ public class PurchasedDrinksService implements BaseService<PurchasedDrinksReques
         purchasedDrinks.setBranch(branch);
         purchasedDrinks.setEmployee(user);
         purchasedDrinks.setWarehouse(warehouse);
+        purchasedDrinks.setLocalDateTime(LocalDateTime.now());
     }
 
     private PurchasedDrinks getByPurchasedDrinksId(Integer integer) {

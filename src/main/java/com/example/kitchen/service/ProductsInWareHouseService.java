@@ -8,7 +8,7 @@ import com.example.kitchen.entity.DailyConsumedProducts;
 import com.example.kitchen.entity.ProductsInWareHouse;
 import com.example.kitchen.entity.PurchasedProducts;
 import com.example.kitchen.entity.Warehouse;
-import com.example.kitchen.model.Response.ProductsInWareHouseResponse;
+import com.example.kitchen.model.response.ProductsInWareHouseResponse;
 import com.example.kitchen.model.request.DailyConsumedProductsRequest;
 import com.example.kitchen.model.request.ProductsInWareHouseRequest;
 import com.example.kitchen.model.request.PurchasedProductsRequest;
@@ -61,7 +61,7 @@ public class ProductsInWareHouseService {
         }
     }
 
-    public ProductsInWareHouse rollBackPurchasedProductsFromWarehouse(PurchasedProducts old) {
+    public void rollBackPurchasedProductsFromWarehouse(PurchasedProducts old) {
         ProductsInWareHouse productsInWareHouse = getProductsInWareHouse(
                 old.getName(),
                 old.getMeasurementType(),
@@ -69,7 +69,7 @@ public class ProductsInWareHouseService {
                 old.getWarehouse().getId());
 
         reduceProductsQuantity(productsInWareHouse, old.getQuantity());
-        return productsInWareHouseRepository.save(productsInWareHouse);
+        productsInWareHouseRepository.save(productsInWareHouse);
     }
 
     public void consumedProducts(DailyConsumedProductsRequest request) {

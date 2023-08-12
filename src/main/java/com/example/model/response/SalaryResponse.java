@@ -1,5 +1,6 @@
 package com.example.model.response;
 
+import com.example.entity.Branch;
 import com.example.entity.Salary;
 import com.example.enums.Months;
 import jakarta.persistence.Enumerated;
@@ -18,9 +19,9 @@ public class SalaryResponse {
 
     private String date;
 
-    private Integer userId;
+    private UserResponseDto user;
 
-    private Integer branchId;
+    private Branch branch;
 
     private double fix;
 
@@ -42,12 +43,12 @@ public class SalaryResponse {
                 .id(salary.getId())
                 .fix(salary.getFix())
                 .salary(salary.getSalary())
-                .userId(salary.getUser().getId())
+                .user(UserResponseDto.from(salary.getUser()))
                 .date(salary.getDate().toString())
                 .amountDebt(salary.getAmountDebt())
                 .givenSalary(salary.getGivenSalary())
                 .cashAdvance(salary.getCashAdvance())
-                .branchId(salary.getBranch().getId())
+                .branch(salary.getBranch())
                 .partlySalary(salary.getPartlySalary())
                 .classLeaderSalary(salary.getClassLeaderSalary())
                 .build();

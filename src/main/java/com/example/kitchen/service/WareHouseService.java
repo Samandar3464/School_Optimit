@@ -5,7 +5,7 @@ import com.example.enums.Constants;
 import com.example.exception.RecordAlreadyExistException;
 import com.example.exception.RecordNotFoundException;
 import com.example.kitchen.entity.Warehouse;
-import com.example.kitchen.model.Response.WarehouseResponse;
+import com.example.kitchen.model.response.WarehouseResponse;
 import com.example.kitchen.model.request.WareHouseRequest;
 import com.example.kitchen.repository.WareHouseRepository;
 import com.example.model.common.ApiResponse;

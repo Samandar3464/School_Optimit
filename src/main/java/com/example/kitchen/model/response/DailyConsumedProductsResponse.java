@@ -1,22 +1,31 @@
-package com.example.kitchen.model.Response;
+package com.example.kitchen.model.response;
 
 import com.example.entity.Branch;
 import com.example.enums.MeasurementType;
 import com.example.kitchen.entity.Warehouse;
+import com.example.model.response.UserResponseDto;
 import lombok.*;
 
+import java.time.LocalDateTime;
+
 @Data
-public class ProductsInWareHouseResponse {
+public class DailyConsumedProductsResponse {
 
     private Integer id;
 
     private String name;
 
+    private boolean delete;
+
     private double quantity;
+
+    private String description;
+
+    private String localDateTime;
 
     private MeasurementType measurementType;
 
-    private boolean active;
+    private UserResponseDto employee;
 
     private Branch branch;
 

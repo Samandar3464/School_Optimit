@@ -12,9 +12,9 @@ public class ProductsInWarehouseController {
 
     private final ProductsInWareHouseService productsInWareHouseService;
 
-    @GetMapping("{drinksInWareHouseId}")
-    public ApiResponse getById(@PathVariable Integer drinksInWareHouseId) {
-        return productsInWareHouseService.findByIdAndActiveTrue(drinksInWareHouseId);
+    @GetMapping("{productsInWarehouseId}")
+    public ApiResponse getById(@PathVariable Integer productsInWarehouseId) {
+        return productsInWareHouseService.findByIdAndActiveTrue(productsInWarehouseId);
     }
 
     @GetMapping("getAllByWarehouseId/{warehouseId}")

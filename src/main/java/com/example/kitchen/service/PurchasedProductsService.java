@@ -6,7 +6,7 @@ import com.example.enums.Constants;
 import com.example.exception.RecordNotFoundException;
 import com.example.kitchen.entity.PurchasedProducts;
 import com.example.kitchen.entity.Warehouse;
-import com.example.kitchen.model.Response.PurchasedProductsResponse;
+import com.example.kitchen.model.response.PurchasedProductsResponse;
 import com.example.kitchen.model.request.PurchasedProductsRequest;
 import com.example.kitchen.repository.PurchasedProductsRepository;
 import com.example.kitchen.repository.WareHouseRepository;
@@ -20,6 +20,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -56,19 +57,19 @@ public class PurchasedProductsService implements BaseService<PurchasedProductsRe
     @Override
     @Transactional(rollbackFor = {Exception.class, RecordNotFoundException.class})
     public ApiResponse update(PurchasedProductsRequest request) {
+        updateWarehouse(request);
         PurchasedProducts purchasedProducts = modelMapper.map(request, PurchasedProducts.class);
         purchasedProducts.setId(request.getId());
         setPurchasedProducts(request, purchasedProducts);
         purchasedProductsRepository.save(purchasedProducts);
-        updateWarehouse(request);
         PurchasedProductsResponse response = getResponse(purchasedProducts);
         return new ApiResponse(Constants.SUCCESSFULLY, true, response);
     }
 
     private void updateWarehouse(PurchasedProductsRequest request) {
-        PurchasedProducts oldPurchasedProducts = getByPurchasedProductId(request.getId());
-        productsInWareHouseService.rollBackPurchasedProductsFromWarehouse(oldPurchasedProducts);
-        productsInWareHouseService.storageOfPurchasedProducts(request);
+            PurchasedProducts oldPurchasedProducts = getByPurchasedProductId(request.getId());
+            productsInWareHouseService.rollBackPurchasedProductsFromWarehouse(oldPurchasedProducts);
+            productsInWareHouseService.storageOfPurchasedProducts(request);
     }
 
     @Override
@@ -94,6 +95,7 @@ public class PurchasedProductsService implements BaseService<PurchasedProductsRe
         purchasedProducts.setBranch(branch);
         purchasedProducts.setEmployee(user);
         purchasedProducts.setWarehouse(warehouse);
+        purchasedProducts.setLocalDateTime(LocalDateTime.now());
     }
 
     public ApiResponse getAllByWarehouseId(Integer warehouseId, int page, int size) {
@@ -121,7 +123,7 @@ public class PurchasedProductsService implements BaseService<PurchasedProductsRe
 
     private PurchasedProductsResponse getResponse(PurchasedProducts purchasedProducts) {
         PurchasedProductsResponse response = modelMapper.map(purchasedProducts, PurchasedProductsResponse.class);
-        response.setLocalDateTime(purchasedProducts.getLocalDateTime());
+        response.setLocalDateTime(purchasedProducts.getLocalDateTime().toString());
         return response;
     }
 

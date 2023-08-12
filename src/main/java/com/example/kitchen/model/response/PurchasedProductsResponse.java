@@ -1,6 +1,7 @@
-package com.example.kitchen.model.Response;
+package com.example.kitchen.model.response;
 
 import com.example.entity.Branch;
+import com.example.enums.MeasurementType;
 import com.example.kitchen.entity.Warehouse;
 import com.example.model.response.UserResponseDto;
 import lombok.*;
@@ -8,25 +9,30 @@ import lombok.*;
 import java.time.LocalDateTime;
 
 @Data
-public class DailyConsumedDrinksResponse {
+public class PurchasedProductsResponse {
 
     private Integer id;
 
     private String name;
 
-    private int literQuantity;
+    private double quantity;
 
-    private int count;
+    private double unitPrice;
+
+    private double totalPrice;
+
+    private boolean delete;
 
     private String description;
 
-    private boolean active;
+    private String localDateTime;
 
-    private LocalDateTime localDateTime;
+    private MeasurementType measurementType;
 
     private UserResponseDto employee;
 
     private Branch branch;
 
     private Warehouse warehouse;
+
 }
