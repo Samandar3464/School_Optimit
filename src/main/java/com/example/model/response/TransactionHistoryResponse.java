@@ -49,7 +49,7 @@ public class TransactionHistoryResponse {
                 .moneyAmount(transactionHistory.getMoneyAmount())
                 .expenseType(transactionHistory.getExpenseType())
                 .active(transactionHistory.isActive())
-                .accountNumber(transactionHistory.getStudent().getAccountNumber())
+                .accountNumber(transactionHistory.getStudent() == null ? null : transactionHistory.getStudent().getAccountNumber())
                 .paidInFull(transactionHistory.isPaidInFull())
                 .paymentType(transactionHistory.getPaymentType())
                 .branch(transactionHistory.getBranch())
