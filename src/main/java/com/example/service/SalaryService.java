@@ -57,10 +57,10 @@ public class SalaryService implements BaseService<SalaryRequest, String> {
 
     @Override
     public ApiResponse update(SalaryRequest salaryRequest) {
-        Salary salary1 = findByUserPhoneNumberAndActiveTrue(salaryRequest.getPhoneNumber());
+        Salary salary1 = salaryRepository.findById(salaryRequest.getId()).orElseThrow(()->new RecordNotFoundException(Constants.SALARY_NOT_FOUND));
         Salary salary = Salary.toSalary(salaryRequest);
-        if (salary1.getDate().getDayOfMonth() != salary.getDate().getDayOfMonth()) {
-            throw new RecordNotFoundException(Constants.DO_NOT_CHANGE);
+        if (salary1.getDate().getDayOfMonth() != LocalDate.now().getDayOfMonth()) {
+            throw new RecordNotFoundException(Constants.DO_NOT_CHANGE_BECAUSE_TIME_EXPIRED);
         }
         salary.setId(salaryRequest.getId());
         setSalary(salaryRequest, salary);
