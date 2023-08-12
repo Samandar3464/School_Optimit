@@ -3,7 +3,6 @@ package com.example.kitchen.entity;
 import com.example.entity.Branch;
 import com.example.entity.User;
 import com.example.enums.MeasurementType;
-import com.example.kitchen.model.request.PurchasedProductsRequest;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -29,7 +28,7 @@ public class PurchasedProducts {
 
     private double totalPrice;
 
-    private boolean active;
+    private boolean delete;
 
     private String description;
 
@@ -45,18 +44,4 @@ public class PurchasedProducts {
 
     @ManyToOne
     private Warehouse warehouse;
-
-    public static PurchasedProducts toEntity(PurchasedProductsRequest request){
-        return PurchasedProducts
-                .builder()
-                .name(request.getName())
-                .quantity(request.getQuantity())
-                .unitPrice(request.getUnitPrice())
-                .totalPrice(request.getTotalPrice())
-                .description(request.getDescription())
-                .measurementType(request.getMeasurementType())
-                .localDateTime(LocalDateTime.now())
-                .active(true)
-                .build();
-    }
 }

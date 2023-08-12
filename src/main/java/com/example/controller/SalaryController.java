@@ -20,6 +20,45 @@ public class SalaryController {
         return salaryService.create(salaryRequest);
     }
 
+
+    @PostMapping("giveCashAdvance")
+    public ApiResponse giveCashAdvance(@RequestParam String phoneNumber,
+                                       @RequestParam double cashSalary,
+                                       @RequestParam PaymentType paymentType) {
+        return salaryService.giveCashAdvance(phoneNumber, cashSalary, paymentType);
+    }
+
+    @PostMapping("giveDebtToEmployee")
+    public ApiResponse giveDebtToEmployee(@RequestParam String phoneNumber,
+                                          @RequestParam double debitAmount,
+                                          @RequestParam PaymentType paymentType) {
+        return salaryService.giveDebtToEmployee(phoneNumber, debitAmount, paymentType);
+    }
+
+    @PostMapping("debtRepayment")
+    public ApiResponse debtRepayment(@RequestParam String phoneNumber) {
+        return salaryService.debtRepayment(phoneNumber);
+    }
+
+    @PostMapping("givePartlySalary")
+    public ApiResponse givePartlySalary(@RequestParam String phoneNumber,
+                                        @RequestParam double partlySalary,
+                                        @RequestParam PaymentType paymentType) {
+        return salaryService.givePartlySalary(phoneNumber, partlySalary, paymentType);
+    }
+
+    @PostMapping("giveSalary")
+    public ApiResponse giveSalary(@RequestParam String phoneNumber,
+                                  @RequestParam boolean withholdingOfDebtIfAny,
+                                  @RequestParam PaymentType paymentType) {
+        return salaryService.giveSalary(phoneNumber, withholdingOfDebtIfAny, paymentType);
+    }
+
+    @GetMapping("getAllByBranchId/{branchId}")
+    public ApiResponse getAllByBranchId(@PathVariable Integer branchId) {
+        return salaryService.getAllByBranchId(branchId);
+    }
+
     @GetMapping("getByUserId/{phoneNumber}")
     public ApiResponse getByUserId(@PathVariable String phoneNumber) {
         return salaryService.getById(phoneNumber);
@@ -35,37 +74,4 @@ public class SalaryController {
         return salaryService.delete(phoneNumber);
     }
 
-
-    @GetMapping("giveCashAdvance/{phoneNumber}/{cashSalary}")
-    public ApiResponse giveCashAdvance(@PathVariable String phoneNumber,
-                                       @PathVariable double cashSalary,
-                                       @RequestParam PaymentType paymentType) {
-        return salaryService.giveCashAdvance(phoneNumber, cashSalary, paymentType);
-    }
-
-    @GetMapping("giveDebtToEmployee/{phoneNumber}/{debitAmount}")
-    public ApiResponse giveDebtToEmployee(@PathVariable String phoneNumber,
-                                @PathVariable double debitAmount,
-                                @RequestParam PaymentType paymentType) {
-        return salaryService.giveDebtToEmployee(phoneNumber, debitAmount, paymentType);
-    }
-
-    @GetMapping("debtRepayment/{phoneNumber}")
-    public ApiResponse debtRepayment(@PathVariable String phoneNumber) {
-        return salaryService.debtRepayment(phoneNumber);
-    }
-
-    @GetMapping("givePartlySalary/{phoneNumber}/{partlySalary}")
-    public ApiResponse givePartlySalary(@PathVariable String phoneNumber,
-                                        @PathVariable double partlySalary,
-                                        @RequestParam PaymentType paymentType) {
-        return salaryService.givePartlySalary(phoneNumber, partlySalary, paymentType);
-    }
-
-    @GetMapping("giveSalary/{phoneNumber}/{withholdingOfDebtIfAny}")
-    public ApiResponse giveSalary(@PathVariable String phoneNumber,
-                                  @PathVariable boolean withholdingOfDebtIfAny,
-                                  @RequestParam PaymentType paymentType) {
-        return salaryService.giveSalary(phoneNumber, withholdingOfDebtIfAny, paymentType);
-    }
 }

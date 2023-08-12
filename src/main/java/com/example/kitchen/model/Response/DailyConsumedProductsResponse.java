@@ -2,18 +2,13 @@ package com.example.kitchen.model.Response;
 
 import com.example.entity.Branch;
 import com.example.enums.MeasurementType;
-import com.example.kitchen.entity.DailyConsumedProducts;
 import com.example.kitchen.entity.Warehouse;
 import com.example.model.response.UserResponseDto;
 import lombok.*;
 
 import java.time.LocalDateTime;
 
-@Getter
-@Setter
-@AllArgsConstructor
-@NoArgsConstructor
-@Builder
+@Data
 public class DailyConsumedProductsResponse {
 
     private Integer id;
@@ -35,20 +30,4 @@ public class DailyConsumedProductsResponse {
     private Branch branch;
 
     private Warehouse warehouse;
-
-    public static DailyConsumedProductsResponse toResponse(DailyConsumedProducts dailyConsumedProducts){
-        return DailyConsumedProductsResponse
-                .builder()
-                .id(dailyConsumedProducts.getId())
-                .name(dailyConsumedProducts.getName())
-                .active(dailyConsumedProducts.isActive())
-                .quantity(dailyConsumedProducts.getQuantity())
-                .description(dailyConsumedProducts.getDescription())
-                .localDateTime(dailyConsumedProducts.getLocalDateTime())
-                .measurementType(dailyConsumedProducts.getMeasurementType())
-                .employee(UserResponseDto.from(dailyConsumedProducts.getEmployee()))
-                .branch(dailyConsumedProducts.getBranch())
-                .warehouse(dailyConsumedProducts.getWarehouse())
-                .build();
-    }
 }

@@ -63,7 +63,7 @@
 //
 //    @Override
 //    @ResponseStatus(HttpStatus.OK)
-//    public ApiResponse getById(Integer integer) {
+//    public ApiResponse findByIdAndDeleteFalse(Integer integer) {
 //        Reason reason = reasonRepository.findById(integer).orElseThrow(() -> new RecordNotFoundException(REASON_NOT_FOUND));
 //        ReasonResponse reasonResponse = ReasonResponse.from(reason, attachmentService.getUrl(reason.getImage()));
 //        return new ApiResponse(reasonResponse, true);

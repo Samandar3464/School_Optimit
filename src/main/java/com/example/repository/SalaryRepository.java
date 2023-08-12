@@ -13,4 +13,6 @@ public interface SalaryRepository extends JpaRepository<Salary,Integer> {
 
     Optional<Salary> findByUserPhoneNumberAndActiveTrue(String phoneNumber);
     Optional<Salary> findByUserIdAndActiveTrue(Integer userId);
+
+    List<Salary> findAllByBranch_IdAndActiveTrue(Integer branchId);
 }

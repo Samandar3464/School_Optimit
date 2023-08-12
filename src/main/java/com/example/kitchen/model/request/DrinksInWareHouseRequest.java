@@ -21,7 +21,7 @@ public class DrinksInWareHouseRequest {
 
     private int literQuantity;
 
-    private Integer branch;
+    private Integer branchId;
 
-    private Integer warehouse;
+    private Integer warehouseId;
 }

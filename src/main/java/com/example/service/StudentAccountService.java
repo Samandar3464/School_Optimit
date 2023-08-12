@@ -149,7 +149,7 @@ public class StudentAccountService implements BaseService<StudentAccountCreate, 
 
 //    private void setStudentAccount(StudentAccountRequest request, StudentAccount studentAccount, TransactionHistory transactionHistory) {
 //        studentAccount.setPaidInFull(request.isPaidInFull());
-//        studentAccount.setMainBalance(mainBalanceRepository.findByIdAndActiveTrue(request.getMainBalanceId()).orElseThrow(() -> new RecordNotFoundException(Constants.MAIN_BALANCE_NOT_FOUND)));
+//        studentAccount.setMainBalance(mainBalanceRepository.findByIdAndDeleteFalse(request.getMainBalanceId()).orElseThrow(() -> new RecordNotFoundException(Constants.MAIN_BALANCE_NOT_FOUND)));
 //        studentAccount.setStudent(transactionHistory.getStudent());
 //        studentAccount.setBranch(transactionHistory.getBranch());
 //    }

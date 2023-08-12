@@ -13,8 +13,11 @@ import com.example.model.response.SalaryResponse;
 import com.example.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -117,6 +120,7 @@ public class SalaryService implements BaseService<SalaryRequest, String> {
         }
     }
 
+    @Transactional(rollbackFor = {RecordNotFoundException.class, RecordNotFoundException.class})
     public ApiResponse givePartlySalary(String phoneNumber, double partlySalary, PaymentType paymentType) {
 
         Salary salary = findByUserPhoneNumberAndActiveTrue(phoneNumber);
@@ -300,5 +304,14 @@ public class SalaryService implements BaseService<SalaryRequest, String> {
 
     private Salary findByUserPhoneNumberAndActiveTrue(String phoneNumber) {
         return salaryRepository.findByUserPhoneNumberAndActiveTrue(phoneNumber).orElseThrow(() -> new RecordNotFoundException(Constants.SALARY_NOT_FOUND));
+    }
+
+    public ApiResponse getAllByBranchId(Integer branchId) {
+        List<SalaryResponse> salaryResponses = new ArrayList<>();
+        List<Salary> all = salaryRepository.findAllByBranch_IdAndActiveTrue(branchId);
+        all.forEach(salary -> {
+            salaryResponses.add(SalaryResponse.toResponse(salary));
+        });
+        return new ApiResponse(Constants.SUCCESSFULLY, true, salaryResponses);
     }
 }
