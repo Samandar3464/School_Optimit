@@ -17,9 +17,9 @@
 //    public ApiResponse create(@RequestBody StudentAccountDto studentAccount) {
 //        return studentBalanceService.create(studentAccount);
 //    }
-//    @GetMapping("/findByIdAndActiveTrue/{id}")
-//    public ApiResponse findByIdAndActiveTrue(@PathVariable Integer id) {
-//        return studentBalanceService.findByIdAndActiveTrue(id);
+//    @GetMapping("/findByIdAndDeleteFalse/{id}")
+//    public ApiResponse findByIdAndDeleteFalse(@PathVariable Integer id) {
+//        return studentBalanceService.findByIdAndDeleteFalse(id);
 //    }
 //
 //    @PutMapping("/update")

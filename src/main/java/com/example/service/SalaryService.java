@@ -15,6 +15,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -300,5 +302,23 @@ public class SalaryService implements BaseService<SalaryRequest, String> {
 
     private Salary findByUserPhoneNumberAndActiveTrue(String phoneNumber) {
         return salaryRepository.findByUserPhoneNumberAndActiveTrue(phoneNumber).orElseThrow(() -> new RecordNotFoundException(Constants.SALARY_NOT_FOUND));
+    }
+
+    public ApiResponse getAllByBranchId(Integer branchId) {
+        List<SalaryResponse> salaryResponses = new ArrayList<>();
+        List<Salary> all = salaryRepository.findAllByBranch_IdAndActiveTrue(branchId);
+        all.forEach(salary -> {
+            salaryResponses.add(SalaryResponse.toResponse(salary));
+        });
+        return new ApiResponse(Constants.SUCCESSFULLY, true, salaryResponses);
+    }
+
+    public ApiResponse getAllGivenPartlySalaryByBranchId(Integer branchId) {
+        List<SalaryResponse> salaryResponses = new ArrayList<>();
+        List<Salary> all = salaryRepository.findAllByBranch_IdAndPartlySalaryNotNullAndActiveTrue(branchId);
+        all.forEach(salary -> {
+            salaryResponses.add(SalaryResponse.toResponse(salary));
+        });
+        return new ApiResponse(Constants.SUCCESSFULLY, true, salaryResponses);
     }
 }

@@ -3,10 +3,12 @@ package com.example.kitchen.service;
 import com.example.entity.Branch;
 import com.example.enums.Constants;
 import com.example.exception.RecordNotFoundException;
+import com.example.kitchen.entity.DailyConsumedDrinks;
 import com.example.kitchen.entity.DrinksInWareHouse;
 import com.example.kitchen.entity.PurchasedDrinks;
 import com.example.kitchen.entity.Warehouse;
 import com.example.kitchen.model.Response.DrinksInWareHouseResponse;
+import com.example.kitchen.model.request.DailyConsumedDrinksRequest;
 import com.example.kitchen.model.request.DrinksInWareHouseRequest;
 import com.example.kitchen.model.request.PurchasedDrinksRequest;
 import com.example.kitchen.repository.DrinksInWareHouseRepository;
@@ -41,7 +43,7 @@ public class DrinksInWareHouseService {
 
     public void storageOfPurchasedDrinks(PurchasedDrinksRequest request) {
         Optional<DrinksInWareHouse> drinksInWareHouseOptional = drinksInWareHouseRepository
-                .findByNameAndLiterQuantityAndBranchIdAndWarehouseIdAndActiveTrue(
+                .findByNameAndLiterQuantityAndBranchIdAndWarehouseId(
                         request.getName(),
                         request.getLiterQuantity(),
                         request.getBranchId(),
@@ -49,35 +51,106 @@ public class DrinksInWareHouseService {
 
         if (drinksInWareHouseOptional.isPresent()) {
             DrinksInWareHouse drinksInWareHouse = drinksInWareHouseOptional.get();
+            drinksInWareHouse.setActive(true);
             drinksInWareHouse.setCount(drinksInWareHouse.getCount() + request.getCount());
             drinksInWareHouseRepository.save(drinksInWareHouse);
-        }else {
-            saveDrinks(request);
-        }
-    }
-
-    public DrinksInWareHouse rollBackPurchasedDrinks(PurchasedDrinks purchasedDrinks) {
-        DrinksInWareHouse drinksInWareHouse = drinksInWareHouseRepository
-                .findByNameAndLiterQuantityAndBranchIdAndWarehouseIdAndActiveTrue(
-                        purchasedDrinks.getName(),
-                        purchasedDrinks.getLiterQuantity(),
-                        purchasedDrinks.getBranch().getId(),
-                        purchasedDrinks.getWarehouse().getId())
-                .orElseThrow(() -> new RecordNotFoundException(Constants.DRINKS_IN_WAREHOUSE_NOT_FOUND));
-
-        drinksInWareHouse.setCount(drinksInWareHouse.getCount() - purchasedDrinks.getCount());
-       return drinksInWareHouseRepository.save(drinksInWareHouse);
-    }
-
-    private void saveDrinks(PurchasedDrinksRequest request) {
-        try {
-            DrinksInWareHouseRequest drinksInWareHouseRequest = modelMapper.map(request, DrinksInWareHouseRequest.class);
+        } else {
+            DrinksInWareHouseRequest drinksInWareHouseRequest =
+                    modelMapper.map(request, DrinksInWareHouseRequest.class);
             create(drinksInWareHouseRequest);
-        }catch (Exception e){
-            throw new RecordNotFoundException(e.getMessage());
         }
     }
 
+    public void rollBackPurchasedDrinks(PurchasedDrinks purchasedDrinks) {
+        DrinksInWareHouse drinksInWareHouse = getDrinksInWareHouse(
+                purchasedDrinks.getName(),
+                purchasedDrinks.getLiterQuantity(),
+                purchasedDrinks.getBranch().getId(),
+                purchasedDrinks.getWarehouse().getId());
+
+        reduceCount(drinksInWareHouse, purchasedDrinks.getCount());
+        drinksInWareHouseRepository.save(drinksInWareHouse);
+    }
+
+    public void consumedDrinksFromWarehouse(DailyConsumedDrinksRequest request) {
+        DrinksInWareHouse drinksInWareHouse = getDrinksInWareHouse(
+                request.getName(),
+                request.getLiterQuantity(),
+                request.getBranchId(),
+                request.getWarehouseId());
+
+        reduceCount(drinksInWareHouse, request.getCount());
+        drinksInWareHouseRepository.save(drinksInWareHouse);
+    }
+
+    public void rollbackConsumedDrinksToWarehouse(DailyConsumedDrinks old) {
+        DrinksInWareHouse drinksInWareHouse = getDrinksInWareHouse(
+                old.getName(),
+                old.getLiterQuantity(),
+                old.getBranch().getId(),
+                old.getWarehouse().getId());
+
+        drinksInWareHouse.setActive(true);
+        drinksInWareHouse.setCount(drinksInWareHouse.getCount() + old.getCount());
+        drinksInWareHouseRepository.save(drinksInWareHouse);
+    }
+
+    public ApiResponse getAllByWarehouseId(Integer warehouseId, int page, int size) {
+        Page<DrinksInWareHouse> all = drinksInWareHouseRepository
+                .findAllByWarehouseIdAndActiveTrue(warehouseId, PageRequest.of(page, size));
+        List<DrinksInWareHouseResponse> responses = getDrinksInWareHouseResponses(all);
+        return new ApiResponse(Constants.SUCCESSFULLY, true, responses);
+    }
+
+    public ApiResponse getAllByBranchId(Integer branchId, int page, int size) {
+        Page<DrinksInWareHouse> all = drinksInWareHouseRepository
+                .findAllByBranchIdAndActiveTrue(branchId, PageRequest.of(page, size));
+        List<DrinksInWareHouseResponse> response = getDrinksInWareHouseResponses(all);
+        return new ApiResponse(Constants.SUCCESSFULLY, true, response);
+    }
+
+    public ApiResponse getById(Integer drinksInWarehouseId) {
+        DrinksInWareHouse drinksInWareHouse = drinksInWareHouseRepository.findByIdAndActiveTrue(drinksInWarehouseId)
+                .orElseThrow(() -> new RecordNotFoundException(Constants.DRINKS_IN_WAREHOUSE_NOT_FOUND));
+        DrinksInWareHouseResponse response =
+                modelMapper.map(drinksInWareHouse, DrinksInWareHouseResponse.class);
+        return new ApiResponse(Constants.SUCCESSFULLY, true, response);
+    }
+
+
+    private static void reduceCount(DrinksInWareHouse drinksInWareHouse, int count) {
+        if (drinksInWareHouse.getCount() >= count) {
+            drinksInWareHouse.setCount(drinksInWareHouse.getCount() - count);
+        } else {
+            throw new RecordNotFoundException(Constants.DRINKS_IN_WAREHOUSE_NOT_ENOUGH);
+        }
+        if (drinksInWareHouse.getCount() == 0) {
+            drinksInWareHouse.setActive(false);
+        }
+    }
+
+    private DrinksInWareHouse getDrinksInWareHouse(String name,
+                                                   int literQuantity,
+                                                   Integer branchId,
+                                                   Integer warehouseId) {
+        return drinksInWareHouseRepository
+                .findByNameAndLiterQuantityAndBranchIdAndWarehouseId(
+                        name,
+                        literQuantity,
+                        branchId,
+                        warehouseId)
+                .orElseThrow(() -> new RecordNotFoundException(Constants.DRINKS_IN_WAREHOUSE_NOT_FOUND));
+    }
+
+    private List<DrinksInWareHouseResponse> getDrinksInWareHouseResponses(Page<DrinksInWareHouse> all) {
+        List<DrinksInWareHouseResponse> response = new ArrayList<>();
+        all.forEach(drinksInWareHouse -> {
+            DrinksInWareHouseResponse houseResponse =
+                    modelMapper.map(drinksInWareHouse, DrinksInWareHouseResponse.class);
+            response.add(houseResponse);
+        });
+        return response;
+    }
 
     private void setDrinksWarehouse(DrinksInWareHouseRequest request, DrinksInWareHouse drinksInWareHouse) {
         Branch branch = branchRepository.findByIdAndDeleteFalse(request.getBranchId())
@@ -88,31 +161,5 @@ public class DrinksInWareHouseService {
         drinksInWareHouse.setActive(true);
         drinksInWareHouse.setBranch(branch);
         drinksInWareHouse.setWarehouse(warehouse);
-    }
-
-    public ApiResponse getAllByWarehouseId(Integer warehouseId, int page, int size) {
-        List<DrinksInWareHouseResponse> response = new ArrayList<>();
-        Page<DrinksInWareHouse> all = drinksInWareHouseRepository
-                .findAllByWarehouseIdAndActiveTrue(warehouseId, PageRequest.of(page, size));
-        all.map(drinksInWareHouse ->
-                response.add(modelMapper.map(drinksInWareHouse,DrinksInWareHouseResponse.class)));
-        return new ApiResponse(Constants.SUCCESSFULLY, true, response);
-    }
-
-    public ApiResponse getAllByBranchId(Integer branchId, int page, int size) {
-        List<DrinksInWareHouseResponse> response = new ArrayList<>();
-        Page<DrinksInWareHouse> all = drinksInWareHouseRepository
-                .findAllByBranchIdAndActiveTrue(branchId, PageRequest.of(page, size));
-        all.map(drinksInWareHouse ->
-                response.add(modelMapper.map(drinksInWareHouse,DrinksInWareHouseResponse.class)));
-        return new ApiResponse(Constants.SUCCESSFULLY, true, response);
-    }
-
-    public ApiResponse getById(Integer drinksInWarehouseId) {
-        DrinksInWareHouse drinksInWareHouse = drinksInWareHouseRepository.findByIdAndActiveTrue(drinksInWarehouseId)
-                .orElseThrow(() -> new RecordNotFoundException(Constants.DRINKS_IN_WAREHOUSE_NOT_FOUND));
-        DrinksInWareHouseResponse response =
-                modelMapper.map(drinksInWareHouse, DrinksInWareHouseResponse.class);
-        return new ApiResponse(Constants.SUCCESSFULLY, true, response);
     }
 }

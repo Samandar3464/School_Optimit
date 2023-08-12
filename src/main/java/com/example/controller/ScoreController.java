@@ -22,9 +22,9 @@ public class ScoreController {
         return scoreService.create(scoreRequestDto);
     }
 
-//    @GetMapping("/findByIdAndActiveTrue/{id}")
-//    public ApiResponse findByIdAndActiveTrue(@PathVariable Integer id) {
-//        return scoreService.findByIdAndActiveTrue(id);
+//    @GetMapping("/findByIdAndDeleteFalse/{id}")
+//    public ApiResponse findByIdAndDeleteFalse(@PathVariable Integer id) {
+//        return scoreService.findByIdAndDeleteFalse(id);
 //    }
 
     @PutMapping("/update")

@@ -28,7 +28,7 @@ public class PurchasedProducts {
 
     private double totalPrice;
 
-    private boolean active;
+    private boolean delete;
 
     private String description;
 

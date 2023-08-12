@@ -27,7 +27,7 @@ public class DailyConsumedDrinks {
 
     private String description;
 
-    private boolean active;
+    private boolean delete;
 
     private LocalDateTime localDateTime;
 

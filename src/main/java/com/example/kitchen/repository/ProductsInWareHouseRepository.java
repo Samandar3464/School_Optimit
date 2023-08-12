@@ -9,10 +9,11 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.Optional;
 
 public interface ProductsInWareHouseRepository extends JpaRepository<ProductsInWareHouse, Integer> {
-    Optional<ProductsInWareHouse> findByNameAndMeasurementTypeAndBranchIdAndWarehouseIdAndActiveTrue(String name, MeasurementType measurementType,Integer branchId,Integer wareHouseId);
+    Optional<ProductsInWareHouse> findByNameAndMeasurementTypeAndBranchIdAndWarehouseId(String name, MeasurementType measurementType, Integer branchId, Integer wareHouseId);
 
     Optional<ProductsInWareHouse> findByIdAndActiveTrue(Integer productInWarehouseId);
 
     Page<ProductsInWareHouse> findAllByWarehouseIdAndActiveTrue(Integer wareHouseID, PageRequest of);
+
     Page<ProductsInWareHouse> findAllByBranchIdAndActiveTrue(Integer branchId, PageRequest of);
 }

@@ -7,8 +7,10 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
 
-public interface PurchasedDrinksRepository extends JpaRepository<PurchasedDrinks,Integer> {
-    Optional<PurchasedDrinks> findByIdAndActiveTrue(Integer integer);
-    Page<PurchasedDrinks> findAllByWarehouseIdAndActiveTrue(Integer integer, Pageable pageable);
-    Page<PurchasedDrinks> findAllByBranch_IdAndActiveTrue(Integer integer,Pageable pageable);
+public interface PurchasedDrinksRepository extends JpaRepository<PurchasedDrinks, Integer> {
+    Optional<PurchasedDrinks> findByIdAndDeleteFalse(Integer integer);
+
+    Page<PurchasedDrinks> findAllByWarehouseIdAndDeleteFalse(Integer integer, Pageable pageable);
+
+    Page<PurchasedDrinks> findAllByBranch_IdAndDeleteFalse(Integer integer, Pageable pageable);
 }

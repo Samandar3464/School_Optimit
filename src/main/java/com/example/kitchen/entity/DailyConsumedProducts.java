@@ -22,7 +22,7 @@ public class DailyConsumedProducts {
 
     private String name;
 
-    private boolean active;
+    private boolean delete;
 
     private double quantity;
 

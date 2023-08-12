@@ -36,36 +36,46 @@ public class SalaryController {
     }
 
 
-    @GetMapping("giveCashAdvance/{phoneNumber}/{cashSalary}")
+    @PostMapping("giveCashAdvance/{phoneNumber}/{cashSalary}")
     public ApiResponse giveCashAdvance(@PathVariable String phoneNumber,
                                        @PathVariable double cashSalary,
                                        @RequestParam PaymentType paymentType) {
         return salaryService.giveCashAdvance(phoneNumber, cashSalary, paymentType);
     }
 
-    @GetMapping("giveDebtToEmployee/{phoneNumber}/{debitAmount}")
+    @PostMapping("giveDebtToEmployee/{phoneNumber}/{debitAmount}")
     public ApiResponse giveDebtToEmployee(@PathVariable String phoneNumber,
                                 @PathVariable double debitAmount,
                                 @RequestParam PaymentType paymentType) {
         return salaryService.giveDebtToEmployee(phoneNumber, debitAmount, paymentType);
     }
 
-    @GetMapping("debtRepayment/{phoneNumber}")
+    @PostMapping("debtRepayment/{phoneNumber}")
     public ApiResponse debtRepayment(@PathVariable String phoneNumber) {
         return salaryService.debtRepayment(phoneNumber);
     }
 
-    @GetMapping("givePartlySalary/{phoneNumber}/{partlySalary}")
+    @PostMapping("givePartlySalary/{phoneNumber}/{partlySalary}")
     public ApiResponse givePartlySalary(@PathVariable String phoneNumber,
                                         @PathVariable double partlySalary,
                                         @RequestParam PaymentType paymentType) {
         return salaryService.givePartlySalary(phoneNumber, partlySalary, paymentType);
     }
 
-    @GetMapping("giveSalary/{phoneNumber}/{withholdingOfDebtIfAny}")
+    @PostMapping("giveSalary/{phoneNumber}/{withholdingOfDebtIfAny}")
     public ApiResponse giveSalary(@PathVariable String phoneNumber,
                                   @PathVariable boolean withholdingOfDebtIfAny,
                                   @RequestParam PaymentType paymentType) {
         return salaryService.giveSalary(phoneNumber, withholdingOfDebtIfAny, paymentType);
+    }
+
+    @GetMapping("getAllByBranchId/{branchId}")
+    public ApiResponse getAllByBranchId(@PathVariable Integer branchId){
+        return salaryService.getAllByBranchId(branchId);
+    }
+
+    @GetMapping("getAllGivenPartlySalaryByBranchId/{branchId}")
+    public ApiResponse getAllGivenPartlySalaryByBranchId(@PathVariable Integer branchId){
+        return salaryService.getAllGivenPartlySalaryByBranchId(branchId);
     }
 }

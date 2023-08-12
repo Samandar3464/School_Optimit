@@ -4,7 +4,6 @@ import com.example.entity.Branch;
 import com.example.entity.User;
 import com.example.enums.Constants;
 import com.example.exception.RecordNotFoundException;
-import com.example.kitchen.entity.ProductsInWareHouse;
 import com.example.kitchen.entity.PurchasedProducts;
 import com.example.kitchen.entity.Warehouse;
 import com.example.kitchen.model.Response.PurchasedProductsResponse;
@@ -39,58 +38,47 @@ public class PurchasedProductsService implements BaseService<PurchasedProductsRe
     @Override
     @Transactional(rollbackFor = {Exception.class, RecordNotFoundException.class})
     public ApiResponse create(PurchasedProductsRequest request) {
-        productsInWareHouseService.storageOfPurchasedProducts(request);
         PurchasedProducts purchasedProducts = modelMapper.map(request, PurchasedProducts.class);
         setPurchasedProducts(request, purchasedProducts);
         purchasedProductsRepository.save(purchasedProducts);
-        PurchasedProductsResponse response =
-                modelMapper.map(purchasedProducts, PurchasedProductsResponse.class);
-        response.setLocalDateTime(purchasedProducts.getLocalDateTime());
+        productsInWareHouseService.storageOfPurchasedProducts(request);
+        PurchasedProductsResponse response = getResponse(purchasedProducts);
         return new ApiResponse(Constants.SUCCESSFULLY, true, response);
     }
 
     @Override
     public ApiResponse getById(Integer integer) {
         PurchasedProducts purchasedProducts = getByPurchasedProductId(integer);
-        PurchasedProductsResponse response =
-                modelMapper.map(purchasedProducts, PurchasedProductsResponse.class);
-        response.setLocalDateTime(purchasedProducts.getLocalDateTime());
+        PurchasedProductsResponse response = getResponse(purchasedProducts);
         return new ApiResponse(Constants.SUCCESSFULLY, true, response);
     }
 
     @Override
     @Transactional(rollbackFor = {Exception.class, RecordNotFoundException.class})
     public ApiResponse update(PurchasedProductsRequest request) {
-        productInspectionAndStorage(request);
         PurchasedProducts purchasedProducts = modelMapper.map(request, PurchasedProducts.class);
         purchasedProducts.setId(request.getId());
         setPurchasedProducts(request, purchasedProducts);
         purchasedProductsRepository.save(purchasedProducts);
-        PurchasedProductsResponse response =
-                modelMapper.map(purchasedProducts, PurchasedProductsResponse.class);
+        updateWarehouse(request);
+        PurchasedProductsResponse response = getResponse(purchasedProducts);
         return new ApiResponse(Constants.SUCCESSFULLY, true, response);
     }
 
-    private void productInspectionAndStorage(PurchasedProductsRequest request) {
+    private void updateWarehouse(PurchasedProductsRequest request) {
         PurchasedProducts oldPurchasedProducts = getByPurchasedProductId(request.getId());
-        ProductsInWareHouse productsInWareHouse =
-                productsInWareHouseService.rollBackPurchasedProducts(oldPurchasedProducts);
+        productsInWareHouseService.rollBackPurchasedProductsFromWarehouse(oldPurchasedProducts);
         productsInWareHouseService.storageOfPurchasedProducts(request);
-        productsInWareHouseService.checkingForValid(productsInWareHouse);
     }
 
     @Override
     @Transactional(rollbackFor = {Exception.class, RecordNotFoundException.class})
     public ApiResponse delete(Integer integer) {
         PurchasedProducts purchasedProducts = getByPurchasedProductId(integer);
-        purchasedProducts.setActive(false);
+        purchasedProducts.setDelete(true);
         purchasedProductsRepository.save(purchasedProducts);
-
-        ProductsInWareHouse productsInWareHouse =
-                productsInWareHouseService.rollBackPurchasedProducts(purchasedProducts);
-        PurchasedProductsResponse response =
-                modelMapper.map(purchasedProducts, PurchasedProductsResponse.class);
-        productsInWareHouseService.checkingForValid(productsInWareHouse);
+        productsInWareHouseService.rollBackPurchasedProductsFromWarehouse(purchasedProducts);
+        PurchasedProductsResponse response = getResponse(purchasedProducts);
         return new ApiResponse(Constants.SUCCESSFULLY, true, response);
     }
 
@@ -102,38 +90,43 @@ public class PurchasedProductsService implements BaseService<PurchasedProductsRe
         Warehouse warehouse = wareHouseRepository.findByIdAndActiveTrue(request.getWarehouseId())
                 .orElseThrow(() -> new RecordNotFoundException(Constants.WAREHOUSE_NOT_FOUND));
 
-        purchasedProducts.setActive(true);
+        purchasedProducts.setDelete(false);
         purchasedProducts.setBranch(branch);
         purchasedProducts.setEmployee(user);
         purchasedProducts.setWarehouse(warehouse);
     }
 
-    private PurchasedProducts getByPurchasedProductId(Integer integer) {
-        return purchasedProductsRepository.findByIdAndActiveTrue(integer)
-                .orElseThrow(() -> new RecordNotFoundException(Constants.PURCHASED_PRODUCTS_NOT_FOUND));
-    }
-
     public ApiResponse getAllByWarehouseId(Integer warehouseId, int page, int size) {
-        List<PurchasedProductsResponse> responses = new ArrayList<>();
         Page<PurchasedProducts> all = purchasedProductsRepository
-                .findAllByWarehouseIdAndActiveTrue(warehouseId, PageRequest.of(page, size));
-        all.forEach(purchasedProducts -> {
-            PurchasedProductsResponse response = modelMapper.map(purchasedProducts, PurchasedProductsResponse.class);
-            response.setLocalDateTime(purchasedProducts.getLocalDateTime());
-            responses.add(response);
-        });
+                .findAllByWarehouseIdAndDeleteFalse(warehouseId, PageRequest.of(page, size));
+        List<PurchasedProductsResponse> responses = getPurchasedProductsResponses(all);
         return new ApiResponse(Constants.SUCCESSFULLY, true, responses);
     }
 
     public ApiResponse getAllByBranchId(Integer branchId, int page, int size) {
-        List<PurchasedProductsResponse> responses = new ArrayList<>();
         Page<PurchasedProducts> all = purchasedProductsRepository
-                .findAllByBranch_IdAndActiveTrue(branchId, PageRequest.of(page, size));
+                .findAllByBranch_IdAndDeleteFalse(branchId, PageRequest.of(page, size));
+        List<PurchasedProductsResponse> responses = getPurchasedProductsResponses(all);
+        return new ApiResponse(Constants.SUCCESSFULLY, true, responses);
+    }
+
+    private List<PurchasedProductsResponse> getPurchasedProductsResponses(Page<PurchasedProducts> all) {
+        List<PurchasedProductsResponse> responses = new ArrayList<>();
         all.forEach(purchasedProducts -> {
-            PurchasedProductsResponse response = modelMapper.map(purchasedProducts, PurchasedProductsResponse.class);
-            response.setLocalDateTime(purchasedProducts.getLocalDateTime());
+            PurchasedProductsResponse response = getResponse(purchasedProducts);
             responses.add(response);
         });
-        return new ApiResponse(Constants.SUCCESSFULLY, true, responses);
+        return responses;
+    }
+
+    private PurchasedProductsResponse getResponse(PurchasedProducts purchasedProducts) {
+        PurchasedProductsResponse response = modelMapper.map(purchasedProducts, PurchasedProductsResponse.class);
+        response.setLocalDateTime(purchasedProducts.getLocalDateTime());
+        return response;
+    }
+
+    private PurchasedProducts getByPurchasedProductId(Integer integer) {
+        return purchasedProductsRepository.findByIdAndDeleteFalse(integer)
+                .orElseThrow(() -> new RecordNotFoundException(Constants.PURCHASED_PRODUCTS_NOT_FOUND));
     }
 }

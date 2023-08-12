@@ -2,6 +2,7 @@ package com.example.kitchen.service;
 
 import com.example.entity.Branch;
 import com.example.enums.Constants;
+import com.example.enums.MeasurementType;
 import com.example.exception.RecordNotFoundException;
 import com.example.kitchen.entity.DailyConsumedProducts;
 import com.example.kitchen.entity.ProductsInWareHouse;
@@ -43,7 +44,7 @@ public class ProductsInWareHouseService {
 
     public void storageOfPurchasedProducts(PurchasedProductsRequest request) {
         Optional<ProductsInWareHouse> productsInWareHouseOptional =
-                productsInWareHouseRepository.findByNameAndMeasurementTypeAndBranchIdAndWarehouseIdAndActiveTrue(
+                productsInWareHouseRepository.findByNameAndMeasurementTypeAndBranchIdAndWarehouseId(
                         request.getName(),
                         request.getMeasurementType(),
                         request.getBranchId(),
@@ -51,38 +52,51 @@ public class ProductsInWareHouseService {
 
         if (productsInWareHouseOptional.isPresent()) {
             ProductsInWareHouse productsInWareHouse = productsInWareHouseOptional.get();
+            productsInWareHouse.setActive(true);
             productsInWareHouse.setQuantity(productsInWareHouse.getQuantity() + request.getQuantity());
             productsInWareHouseRepository.save(productsInWareHouse);
         } else {
-            saveProductsToWarehouse(request);
-        }
-    }
-
-    private void saveProductsToWarehouse(PurchasedProductsRequest request) {
-        try {
             ProductsInWareHouseRequest productsInWareHouseRequest = modelMapper.map(request, ProductsInWareHouseRequest.class);
             create(productsInWareHouseRequest);
-        } catch (Exception e) {
-            throw new RecordNotFoundException(e.getMessage());
         }
     }
 
-    public ProductsInWareHouse rollBackPurchasedProducts(PurchasedProducts old) {
-        ProductsInWareHouse productsInWareHouse = productsInWareHouseRepository
-                .findByNameAndMeasurementTypeAndBranchIdAndWarehouseIdAndActiveTrue(
-                        old.getName(),
-                        old.getMeasurementType(),
-                        old.getBranch().getId(),
-                        old.getWarehouse().getId())
-                .orElseThrow(() -> new RecordNotFoundException(Constants.PRODUCTS_IN_WAREHOUSE_NOT_FOUND));
+    public ProductsInWareHouse rollBackPurchasedProductsFromWarehouse(PurchasedProducts old) {
+        ProductsInWareHouse productsInWareHouse = getProductsInWareHouse(
+                old.getName(),
+                old.getMeasurementType(),
+                old.getBranch().getId(),
+                old.getWarehouse().getId());
 
-        productsInWareHouse.setQuantity(productsInWareHouse.getQuantity() - old.getQuantity());
+        reduceProductsQuantity(productsInWareHouse, old.getQuantity());
         return productsInWareHouseRepository.save(productsInWareHouse);
     }
 
+    public void consumedProducts(DailyConsumedProductsRequest request) {
+        ProductsInWareHouse productsInWareHouse = getProductsInWareHouse(
+                request.getName(),
+                request.getMeasurementType(),
+                request.getBranchId(),
+                request.getWarehouseId());
+
+        reduceProductsQuantity(productsInWareHouse, request.getQuantity());
+        productsInWareHouseRepository.save(productsInWareHouse);
+    }
+
+    public void rollBackConsumedProducts(DailyConsumedProducts consumedProducts) {
+        ProductsInWareHouse productsInWareHouse = getProductsInWareHouse(
+                consumedProducts.getName(),
+                consumedProducts.getMeasurementType(),
+                consumedProducts.getBranch().getId(),
+                consumedProducts.getWarehouse().getId());
+
+        productsInWareHouse.setQuantity(productsInWareHouse.getQuantity() + consumedProducts.getQuantity());
+        productsInWareHouse.setActive(true);
+        productsInWareHouseRepository.save(productsInWareHouse);
+    }
+
     public ApiResponse findByIdAndActiveTrue(Integer productInWarehouseId) {
-        ProductsInWareHouse productsInWareHouse =
-                productsInWareHouseRepository.findByIdAndActiveTrue(productInWarehouseId)
+        ProductsInWareHouse productsInWareHouse = productsInWareHouseRepository.findByIdAndActiveTrue(productInWarehouseId)
                         .orElseThrow(() -> new RecordNotFoundException(Constants.PRODUCTS_IN_WAREHOUSE_NOT_FOUND));
         ProductsInWareHouseResponse wareHouseResponse =
                 modelMapper.map(productsInWareHouse, ProductsInWareHouseResponse.class);
@@ -90,20 +104,16 @@ public class ProductsInWareHouseService {
     }
 
     public ApiResponse findAllByWarehouseIdAndActiveTrue(Integer wareHouseID, int page, int size) {
-        List<ProductsInWareHouseResponse> wareHouseResponses = new ArrayList<>();
         Page<ProductsInWareHouse> all = productsInWareHouseRepository
                 .findAllByWarehouseIdAndActiveTrue(wareHouseID, PageRequest.of(page, size));
-        all.map(productsInWareHouse ->
-                wareHouseResponses.add(modelMapper.map(productsInWareHouse, ProductsInWareHouseResponse.class)));
+        List<ProductsInWareHouseResponse> wareHouseResponses = getResponses(all);
         return new ApiResponse(Constants.SUCCESSFULLY, true, wareHouseResponses);
     }
 
     public ApiResponse getAllByBranchId(Integer branchId, int page, int size) {
-        List<ProductsInWareHouseResponse> wareHouseResponses = new ArrayList<>();
         Page<ProductsInWareHouse> all = productsInWareHouseRepository
                 .findAllByBranchIdAndActiveTrue(branchId, PageRequest.of(page, size));
-        all.map(productsInWareHouse ->
-                wareHouseResponses.add(modelMapper.map(productsInWareHouse, ProductsInWareHouseResponse.class)));
+        List<ProductsInWareHouseResponse> wareHouseResponses = getResponses(all);
         return new ApiResponse(Constants.SUCCESSFULLY, true, wareHouseResponses);
     }
 
@@ -118,39 +128,34 @@ public class ProductsInWareHouseService {
         productsInWareHouse.setWarehouse(warehouse);
     }
 
-    public void consumedProducts(DailyConsumedProductsRequest request) {
-        ProductsInWareHouse productsInWareHouse = productsInWareHouseRepository
-                .findByNameAndMeasurementTypeAndBranchIdAndWarehouseIdAndActiveTrue(
-                        request.getName(),
-                        request.getMeasurementType(),
-                        request.getBranchId(),
-                        request.getWarehouseId())
-                .orElseThrow(() -> new RecordNotFoundException(Constants.CONSUMED_PRODUCTS_NOT_FOUND));
-
-        productsInWareHouse.setQuantity(productsInWareHouse.getQuantity() - request.getQuantity());
-        checkingForValid(productsInWareHouse);
+    private static void reduceProductsQuantity(ProductsInWareHouse productsInWareHouse, double quantity) {
+        if (productsInWareHouse.getQuantity() >= quantity) {
+            productsInWareHouse.setQuantity(productsInWareHouse.getQuantity() - quantity);
+        } else {
+            throw new RecordNotFoundException(Constants.PRODUCT_NOT_ENOUGH_QUANTITY);
+        }
         if (productsInWareHouse.getQuantity() == 0) {
             productsInWareHouse.setActive(false);
         }
-        productsInWareHouseRepository.save(productsInWareHouse);
     }
 
-    public void rollBackConsumedProducts(DailyConsumedProducts consumedProducts) {
-        ProductsInWareHouse productsInWareHouse = productsInWareHouseRepository
-                .findByNameAndMeasurementTypeAndBranchIdAndWarehouseIdAndActiveTrue(
-                        consumedProducts.getName(),
-                        consumedProducts.getMeasurementType(),
-                        consumedProducts.getBranch().getId(),
-                        consumedProducts.getWarehouse().getId())
-                .orElseThrow(() -> new RecordNotFoundException(Constants.CONSUMED_PRODUCTS_NOT_FOUND));
-
-        productsInWareHouse.setQuantity(productsInWareHouse.getQuantity() + consumedProducts.getQuantity());
-        productsInWareHouseRepository.save(productsInWareHouse);
+    private List<ProductsInWareHouseResponse> getResponses(Page<ProductsInWareHouse> all) {
+        List<ProductsInWareHouseResponse> wareHouseResponses = new ArrayList<>();
+        all.map(productsInWareHouse ->
+                wareHouseResponses.add(modelMapper.map(productsInWareHouse, ProductsInWareHouseResponse.class)));
+        return wareHouseResponses;
     }
 
-    public void checkingForValid(ProductsInWareHouse productsInWareHouse) {
-        if (productsInWareHouse.getQuantity() < 0) {
-            throw new RecordNotFoundException(Constants.PRODUCT_NOT_ENOUGH_QUANTITY);
-        }
+    private ProductsInWareHouse getProductsInWareHouse(String name,
+                                                       MeasurementType measurementType,
+                                                       Integer branchId,
+                                                       Integer warehouseId) {
+        return productsInWareHouseRepository
+                .findByNameAndMeasurementTypeAndBranchIdAndWarehouseId(
+                        name,
+                        measurementType,
+                        branchId,
+                        warehouseId)
+                .orElseThrow(() -> new RecordNotFoundException(Constants.PRODUCTS_IN_WAREHOUSE_NOT_FOUND));
     }
 }

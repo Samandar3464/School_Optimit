@@ -28,24 +28,86 @@ import java.util.List;
 @RequiredArgsConstructor
 public class DailyConsumedProductsService implements BaseService<DailyConsumedProductsRequest, Integer> {
 
-    private final DailyConsumedProductsRepository dailyConsumedProductsRepository;
+    private final ModelMapper modelMapper;
+    private final UserRepository userRepository;
     private final BranchRepository branchRepository;
     private final WareHouseRepository wareHouseRepository;
-    private final UserRepository userRepository;
     private final ProductsInWareHouseService productsInWareHouseService;
-    private final ModelMapper modelMapper;
+    private final DailyConsumedProductsRepository dailyConsumedProductsRepository;
 
     @Override
     @Transactional(rollbackFor = {RecordNotFoundException.class, Exception.class})
     public ApiResponse create(DailyConsumedProductsRequest request) {
-        productsInWareHouseService.consumedProducts(request);
-        DailyConsumedProducts consumedProducts =
-                modelMapper.map(request, DailyConsumedProducts.class);
+        DailyConsumedProducts consumedProducts = getDailyConsumedProducts(request);
         setConsumedProducts(request, consumedProducts);
         dailyConsumedProductsRepository.save(consumedProducts);
+        DailyConsumedProductsResponse response = getResponse(consumedProducts);
+        return new ApiResponse(Constants.SUCCESSFULLY, true, response);
+    }
+
+    @Override
+    public ApiResponse getById(Integer integer) {
+        DailyConsumedProducts dailyConsumedProducts = getByID(integer);
+        DailyConsumedProductsResponse response = getResponse(dailyConsumedProducts);
+        return new ApiResponse(Constants.SUCCESSFULLY, true, response);
+    }
+
+    @Override
+    @Transactional(rollbackFor = {RecordNotFoundException.class, Exception.class})
+    public ApiResponse update(DailyConsumedProductsRequest request) {
+        updateWareHouse(request);
+        DailyConsumedProducts consumedProducts = modelMapper.map(request, DailyConsumedProducts.class);
+        consumedProducts.setId(request.getId());
+        setConsumedProducts(request, consumedProducts);
+        dailyConsumedProductsRepository.save(consumedProducts);
+        DailyConsumedProductsResponse response = getResponse(consumedProducts);
+        return new ApiResponse(Constants.SUCCESSFULLY, true, response);
+    }
+
+    @Override
+    public ApiResponse delete(Integer integer) {
+        DailyConsumedProducts dailyConsumedProducts = getByID(integer);
+        productsInWareHouseService.rollBackConsumedProducts(dailyConsumedProducts);
+        dailyConsumedProducts.setDelete(true);
+        dailyConsumedProductsRepository.save(dailyConsumedProducts);
+        DailyConsumedProductsResponse response = getResponse(dailyConsumedProducts);
+        return new ApiResponse(Constants.DELETED, true, response);
+    }
+
+    public ApiResponse getAllByWarehouseId(Integer warehouseId, int page, int size) {
+        Page<DailyConsumedProducts> all = dailyConsumedProductsRepository
+                .findAllByWarehouseIdAndDeleteFalse(warehouseId, PageRequest.of(page, size));
+        List<DailyConsumedProductsResponse> responses = toAllResponse(all);
+        return new ApiResponse(Constants.SUCCESSFULLY, true, responses);
+    }
+
+    public ApiResponse getAllByBranchId(Integer branchId, int page, int size) {
+        Page<DailyConsumedProducts> all = dailyConsumedProductsRepository
+                .findAllByBranchIdAndDeleteFalse(branchId, PageRequest.of(page, size));
+        List<DailyConsumedProductsResponse> responses = toAllResponse(all);
+        return new ApiResponse(Constants.SUCCESSFULLY, true, responses);
+    }
+
+    private List<DailyConsumedProductsResponse> toAllResponse(Page<DailyConsumedProducts> all) {
+        List<DailyConsumedProductsResponse> responses = new ArrayList<>();
+        all.forEach(dailyConsumedProducts -> {
+            DailyConsumedProductsResponse response = getResponse(dailyConsumedProducts);
+            responses.add(response);
+        });
+        return responses;
+    }
+
+    private void updateWareHouse(DailyConsumedProductsRequest request) {
+        DailyConsumedProducts old = getByID(request.getId());
+        productsInWareHouseService.rollBackConsumedProducts(old);
+        productsInWareHouseService.consumedProducts(request);
+    }
+
+    private DailyConsumedProductsResponse getResponse(DailyConsumedProducts consumedProducts) {
         DailyConsumedProductsResponse response =
                 modelMapper.map(consumedProducts, DailyConsumedProductsResponse.class);
-        return new ApiResponse(Constants.SUCCESSFULLY, true, response);
+        response.setLocalDateTime(consumedProducts.getLocalDateTime());
+        return response;
     }
 
     private void setConsumedProducts(DailyConsumedProductsRequest request, DailyConsumedProducts consumedProducts) {
@@ -56,69 +118,20 @@ public class DailyConsumedProductsService implements BaseService<DailyConsumedPr
         Warehouse warehouse = wareHouseRepository.findByIdAndActiveTrue(request.getWarehouseId())
                 .orElseThrow(() -> new RecordNotFoundException(Constants.WAREHOUSE_NOT_FOUND));
 
-        consumedProducts.setActive(true);
+        consumedProducts.setDelete(false);
         consumedProducts.setBranch(branch);
         consumedProducts.setEmployee(user);
         consumedProducts.setWarehouse(warehouse);
         consumedProducts.setLocalDateTime(LocalDateTime.now());
     }
 
-    @Override
-    public ApiResponse getById(Integer integer) {
-        DailyConsumedProducts dailyConsumedProducts = getByID(integer);
-        DailyConsumedProductsResponse response =
-                modelMapper.map(dailyConsumedProducts, DailyConsumedProductsResponse.class);
-        return new ApiResponse(Constants.SUCCESSFULLY, true, response);
+    private DailyConsumedProducts getDailyConsumedProducts(DailyConsumedProductsRequest request) {
+        productsInWareHouseService.consumedProducts(request);
+        return modelMapper.map(request, DailyConsumedProducts.class);
     }
 
     private DailyConsumedProducts getByID(Integer integer) {
-        return dailyConsumedProductsRepository
-                .findByIdAndActiveTrue(integer).orElseThrow(() -> new RecordNotFoundException(Constants.CONSUMED_PRODUCTS_NOT_FOUND));
-    }
-
-    @Override
-    @Transactional(rollbackFor = {RecordNotFoundException.class, Exception.class})
-    public ApiResponse update(DailyConsumedProductsRequest request) {
-        DailyConsumedProducts old = getByID(request.getId());
-        productsInWareHouseService.rollBackConsumedProducts(old);
-        productsInWareHouseService.consumedProducts(request);
-
-        DailyConsumedProducts consumedProducts =
-                modelMapper.map(request, DailyConsumedProducts.class);
-        setConsumedProducts(request, consumedProducts);
-        consumedProducts.setId(request.getId());
-        dailyConsumedProductsRepository.save(consumedProducts);
-        DailyConsumedProductsResponse response =
-                modelMapper.map(consumedProducts, DailyConsumedProductsResponse.class);
-        return new ApiResponse(Constants.SUCCESSFULLY, true, response);
-    }
-
-    @Override
-    public ApiResponse delete(Integer integer) {
-        DailyConsumedProducts dailyConsumedProducts = getByID(integer);
-        productsInWareHouseService.rollBackConsumedProducts(dailyConsumedProducts);
-        dailyConsumedProducts.setActive(false);
-        dailyConsumedProductsRepository.save(dailyConsumedProducts);
-        DailyConsumedProductsResponse response =
-                modelMapper.map(dailyConsumedProducts, DailyConsumedProductsResponse.class);
-        return new ApiResponse(Constants.DELETED, true, response);
-    }
-
-    public ApiResponse getAllByWarehouseId(Integer warehouseId, int page, int size) {
-        List<DailyConsumedProductsResponse> responses = new ArrayList<>();
-        Page<DailyConsumedProducts> all = dailyConsumedProductsRepository
-                .findAllByWarehouseIdAndActiveTrue(warehouseId, PageRequest.of(page, size));
-        all.map(dailyConsumedProducts ->
-                responses.add(modelMapper.map(dailyConsumedProducts, DailyConsumedProductsResponse.class)));
-        return new ApiResponse(Constants.SUCCESSFULLY, true, responses);
-    }
-
-    public ApiResponse getAllByBranchId(Integer branchId, int page, int size) {
-        List<DailyConsumedProductsResponse> responses = new ArrayList<>();
-        Page<DailyConsumedProducts> all = dailyConsumedProductsRepository
-                .findAllByBranchIdAndActiveTrue(branchId, PageRequest.of(page, size));
-        all.map(dailyConsumedProducts ->
-                responses.add(modelMapper.map(dailyConsumedProducts, DailyConsumedProductsResponse.class)));
-        return new ApiResponse(Constants.SUCCESSFULLY, true, responses);
+        return dailyConsumedProductsRepository.findByIdAndDeleteFalse(integer)
+                .orElseThrow(() -> new RecordNotFoundException(Constants.CONSUMED_PRODUCTS_NOT_FOUND));
     }
 }
