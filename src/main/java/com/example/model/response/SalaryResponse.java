@@ -37,6 +37,8 @@ public class SalaryResponse {
 
     private double classLeaderSalary;
 
+    private Integer mainBalanceId;
+
     public static SalaryResponse toResponse(Salary salary) {
         return SalaryResponse
                 .builder()
@@ -51,6 +53,7 @@ public class SalaryResponse {
                 .branch(salary.getBranch())
                 .partlySalary(salary.getPartlySalary())
                 .classLeaderSalary(salary.getClassLeaderSalary())
+                .mainBalanceId(salary.getMainBalance().getId())
                 .build();
     }
 
