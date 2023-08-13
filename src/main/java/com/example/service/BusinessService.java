@@ -4,6 +4,7 @@ import com.example.entity.Business;
 import com.example.exception.RecordAlreadyExistException;
 import com.example.exception.RecordNotFoundException;
 import com.example.model.common.ApiResponse;
+import com.example.model.request.BusinessRequest;
 import com.example.model.response.BusinessResponseListForAdmin;
 import com.example.repository.BusinessRepository;
 import lombok.RequiredArgsConstructor;
@@ -18,13 +19,13 @@ import static com.example.enums.Constants.*;
 
 @RequiredArgsConstructor
 @Service
-public class BusinessService implements BaseService<Business, Integer> {
+public class BusinessService implements BaseService<BusinessRequest, Integer> {
 
     private final BusinessRepository businessRepository;
 
     @Override
     @ResponseStatus(HttpStatus.CREATED)
-    public ApiResponse create(Business business) {
+    public ApiResponse create(BusinessRequest business) {
         if (businessRepository.existsByName(business.getName())) {
             throw new RecordAlreadyExistException(BUSINESS_NAME_ALREADY_EXIST);
         }
@@ -42,7 +43,7 @@ public class BusinessService implements BaseService<Business, Integer> {
 
     @Override
     @ResponseStatus(HttpStatus.OK)
-    public ApiResponse update(Business newBusiness) {
+    public ApiResponse update(BusinessRequest newBusiness) {
         Business business = businessRepository.findById(newBusiness.getId())
                 .orElseThrow(() -> new RecordNotFoundException(BUSINESS_NOT_FOUND));
         business.setPhoneNumber(newBusiness.getPhoneNumber());

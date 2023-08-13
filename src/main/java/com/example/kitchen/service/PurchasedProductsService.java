@@ -8,6 +8,7 @@ import com.example.kitchen.entity.PurchasedProducts;
 import com.example.kitchen.entity.Warehouse;
 import com.example.kitchen.model.response.PurchasedProductsResponse;
 import com.example.kitchen.model.request.PurchasedProductsRequest;
+import com.example.kitchen.model.response.PurchasedProductsResponsePage;
 import com.example.kitchen.repository.PurchasedProductsRepository;
 import com.example.kitchen.repository.WareHouseRepository;
 import com.example.model.common.ApiResponse;
@@ -101,24 +102,29 @@ public class PurchasedProductsService implements BaseService<PurchasedProductsRe
     public ApiResponse getAllByWarehouseId(Integer warehouseId, int page, int size) {
         Page<PurchasedProducts> all = purchasedProductsRepository
                 .findAllByWarehouseIdAndDeleteFalse(warehouseId, PageRequest.of(page, size));
-        List<PurchasedProductsResponse> responses = getPurchasedProductsResponses(all);
+        PurchasedProductsResponsePage responses = getPurchasedProductsResponses(all);
         return new ApiResponse(Constants.SUCCESSFULLY, true, responses);
     }
 
     public ApiResponse getAllByBranchId(Integer branchId, int page, int size) {
         Page<PurchasedProducts> all = purchasedProductsRepository
                 .findAllByBranch_IdAndDeleteFalse(branchId, PageRequest.of(page, size));
-        List<PurchasedProductsResponse> responses = getPurchasedProductsResponses(all);
+        PurchasedProductsResponsePage responses = getPurchasedProductsResponses(all);
         return new ApiResponse(Constants.SUCCESSFULLY, true, responses);
     }
 
-    private List<PurchasedProductsResponse> getPurchasedProductsResponses(Page<PurchasedProducts> all) {
+    private PurchasedProductsResponsePage getPurchasedProductsResponses(Page<PurchasedProducts> all) {
+        PurchasedProductsResponsePage responsePage = new PurchasedProductsResponsePage();
+        responsePage.setTotalPage(all.getTotalPages());
+        responsePage.setTotalElements(all.getTotalElements());
+
         List<PurchasedProductsResponse> responses = new ArrayList<>();
         all.forEach(purchasedProducts -> {
             PurchasedProductsResponse response = getResponse(purchasedProducts);
             responses.add(response);
         });
-        return responses;
+        responsePage.setPurchasedProductsResponses(responses);
+        return responsePage;
     }
 
     private PurchasedProductsResponse getResponse(PurchasedProducts purchasedProducts) {

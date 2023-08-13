@@ -52,12 +52,12 @@ public class TransactionHistoryResponse {
                 .accountNumber(transactionHistory.getStudent() == null ? null : transactionHistory.getStudent().getAccountNumber())
                 .paidInFull(transactionHistory.isPaidInFull())
                 .paymentType(transactionHistory.getPaymentType())
-                .branch(transactionHistory.getBranch())
-                .mainBalanceResponse(MainBalanceResponse.toResponse(transactionHistory.getMainBalance()))
+                .branch(transactionHistory.getBranch() == null ? null : transactionHistory.getBranch())
+                .mainBalanceResponse(transactionHistory.getMainBalance() == null ? null : MainBalanceResponse.toResponse(transactionHistory.getMainBalance()))
                 .taker(transactionHistory.getTaker() == null ? null : UserResponseDto.from(transactionHistory.getTaker()))
                 .student(transactionHistory.getStudent() == null ? null : StudentResponse.from(transactionHistory.getStudent()))
                 .comment(transactionHistory.getComment())
-                .date(transactionHistory.getDate().toString())
+                .date(transactionHistory.getDate() == null ? null : transactionHistory.getDate().toString())
                 .build();
     }
 

@@ -30,6 +30,4 @@ public class RoomType {
 
     @Transient
     private Integer comingBranchId;
-
-
 }

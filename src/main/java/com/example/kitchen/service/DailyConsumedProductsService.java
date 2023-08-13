@@ -8,6 +8,7 @@ import com.example.kitchen.entity.DailyConsumedProducts;
 import com.example.kitchen.entity.Warehouse;
 import com.example.kitchen.model.response.DailyConsumedProductsResponse;
 import com.example.kitchen.model.request.DailyConsumedProductsRequest;
+import com.example.kitchen.model.response.DailyConsumedProductsResponsePage;
 import com.example.kitchen.repository.DailyConsumedProductsRepository;
 import com.example.kitchen.repository.WareHouseRepository;
 import com.example.model.common.ApiResponse;
@@ -77,24 +78,29 @@ public class DailyConsumedProductsService implements BaseService<DailyConsumedPr
     public ApiResponse getAllByWarehouseId(Integer warehouseId, int page, int size) {
         Page<DailyConsumedProducts> all = dailyConsumedProductsRepository
                 .findAllByWarehouseIdAndDeleteFalse(warehouseId, PageRequest.of(page, size));
-        List<DailyConsumedProductsResponse> responses = toAllResponse(all);
+        DailyConsumedProductsResponsePage responses = toAllResponse(all);
         return new ApiResponse(Constants.SUCCESSFULLY, true, responses);
     }
 
     public ApiResponse getAllByBranchId(Integer branchId, int page, int size) {
         Page<DailyConsumedProducts> all = dailyConsumedProductsRepository
                 .findAllByBranchIdAndDeleteFalse(branchId, PageRequest.of(page, size));
-        List<DailyConsumedProductsResponse> responses = toAllResponse(all);
+        DailyConsumedProductsResponsePage responses = toAllResponse(all);
         return new ApiResponse(Constants.SUCCESSFULLY, true, responses);
     }
 
-    private List<DailyConsumedProductsResponse> toAllResponse(Page<DailyConsumedProducts> all) {
+    private DailyConsumedProductsResponsePage toAllResponse(Page<DailyConsumedProducts> all) {
+        DailyConsumedProductsResponsePage responsePage = new DailyConsumedProductsResponsePage();
+        responsePage.setTotalPage(all.getTotalPages());
+        responsePage.setTotalElements(all.getTotalElements());
+
         List<DailyConsumedProductsResponse> responses = new ArrayList<>();
         all.forEach(dailyConsumedProducts -> {
             DailyConsumedProductsResponse response = getResponse(dailyConsumedProducts);
             responses.add(response);
         });
-        return responses;
+        responsePage.setDailyConsumedProductsResponses(responses);
+        return responsePage;
     }
 
     private void updateWareHouse(DailyConsumedProductsRequest request) {
