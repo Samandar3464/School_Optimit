@@ -20,7 +20,7 @@ public interface StudentRepository extends JpaRepository<Student, Integer> {
     List<Student> findAllByBranchIdAndActiveFalseOrderByAddedTimeAsc(Integer branchId,Sort sort);
 
 
-    List<Student> findByFamilyIn(Collection<List<Family>> family, Sort sort);
+    List<Student> findByFamiliesIn(Collection<List<Family>> families, Sort sort);
 
     Optional<Student> findByIdAndActiveTrue(Integer id);
     Optional<Student> findByAccountNumberAndActiveTrue(String accountNumber);

@@ -17,4 +17,7 @@ public interface FamilyRepository extends JpaRepository<Family,Integer> {
     boolean existsByPhoneNumber(@NotBlank @Size(min = 9, max = 9) String phoneNumber);
 
     Optional<Family> findByPhoneNumberAndPassword(@NotBlank @Size(min = 9, max = 9) String phoneNumber, @NotBlank @Size(min = 6) String password);
+
+    Optional<Family> findByIdAndActiveTrue(Integer integer);
+
 }

@@ -75,7 +75,7 @@ public class Student {
 
     @JsonIgnore
     @ManyToMany(cascade = CascadeType.ALL)
-    private List<Family> family;
+    private List<Family> families;
 
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)

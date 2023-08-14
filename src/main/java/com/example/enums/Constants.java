@@ -54,7 +54,7 @@ public class Constants {
     public static final String SUBJECT_ALREADY_EXIST = "SUBJECT_ALREADY_EXIST";
 
     public static final String TOPIC_NOT_FOUND = "TOPIC_NOT_FOUND";
-    public static final String TEACHER_ALREADY_EXIST = "TEACHER_ALREADY_EXIST";
+    public static final String TEACHER_ALREADY_BUSY = "TEACHER_ALREADY_BUSY";
     public static final String TEACHER_NOT_FOUND = "TEACHER_NOT_FOUND";
     public static final String TOPIC_ALREADY_EXIST = "Bu fan ichida huddu shunaqa majzu mavjud.";
 
@@ -133,4 +133,7 @@ public class Constants {
     public static final String DRINKS_IN_WAREHOUSE_NOT_ENOUGH = "DRINKS_IN_WAREHOUSE_NOT_ENOUGH";
     public static final String CONSUMED_PRODUCTS_NOT_FOUND = "CONSUMED_PRODUCTS_NOT_FOUND";
     public static final String DO_NOT_CHANGE_BECAUSE_TIME_EXPIRED = "DO_NOT_CHANGE_BECAUSE_TIME_EXPIRED";
+    public static final String LESSON_SCHEDULE_ALREADY_EXISTS = "LESSON_SCHEDULE_ALREADY_EXISTS";
+    public static final String STUDENT_CLASS_BUSY = "STUDENT_CLASS_BUSY";
+    public static final String ROOM_BUSY = "ROOM_BUSY";
 }

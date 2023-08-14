@@ -5,6 +5,8 @@ import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import lombok.*;
 
+import java.time.LocalDate;
+
 
 @Getter
 @Setter
@@ -15,8 +17,7 @@ public class OverallReportRequest {
 
     private Integer id;
 
-    @Enumerated(EnumType.STRING)
-    private Months month;
+    private LocalDate date;
 
     private Integer userId;
 }

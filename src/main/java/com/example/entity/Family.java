@@ -2,8 +2,6 @@ package com.example.entity;
 
 import com.example.enums.Gender;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
 import lombok.*;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
@@ -22,35 +20,28 @@ public class Family {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @NotBlank
     private String fullName;
 
-    @NotBlank
-    @Size(min = 9,max = 9)
     private String phoneNumber;
 
-    @NotBlank
-    @Size(min = 6)
     private String password;
 
     private LocalDateTime registeredDate;
 
     private String fireBaseToken;
 
-    @Enumerated(EnumType.STRING)
     private Gender gender;
 
-    @Transient
+    @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
-    private Integer studentId;
+    private Student student;
 
     private boolean active;
 
     @ManyToOne
     private Branch branch;
 
-    @Transient
-    private Integer comingBranchId;
+
     public static Family from(Family family){
         return Family.builder()
                 .fullName(family.getFullName())

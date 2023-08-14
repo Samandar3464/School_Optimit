@@ -1,6 +1,6 @@
 package com.example.model.response;
 
-import com.example.model.request.LessonScheduleDto;
+import com.example.model.request.LessonScheduleRequest;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -8,7 +8,7 @@ import lombok.Data;
 @AllArgsConstructor
 public class ErrorResponseSchedule {
 
-    private LessonScheduleDto lessonScheduleDto;
+    private LessonScheduleRequest lessonScheduleRequest;
 
     private String massage;
 }

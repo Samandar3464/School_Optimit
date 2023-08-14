@@ -1,22 +1,24 @@
 package com.example.service;
 
 import com.example.entity.*;
+import com.example.enums.Constants;
+import com.example.exception.RecordAlreadyExistException;
 import com.example.exception.RecordNotFoundException;
-import com.example.exception.UserNotFoundException;
 import com.example.model.common.ApiResponse;
-import com.example.model.request.LessonScheduleDto;
-import com.example.model.response.ErrorResponseSchedule;
+import com.example.model.request.LessonScheduleRequest;
 import com.example.model.response.LessonScheduleResponse;
+import com.example.model.response.LessonScheduleResponsePage;
+import com.example.model.response.StudentClassResponse;
+import com.example.model.response.UserResponseDto;
 import com.example.repository.*;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Sort;
+import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -25,7 +27,7 @@ import static com.example.enums.Constants.*;
 
 @Service
 @RequiredArgsConstructor
-public class LessonScheduleService implements BaseService<List<LessonScheduleDto>, Integer> {
+public class LessonScheduleService implements BaseService<LessonScheduleRequest, Integer> {
 
     private final BranchRepository branchRepository;
     private final UserRepository userRepository;
@@ -34,94 +36,37 @@ public class LessonScheduleService implements BaseService<List<LessonScheduleDto
     private final StudentClassRepository studentClassRepository;
     private final LessonScheduleRepository lessonScheduleRepository;
     private final TypeOfWorkRepository typeOfWorkRepository;
+    private final ModelMapper modelMapper;
 
     @Override
-    @ResponseStatus(HttpStatus.CREATED)
-    @Transactional(rollbackFor = {RecordNotFoundException.class, UserNotFoundException.class})
-    public ApiResponse create(List<LessonScheduleDto> scheduleDtoList) {
-        List<ErrorResponseSchedule> errorResponse = new ArrayList<>();
-        int i = 0;
-        for (LessonScheduleDto schd : scheduleDtoList) {
-            Optional<LessonSchedule> teacherBusy = lessonScheduleRepository.findFirstByBranchIdAndTeacherIdAndStartTimeAndActiveTrue(schd.getBranchId(), schd.getTeacherId(), schd.getStartTime());
-            Optional<LessonSchedule> studentClassBusy = lessonScheduleRepository.findFirstByBranchIdAndStudentClassIdAndStartTimeAndActiveTrue(schd.getBranchId(), schd.getStudentClassId(), schd.getStartTime());
-            Optional<LessonSchedule> roomBusy = lessonScheduleRepository.findFirstByBranchIdAndRoomIdAndStartTimeAndActiveTrue(schd.getBranchId(), schd.getRoomId(), schd.getStartTime());
-            if (teacherBusy.isPresent()) {
-                errorResponse.add(new ErrorResponseSchedule(schd, "teacher busy this time"));
-                if (studentClassBusy.isPresent()) {
-                    errorResponse.get(i).setMassage("teacher and class busy this time");
-                }
-                if (roomBusy.isPresent()) {
-                    errorResponse.get(i).setMassage("teacher , class and room busy this time");
-                }
-            } else if (studentClassBusy.isPresent()) {
-                errorResponse.add(new ErrorResponseSchedule(schd, "class busy this time"));
-                if (roomBusy.isPresent()) {
-                    errorResponse.get(i).setMassage("class and room busy this time");
-                }
-            } else if (roomBusy.isPresent()) {
-                errorResponse.add(new ErrorResponseSchedule(schd, "room busy this time"));
-            } else {
-                errorResponse.add(new ErrorResponseSchedule(schd, "Everything ok"));
-            }
-            i++;
-
-        }
-        for (ErrorResponseSchedule errorResponseSchedule : errorResponse) {
-            if (!errorResponseSchedule.getMassage().equals("Everything ok")) {
-                return new ApiResponse(errorResponse, false);
-            }
-        }
-        add(scheduleDtoList);
-        return new ApiResponse(SUCCESSFULLY, true);
+    public ApiResponse create(LessonScheduleRequest scheduleRequest) {
+        checkingLessonSchedule(scheduleRequest);
+        LessonSchedule lessonSchedule = modelMapper.map(scheduleRequest, LessonSchedule.class);
+        setLessonSchedule(scheduleRequest, lessonSchedule);
+        lessonScheduleRepository.save(lessonSchedule);
+        LessonScheduleResponse response = getLessonScheduleResponse(lessonSchedule);
+        return new ApiResponse(SUCCESSFULLY, true, response);
     }
 
-
     @Override
-    @ResponseStatus(HttpStatus.OK)
     public ApiResponse getById(Integer integer) {
         LessonSchedule lessonSchedule = lessonScheduleRepository.findById(integer)
                 .orElseThrow(() -> new RecordNotFoundException(LESSON_SCHEDULE_NOT_FOUND));
-        return new ApiResponse(LessonScheduleResponse.from(lessonSchedule), true);
-    }
-
-    @Override
-    @ResponseStatus(HttpStatus.OK)
-    public ApiResponse update(List<LessonScheduleDto> scheduleDtoList) {
-        return null;
+        LessonScheduleResponse response = getLessonScheduleResponse(lessonSchedule);
+        return new ApiResponse(SUCCESSFULLY, true, response);
     }
 
 
-    @ResponseStatus(HttpStatus.OK)
-    @Transactional(rollbackFor = {RecordNotFoundException.class, UserNotFoundException.class})
-    public ApiResponse update(LessonScheduleDto schd) {
-        Optional<LessonSchedule> teacherBusy = lessonScheduleRepository.findFirstByBranchIdAndTeacherIdAndStartTimeAndActiveTrue(schd.getBranchId(), schd.getTeacherId(), schd.getStartTime());
-        Optional<LessonSchedule> studentClassBusy = lessonScheduleRepository.findFirstByBranchIdAndStudentClassIdAndStartTimeAndActiveTrue(schd.getBranchId(), schd.getStudentClassId(), schd.getStartTime());
-        Optional<LessonSchedule> roomBusy = lessonScheduleRepository.findFirstByBranchIdAndRoomIdAndStartTimeAndActiveTrue(schd.getBranchId(), schd.getRoomId(), schd.getStartTime());
-        ErrorResponseSchedule errorResponse;
-        if (teacherBusy.isPresent()) {
-            errorResponse = new ErrorResponseSchedule(schd, "teacher busy this time");
-            if (studentClassBusy.isPresent()) {
-                errorResponse = new ErrorResponseSchedule(schd, "teacher and class busy this time");
-            }
-            if (roomBusy.isPresent()) {
-                errorResponse = new ErrorResponseSchedule(schd, "teacher , class and room busy this time");
-            }
-        } else if (studentClassBusy.isPresent()) {
-            errorResponse = new ErrorResponseSchedule(schd, "class busy this time");
-            if (roomBusy.isPresent()) {
-                errorResponse = new ErrorResponseSchedule(schd, "class and room busy this time");
-            }
-        } else if (roomBusy.isPresent()) {
-            errorResponse = new ErrorResponseSchedule(schd, "room busy this time");
-        } else {
-            errorResponse = new ErrorResponseSchedule(schd, "Everything ok");
-        }
-
-        if (!errorResponse.getMassage().equals("Everything ok")) {
-            return new ApiResponse(errorResponse, false);
-        }
-        updateCreator(schd);
-        return new ApiResponse(SUCCESSFULLY, true);
+    public ApiResponse update(LessonScheduleRequest lessonScheduleRequest) {
+        lessonScheduleRepository.findByIdAndActiveTrue(lessonScheduleRequest.getId())
+                .orElseThrow(() -> new RecordNotFoundException(LESSON_SCHEDULE_NOT_FOUND));
+        checkingLessonSchedule(lessonScheduleRequest);
+        LessonSchedule lessonSchedule = modelMapper.map(lessonScheduleRequest, LessonSchedule.class);
+        setLessonSchedule(lessonScheduleRequest, lessonSchedule);
+        lessonSchedule.setId(lessonScheduleRequest.getId());
+        lessonScheduleRepository.save(lessonSchedule);
+        LessonScheduleResponse response = getLessonScheduleResponse(lessonSchedule);
+        return new ApiResponse(SUCCESSFULLY, true, response);
     }
 
 
@@ -132,68 +77,105 @@ public class LessonScheduleService implements BaseService<List<LessonScheduleDto
                 .orElseThrow(() -> new RecordNotFoundException(LESSON_SCHEDULE_NOT_FOUND));
         lessonSchedule.setActive(false);
         lessonScheduleRepository.save(lessonSchedule);
-        return new ApiResponse(DELETED, true);
+        LessonScheduleResponse response = getLessonScheduleResponse(lessonSchedule);
+        return new ApiResponse(DELETED, true, response);
     }
 
-    @ResponseStatus(HttpStatus.OK)
-    public ApiResponse getAllByBranchId(Integer integer) {
-        int dayOfWeek = LocalDate.now().atStartOfDay().getDayOfWeek().getValue();
-        LocalDateTime startWeek = LocalDateTime.now().minusDays(dayOfWeek);
-        LocalDateTime endWeek = startWeek.plusDays(7);
-        List<LessonSchedule> lessonScheduleList = lessonScheduleRepository
-                .findAllByBranchIdAndActiveTrueAndStartTimeBetween(integer, startWeek, endWeek, Sort.by(Sort.Direction.DESC,"id"));
-        List<LessonScheduleResponse> lessonScheduleResponseList = new ArrayList<>();
-        lessonScheduleList.forEach(schedule -> lessonScheduleResponseList.add(LessonScheduleResponse.from(schedule)));
-        return new ApiResponse(lessonScheduleResponseList, true);
+
+    public ApiResponse getAllByBranchId(Integer integer, int page, int size) {
+        Page<LessonSchedule> all = lessonScheduleRepository.findByBranchIdAndActiveTrue(integer, PageRequest.of(page, size));
+        LessonScheduleResponsePage scheduleResponsePage = getLessonScheduleResponsePage(all);
+        return new ApiResponse(SUCCESSFULLY, true, scheduleResponsePage);
     }
 
-    private void add(List<LessonScheduleDto> scheduleDtoList) {
-        List<LessonSchedule> lessonScheduleList = new ArrayList<>();
-        scheduleDtoList.forEach(schd -> {
-            Branch branch = branchRepository.findById(schd.getBranchId()).orElseThrow(() -> new RecordNotFoundException(BRANCH_NOT_FOUND));
-            User teacher = userRepository.findById(schd.getTeacherId()).orElseThrow(() -> new UserNotFoundException(TEACHER_NOT_FOUND));
-            Subject subject = subjectRepository.findById(schd.getSubjectId()).orElseThrow(() -> new RecordNotFoundException(SUBJECT_NOT_FOUND));
-            Room room = roomRepository.findById(schd.getRoomId()).orElseThrow(() -> new RecordNotFoundException(ROOM_NOT_FOUND));
-            StudentClass studentClass = studentClassRepository.findById(schd.getStudentClassId()).orElseThrow(() -> new RecordNotFoundException(CLASS_NOT_FOUND));
-            TypeOfWork typeOfWork = typeOfWorkRepository.findById(schd.getTypeOfWorkId()).orElseThrow(() -> new RecordNotFoundException(TYPE_OF_WORK_NOT_FOUND));
+    public ApiResponse getAllByStudentClassLevel(Integer level, int page, int size) {
+        Page<LessonSchedule> all = lessonScheduleRepository.findByStudentClassLevel_IdAndActiveTrue(level, PageRequest.of(page, size));
+        LessonScheduleResponsePage scheduleResponsePage = getLessonScheduleResponsePage(all);
+        return new ApiResponse(SUCCESSFULLY, true, scheduleResponsePage);
+    }
 
-            LessonSchedule lessonSchedule = LessonSchedule.from(schd);
-            lessonSchedule.setBranch(branch);
-            lessonSchedule.setTeacher(teacher);
-            lessonSchedule.setSubject(subject);
-            lessonSchedule.setRoom(room);
-            lessonSchedule.setStudentClass(studentClass);
-            lessonSchedule.setTypeOfWork(typeOfWork);
-            lessonScheduleList.add(lessonSchedule);
+    public ApiResponse getAllByTeacherId(Integer teacherId, int page, int size) {
+        Page<LessonSchedule> all = lessonScheduleRepository.findByTeacherIdAndActiveTrue(teacherId, PageRequest.of(page, size));
+        LessonScheduleResponsePage scheduleResponsePage = getLessonScheduleResponsePage(all);
+        return new ApiResponse(SUCCESSFULLY, true, scheduleResponsePage);
+    }
+
+    private LessonScheduleResponsePage getLessonScheduleResponsePage(Page<LessonSchedule> all) {
+        LessonScheduleResponsePage scheduleResponsePage = new LessonScheduleResponsePage();
+        List<LessonScheduleResponse> responses = new ArrayList<>();
+        all.forEach(lessonSchedule -> {
+            responses.add(getLessonScheduleResponse(lessonSchedule));
         });
-        lessonScheduleRepository.saveAll(lessonScheduleList);
+        scheduleResponsePage.setLessonScheduleResponseList(responses);
+        scheduleResponsePage.setTotalPage(all.getTotalPages());
+        scheduleResponsePage.setTotalElement(all.getTotalElements());
+        return scheduleResponsePage;
     }
 
-    private void updateCreator(LessonScheduleDto schd) {
-        LessonSchedule lessonSchedule = lessonScheduleRepository.findById(schd.getId()).orElseThrow(() -> new RecordNotFoundException(LESSON_SCHEDULE_NOT_FOUND));
-        lessonSchedule.setDurationLesson(schd.getDurationLesson());
-        lessonSchedule.setStartTime(schd.getStartTime());
-        lessonSchedule.setEndTime(schd.getEndTime());
-        if (!schd.getTeacherId().equals(lessonSchedule.getTeacher().getId())) {
-            User teacher = userRepository.findById(schd.getTeacherId()).orElseThrow(() -> new UserNotFoundException(TEACHER_NOT_FOUND));
-            lessonSchedule.setTeacher(teacher);
+    private LessonScheduleResponse getLessonScheduleResponse(LessonSchedule lessonSchedule) {
+        LessonScheduleResponse response = modelMapper.map(lessonSchedule, LessonScheduleResponse.class);
+        response.setDate(lessonSchedule.getDate().toString());
+        response.setTeacher(modelMapper.map(lessonSchedule.getTeacher(), UserResponseDto.class));
+        response.setStudentClass(modelMapper.map(lessonSchedule.getStudentClass(), StudentClassResponse.class));
+        return response;
+    }
+
+    private void checkingLessonSchedule(LessonScheduleRequest lessonScheduleRequest) {
+
+        Optional<LessonSchedule> studentClassOptional = lessonScheduleRepository
+                .findByStudentClassIdAndLessonHourAndBranchIdAndDateAndActiveTrue(
+                        lessonScheduleRequest.getStudentClassId(),
+                        lessonScheduleRequest.getLessonHour(),
+                        lessonScheduleRequest.getBranchId(),
+                        lessonScheduleRequest.getLocalDate());
+
+        if (studentClassOptional.isPresent()) {
+            throw new RecordAlreadyExistException(Constants.STUDENT_CLASS_BUSY);
         }
-        if (!schd.getSubjectId().equals(lessonSchedule.getSubject().getId())) {
-            Subject subject = subjectRepository.findById(schd.getSubjectId()).orElseThrow(() -> new RecordNotFoundException(SUBJECT_NOT_FOUND));
-            lessonSchedule.setSubject(subject);
+
+        Optional<LessonSchedule> teacherOptional = lessonScheduleRepository
+                .findByTeacherIdAndLessonHourAndBranchIdAndDateAndActiveTrue(
+                        lessonScheduleRequest.getTeacherId(),
+                        lessonScheduleRequest.getLessonHour(),
+                        lessonScheduleRequest.getBranchId(),
+                        lessonScheduleRequest.getLocalDate());
+
+        if (teacherOptional.isPresent()) {
+            throw new RecordAlreadyExistException(TEACHER_ALREADY_BUSY);
         }
-        if (!schd.getRoomId().equals(lessonSchedule.getRoom().getId())) {
-            Room room = roomRepository.findById(schd.getRoomId()).orElseThrow(() -> new RecordNotFoundException(ROOM_NOT_FOUND));
-            lessonSchedule.setRoom(room);
+
+        Optional<LessonSchedule> roomOptional = lessonScheduleRepository
+                .findByRoomIdAndLessonHourAndBranchIdAndDateAndActiveTrue(
+                        lessonScheduleRequest.getRoomId(),
+                        lessonScheduleRequest.getLessonHour(),
+                        lessonScheduleRequest.getBranchId(),
+                        lessonScheduleRequest.getLocalDate());
+
+        if (roomOptional.isPresent()) {
+            throw new RecordAlreadyExistException(Constants.ROOM_BUSY);
         }
-        if (!schd.getStudentClassId().equals(lessonSchedule.getStudentClass().getId())) {
-            StudentClass studentClass = studentClassRepository.findById(schd.getStudentClassId()).orElseThrow(() -> new RecordNotFoundException(CLASS_NOT_FOUND));
-            lessonSchedule.setStudentClass(studentClass);
-        }
-        if (!schd.getTeacherId().equals(lessonSchedule.getTypeOfWork().getId())) {
-            TypeOfWork typeOfWork = typeOfWorkRepository.findById(schd.getTypeOfWorkId()).orElseThrow(() -> new RecordNotFoundException(TYPE_OF_WORK_NOT_FOUND));
-            lessonSchedule.setTypeOfWork(typeOfWork);
-        }
-        lessonScheduleRepository.save(lessonSchedule);
+    }
+
+    private void setLessonSchedule(LessonScheduleRequest scheduleRequest, LessonSchedule lessonSchedule) {
+        User user = userRepository.findByIdAndBlockedFalse(scheduleRequest.getTeacherId())
+                .orElseThrow(() -> new RecordNotFoundException(USER_NOT_FOUND));
+        Branch branch = branchRepository.findByIdAndDeleteFalse(scheduleRequest.getBranchId())
+                .orElseThrow(() -> new RecordNotFoundException(BRANCH_NOT_FOUND));
+        StudentClass studentClass = studentClassRepository.findByIdAndActiveTrue(scheduleRequest.getStudentClassId())
+                .orElseThrow(() -> new RecordNotFoundException(CLASS_NOT_FOUND));
+        TypeOfWork typeOfWork = typeOfWorkRepository.findById(scheduleRequest.getTypeOfWorkId())
+                .orElseThrow(() -> new RecordNotFoundException(TYPE_OF_WORK_NOT_FOUND));
+        Room room = roomRepository.findByIdAndActiveTrue(scheduleRequest.getRoomId())
+                .orElseThrow(() -> new RecordNotFoundException(ROOM_NOT_FOUND));
+        Subject subject = subjectRepository.findByIdAndActiveTrue(scheduleRequest.getSubjectId())
+                .orElseThrow(() -> new RecordNotFoundException(SUBJECT_NOT_FOUND));
+
+        lessonSchedule.setActive(true);
+        lessonSchedule.setRoom(room);
+        lessonSchedule.setTeacher(user);
+        lessonSchedule.setBranch(branch);
+        lessonSchedule.setSubject(subject);
+        lessonSchedule.setTypeOfWork(typeOfWork);
+        lessonSchedule.setStudentClass(studentClass);
     }
 }

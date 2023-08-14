@@ -1,13 +1,11 @@
 package com.example.entity;
 
-import com.example.model.request.StaffAttendanceRequest;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -23,10 +21,6 @@ public class StaffAttendance {
 
     private boolean cameToWork;
 
-    private LocalDateTime comeTime;
-
-    private LocalDateTime leaveTime;
-
     private LocalDate date;
 
     private String description;
@@ -38,15 +32,4 @@ public class StaffAttendance {
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Branch branch;
-
-    public static StaffAttendance toStaffAttendance(StaffAttendanceRequest staffAttendanceRequest){
-        return StaffAttendance
-                .builder()
-                .cameToWork(staffAttendanceRequest.isCameToWork())
-                .description(staffAttendanceRequest.getDescription())
-                .comeTime(staffAttendanceRequest.getComeTime())
-                .leaveTime(staffAttendanceRequest.getLeaveTime())
-                .date(staffAttendanceRequest.getDate())
-                .build();
-    }
 }

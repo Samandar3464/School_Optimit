@@ -1,12 +1,10 @@
 package com.example.controller;
 
 import com.example.model.common.ApiResponse;
-import com.example.model.request.LessonScheduleDto;
+import com.example.model.request.LessonScheduleRequest;
 import com.example.service.LessonScheduleService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -16,8 +14,8 @@ public class LessonScheduleController {
     private final LessonScheduleService lessonScheduleService;
 
     @PostMapping("/create")
-    public ApiResponse create(@RequestBody List<LessonScheduleDto> lessonScheduleDtoList) {
-        return lessonScheduleService.create(lessonScheduleDtoList);
+    public ApiResponse create(@RequestBody LessonScheduleRequest lessonScheduleRequest) {
+        return lessonScheduleService.create(lessonScheduleRequest);
     }
 
     @GetMapping("/getById/{id}")
@@ -26,8 +24,8 @@ public class LessonScheduleController {
     }
 
     @PutMapping("/update")
-    public ApiResponse update(@RequestBody LessonScheduleDto lessonScheduleDto) {
-        return lessonScheduleService.update(lessonScheduleDto);
+    public ApiResponse update(@RequestBody LessonScheduleRequest lessonScheduleRequest) {
+        return lessonScheduleService.update(lessonScheduleRequest);
     }
 
     @DeleteMapping("/delete/{id}")
@@ -35,8 +33,24 @@ public class LessonScheduleController {
         return lessonScheduleService.delete(id);
     }
 
-    @GetMapping("/getAllActiveSchedule/{id}")
-    public ApiResponse getAllActiveClasses(@PathVariable Integer id) {
-        return lessonScheduleService.getAllByBranchId(id);
+    @GetMapping("/getAllByBranchId/{branchId}")
+    public ApiResponse getAllActiveClasses(@PathVariable Integer branchId,
+                                           @RequestParam(name = "page", defaultValue = "0") int page,
+                                           @RequestParam(name = "size", defaultValue = "5") int size) {
+        return lessonScheduleService.getAllByBranchId(branchId, page, size);
+    }
+
+    @GetMapping("/getAllByTeacherId/{teacherId}")
+    public ApiResponse getAllByTeacherId(@PathVariable Integer teacherId,
+                                           @RequestParam(name = "page", defaultValue = "0") int page,
+                                           @RequestParam(name = "size", defaultValue = "5") int size) {
+        return lessonScheduleService.getAllByTeacherId(teacherId, page, size);
+    }
+
+    @GetMapping("/getAllByStudentClassLevel/{levelId}")
+    public ApiResponse getAllByStudentClassLevel(@PathVariable Integer levelId,
+                                           @RequestParam(name = "page", defaultValue = "0") int page,
+                                           @RequestParam(name = "size", defaultValue = "5") int size) {
+        return lessonScheduleService.getAllByStudentClassLevel(levelId, page, size);
     }
 }
