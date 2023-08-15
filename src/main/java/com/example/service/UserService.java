@@ -3,7 +3,6 @@ package com.example.service;
 import com.example.config.jwtConfig.JwtGenerate;
 import com.example.entity.Attachment;
 import com.example.entity.User;
-import com.example.enums.Constants;
 import com.example.exception.RecordAlreadyExistException;
 import com.example.exception.RecordNotFoundException;
 import com.example.exception.UserNotFoundException;
@@ -11,8 +10,8 @@ import com.example.model.common.ApiResponse;
 import com.example.model.request.*;
 import com.example.model.response.NotificationMessageResponse;
 import com.example.model.response.TokenResponse;
-import com.example.model.response.UserResponseDto;
-import com.example.model.response.UserResponseListForAdmin;
+import com.example.model.response.UserResponse;
+import com.example.model.response.UserResponsePage;
 import com.example.repository.BranchRepository;
 import com.example.repository.RoleRepository;
 import com.example.repository.SubjectRepository;
@@ -162,21 +161,21 @@ public class UserService implements BaseService<UserRegisterDto, Integer> {
     @ResponseStatus(HttpStatus.OK)
     public ApiResponse getUserList(int page, int size) {
         Page<User> all = userRepository.findAll(PageRequest.of(page, size));
-        List<UserResponseDto> userResponseDtoList = new ArrayList<>();
-        all.forEach(obj -> userResponseDtoList.add(toUserResponse(obj)));
-        return new ApiResponse(new UserResponseListForAdmin(userResponseDtoList, all.getTotalElements(), all.getTotalPages(), all.getNumber()), true);
+        List<UserResponse> userResponseList = new ArrayList<>();
+        all.forEach(obj -> userResponseList.add(toUserResponse(obj)));
+        return new ApiResponse(new UserResponsePage(userResponseList, all.getTotalElements(), all.getTotalPages(), all.getNumber()), true);
     }
 
     public ApiResponse getUserListByBranchId(int page, int size,Integer branchId) {
         Page<User> all = userRepository.findAllByBranch_IdAndBlockedFalse(branchId,PageRequest.of(page, size));
-        List<UserResponseDto> userResponseDtoList = new ArrayList<>();
-        all.forEach(obj -> userResponseDtoList.add(toUserResponse(obj)));
-        return new ApiResponse(new UserResponseListForAdmin(userResponseDtoList, all.getTotalElements(), all.getTotalPages(), all.getNumber()), true);
+        List<UserResponse> userResponseList = new ArrayList<>();
+        all.forEach(obj -> userResponseList.add(toUserResponse(obj)));
+        return new ApiResponse(new UserResponsePage(userResponseList, all.getTotalElements(), all.getTotalPages(), all.getNumber()), true);
     }
 
     public ApiResponse getUserListByBranchId(Integer branchId) {
         List<User> all = userRepository.findAllByBranch_IdAndBlockedFalse(branchId, Sort.by(Sort.Direction.DESC,"id"));
-        List<UserResponseDto> responseDtoList = new ArrayList<>();
+        List<UserResponse> responseDtoList = new ArrayList<>();
         all.forEach(obj -> responseDtoList.add(toUserResponse(obj)));
         return new ApiResponse(responseDtoList, true);
     }
@@ -184,9 +183,9 @@ public class UserService implements BaseService<UserRegisterDto, Integer> {
     @ResponseStatus(HttpStatus.OK)
     public ApiResponse getUserList() {
         List<User> all = userRepository.findAll();
-        List<UserResponseDto> userResponseDtoList = new ArrayList<>();
-        all.forEach(obj -> userResponseDtoList.add(toUserResponse(obj)));
-        return new ApiResponse(userResponseDtoList, true);
+        List<UserResponse> userResponseList = new ArrayList<>();
+        all.forEach(obj -> userResponseList.add(toUserResponse(obj)));
+        return new ApiResponse(userResponseList, true);
     }
 
     @ResponseStatus(HttpStatus.OK)
@@ -227,10 +226,10 @@ public class UserService implements BaseService<UserRegisterDto, Integer> {
         return new ApiResponse(SUCCESSFULLY, true, toUserResponse(user));
     }
 
-    public UserResponseDto toUserResponse(User user) {
-        UserResponseDto userResponseDto = UserResponseDto.from(user);
-        userResponseDto.setProfilePhotoUrl(getPhotoLink(user.getProfilePhoto()));
-        return userResponseDto;
+    public UserResponse toUserResponse(User user) {
+        UserResponse userResponse = getResponse(user);
+        userResponse.setProfilePhotoUrl(getPhotoLink(user.getProfilePhoto()));
+        return userResponse;
     }
 
     @ResponseStatus(HttpStatus.OK)
@@ -295,6 +294,10 @@ public class UserService implements BaseService<UserRegisterDto, Integer> {
         user.setPassword(passwordEncoder.encode(userRegisterDto.getPassword()));
         user.setSubjects(userRegisterDto.getSubjectsIds() == null ? null : subjectRepository.findAllById(userRegisterDto.getSubjectsIds()));
         return user;
+    }
+
+    public UserResponse getResponse(User user) {
+        return null;
     }
 }
 

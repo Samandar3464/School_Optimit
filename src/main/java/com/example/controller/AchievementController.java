@@ -35,7 +35,9 @@ public class AchievementController {
     }
 
     @GetMapping("getByUserId/{userId}")
-    public ApiResponse getAllByUserId(@PathVariable Integer userId) {
-        return achievementService.getAllByUserId(userId);
+    public ApiResponse getAllByUserId(@PathVariable Integer userId,
+                                      @RequestParam(name = "page", defaultValue = "0") int page,
+                                      @RequestParam(name = "size", defaultValue = "5") int size) {
+        return achievementService.getAllByUserId(userId, page, size);
     }
 }

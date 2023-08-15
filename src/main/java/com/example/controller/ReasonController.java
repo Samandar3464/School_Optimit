@@ -1,7 +1,7 @@
 //package com.example.controller;
 //
 //import com.example.model.common.ApiResponse;
-//import com.example.model.request.JournalRequestDto;
+//import com.example.model.request.JournalRequest;
 //import com.example.model.request.ReasonRequestDto;
 //import com.example.service.ReasonService;
 //import lombok.RequiredArgsConstructor;

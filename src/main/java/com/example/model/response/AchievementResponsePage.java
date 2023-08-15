@@ -5,8 +5,8 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class TeachingHoursResponseForPage {
-    private List<TeachingHoursResponse> teachingHoursResponses;
+public class AchievementResponsePage {
+    private List<AchievementResponse> achievementResponses;
     private long totalElement;
     private int totalPage;
 }

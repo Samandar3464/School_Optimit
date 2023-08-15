@@ -9,9 +9,11 @@ import com.example.model.request.StudentHomeworkRequest;
 import com.example.model.response.StudentHomeworkResponse;
 import com.example.repository.*;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -19,6 +21,7 @@ import java.util.List;
 public class StudentHomeworkService implements BaseService<StudentHomeworkRequest, Integer> {
 
     private final StudentHomeworkRepository studentHomeworkRepository;
+    private final ModelMapper modelMapper;
     private final UserRepository userRepository;
     private final BranchRepository branchRepository;
     private final SubjectRepository subjectRepository;
@@ -31,13 +34,20 @@ public class StudentHomeworkService implements BaseService<StudentHomeworkReques
         StudentHomework studentHomework = StudentHomework.toEntity(request);
         setStudentHomework(request, studentHomework);
         studentHomeworkRepository.save(studentHomework);
-        return new ApiResponse(Constants.SUCCESSFULLY, true);
+        StudentHomeworkResponse response = getStudentHomeworkResponse(studentHomework);
+        return new ApiResponse(Constants.SUCCESSFULLY, true,response);
+    }
+
+    private StudentHomeworkResponse getStudentHomeworkResponse(StudentHomework studentHomework) {
+        StudentHomeworkResponse response = modelMapper.map(studentHomework, StudentHomeworkResponse.class);
+        response.setDate(studentHomework.getDate().toString());
+        return response;
     }
 
     @Override
     public ApiResponse getById(Integer integer) {
         StudentHomework studentHomework = getStudentHomework(integer);
-        return new ApiResponse(Constants.SUCCESSFULLY, true, StudentHomeworkResponse.toResponse(studentHomework));
+        return new ApiResponse(Constants.SUCCESSFULLY, true, getStudentHomeworkResponse(studentHomework));
     }
 
     @Override
@@ -48,17 +58,27 @@ public class StudentHomeworkService implements BaseService<StudentHomeworkReques
         studentHomework.setId(request.getId());
         setStudentHomework(request, studentHomework);
         studentHomeworkRepository.save(studentHomework);
-        return new ApiResponse(Constants.SUCCESSFULLY, true, StudentHomeworkResponse.toResponse(studentHomework));
+        return new ApiResponse(Constants.SUCCESSFULLY, true, getStudentHomeworkResponse(studentHomework));
     }
 
     public ApiResponse getList() {
         List<StudentHomework> all = studentHomeworkRepository.findAll();
-        return new ApiResponse(Constants.SUCCESSFULLY, true, StudentHomeworkResponse.toAllResponse(all));
+        List<StudentHomeworkResponse> responses = getStudentHomeworkResponses(all);
+        return new ApiResponse(Constants.SUCCESSFULLY, true, responses);
+    }
+
+    private List<StudentHomeworkResponse> getStudentHomeworkResponses(List<StudentHomework> all) {
+        List<StudentHomeworkResponse> responses = new ArrayList<>();
+        all.forEach(studentHomework -> {
+            responses.add(getStudentHomeworkResponse(studentHomework));
+        });
+        return responses;
     }
 
     public ApiResponse getListByActive() {
         List<StudentHomework> all = studentHomeworkRepository.findAllByActiveTrue( Sort.by(Sort.Direction.DESC,"id"));
-        return new ApiResponse(Constants.SUCCESSFULLY, true, StudentHomeworkResponse.toAllResponse(all));
+        List<StudentHomeworkResponse> studentHomeworkResponses = getStudentHomeworkResponses(all);
+        return new ApiResponse(Constants.SUCCESSFULLY, true,studentHomeworkResponses);
     }
 
     @Override
@@ -66,7 +86,7 @@ public class StudentHomeworkService implements BaseService<StudentHomeworkReques
         StudentHomework studentHomework = getStudentHomework(integer);
         studentHomework.setActive(false);
         studentHomeworkRepository.save(studentHomework);
-        return new ApiResponse(Constants.SUCCESSFULLY, true, StudentHomeworkResponse.toResponse(studentHomework));
+        return new ApiResponse(Constants.SUCCESSFULLY, true, getStudentHomeworkResponse(studentHomework));
     }
 
     private void setStudentHomework(StudentHomeworkRequest request, StudentHomework studentHomework) {
@@ -83,6 +103,7 @@ public class StudentHomeworkService implements BaseService<StudentHomeworkReques
     }
 
     private StudentHomework getStudentHomework(Integer integer) {
-        return studentHomeworkRepository.findByIdAndActiveTrue(integer).orElseThrow(() -> new RecordNotFoundException(Constants.STUDENT_HOMEWORK_NOT_FOUND));
+        return studentHomeworkRepository.findByIdAndActiveTrue(integer)
+                .orElseThrow(() -> new RecordNotFoundException(Constants.STUDENT_HOMEWORK_NOT_FOUND));
     }
 }

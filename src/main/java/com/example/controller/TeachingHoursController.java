@@ -45,8 +45,9 @@ public class TeachingHoursController {
     }
 
     @GetMapping("/getAll")
-    public ApiResponse getAll() {
-        return teachingHoursService.getAll();
+    public ApiResponse getAll(@RequestParam(name = "page", defaultValue = "0") int page,
+                              @RequestParam(name = "size", defaultValue = "5") int size) {
+        return teachingHoursService.getAll(page, size);
     }
 
     @PutMapping("/update")

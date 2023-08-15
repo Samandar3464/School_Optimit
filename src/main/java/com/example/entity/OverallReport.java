@@ -20,7 +20,7 @@ public class OverallReport {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    private LocalDate localDate;
+    private LocalDate date;
 
     private String classLeadership;
 

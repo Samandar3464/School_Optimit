@@ -32,7 +32,7 @@ public class SalaryController {
     public ApiResponse giveDebtToEmployee(@RequestParam String phoneNumber,
                                           @RequestParam double debitAmount,
                                           @RequestParam PaymentType paymentType) {
-        return salaryService.giveDebtToEmployee(phoneNumber, debitAmount, paymentType);
+        return salaryService.giveDebt(phoneNumber, debitAmount, paymentType);
     }
 
     @PostMapping("debtRepayment")

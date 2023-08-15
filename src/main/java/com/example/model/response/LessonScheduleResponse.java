@@ -13,7 +13,7 @@ public class LessonScheduleResponse {
 
     private Subject subject;
 
-    private UserResponseDto teacher;
+    private UserResponse teacher;
 
     private StudentClassResponse studentClass;
 

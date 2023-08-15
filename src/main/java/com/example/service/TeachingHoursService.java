@@ -11,12 +11,15 @@ import com.example.model.response.TeachingHoursResponse;
 import com.example.model.response.TeachingHoursResponseForPage;
 import com.example.repository.*;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -29,6 +32,7 @@ public class TeachingHoursService implements BaseService<TeachingHoursRequest, I
     private final UserRepository userRepository;
     private final SubjectRepository subjectRepository;
     private final SalaryRepository salaryRepository;
+    private final ModelMapper modelMapper;
 
     @Override
     public ApiResponse create(TeachingHoursRequest teachingHoursRequest) {
@@ -39,31 +43,41 @@ public class TeachingHoursService implements BaseService<TeachingHoursRequest, I
         set(teachingHoursRequest, teachingHours);
         setSalary(teachingHours);
         teachingHoursRepository.save(teachingHours);
-        return new ApiResponse(Constants.SUCCESSFULLY, true, TeachingHoursResponse.toResponse(teachingHours));
+        TeachingHoursResponse response = getTeachingHoursResponse(teachingHours);
+        return new ApiResponse(Constants.SUCCESSFULLY, true, response);
+    }
+
+    private TeachingHoursResponse getTeachingHoursResponse(TeachingHours teachingHours) {
+        TeachingHoursResponse response = modelMapper.map(teachingHours, TeachingHoursResponse.class);
+        response.setDate(teachingHours.getDate().toString());
+        return response;
     }
 
 
     @Override
     public ApiResponse getById(Integer integer) {
         TeachingHours teachingHours = teachingHoursRepository.findByIdAndActiveTrue(integer).orElseThrow(() -> new RecordNotFoundException(Constants.TEACHING_HOURS_NOT_FOUND));
-        return new ApiResponse(Constants.SUCCESSFULLY, true, TeachingHoursResponse.toResponse(teachingHours));
+        return new ApiResponse(Constants.SUCCESSFULLY, true, getTeachingHoursResponse(teachingHours));
     }
 
-    public ApiResponse getAll() {
-        List<TeachingHoursResponse> response = TeachingHoursResponse.toAllResponse(teachingHoursRepository.findAllByActiveTrue());
+    public ApiResponse getAll(int page, int size) {
+        Page<TeachingHours> all = teachingHoursRepository.findAllByActiveTrue(PageRequest.of(page, size));
+        TeachingHoursResponseForPage response = getTeachingHoursResponses(all);
         return new ApiResponse(Constants.SUCCESSFULLY, true, response);
     }
 
     public ApiResponse getByTeacherIdAndActiveTrue(Integer id, int page, int size) {
-        Page<TeachingHours> all = teachingHoursRepository.findAllByTeacherIdAndActiveTrue(id, PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "id")));
-        List<TeachingHoursResponse> response = TeachingHoursResponse.toAllResponse(all.getContent());
-        return new ApiResponse(Constants.SUCCESSFULLY, true, new TeachingHoursResponseForPage(response, all.getTotalElements(), all.getTotalPages(), all.getNumber()));
+        Page<TeachingHours> all = teachingHoursRepository
+                .findAllByTeacherIdAndActiveTrue(id, PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "id")));
+        TeachingHoursResponseForPage response = getTeachingHoursResponses(all);
+        return new ApiResponse(Constants.SUCCESSFULLY, true, response);
     }
 
     public ApiResponse getByTeacherIdAndDate(Integer teacherId, LocalDate startDay, LocalDate finishDay, int page, int size) {
-        Page<TeachingHours> all = teachingHoursRepository.findAllByTeacherIdAndActiveTrueAndDateBetween(teacherId, startDay, finishDay, PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "id")));
-        List<TeachingHoursResponse> response = TeachingHoursResponse.toAllResponse(all.getContent());
-        return new ApiResponse(Constants.SUCCESSFULLY, true, new TeachingHoursResponseForPage(response, all.getTotalElements(), all.getTotalPages(), all.getNumber()));
+        Page<TeachingHours> all = teachingHoursRepository
+                .findAllByTeacherIdAndActiveTrueAndDateBetween(teacherId, startDay, finishDay, PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "id")));
+        TeachingHoursResponseForPage response = getTeachingHoursResponses(all);
+        return new ApiResponse(Constants.SUCCESSFULLY, true, response);
     }
 
     @Override
@@ -77,7 +91,7 @@ public class TeachingHoursService implements BaseService<TeachingHoursRequest, I
         set(teachingHoursRequest, newTeachingHours);
         hourlyWageSetting(newTeachingHours, oldTransaction.getTypeOfWork().getPrice());
         teachingHoursRepository.save(newTeachingHours);
-        return new ApiResponse(Constants.SUCCESSFULLY, true, TeachingHoursResponse.toResponse(newTeachingHours));
+        return new ApiResponse(Constants.SUCCESSFULLY, true, getTeachingHoursResponse(newTeachingHours));
     }
 
     private void hourlyWageSetting(TeachingHours teachingHours, double oldMoney) {
@@ -121,7 +135,7 @@ public class TeachingHoursService implements BaseService<TeachingHoursRequest, I
         } else {
             throw new RecordNotFoundException(Constants.DO_NOT_CHANGE);
         }
-        return new ApiResponse(Constants.DELETED, true, TeachingHoursResponse.toResponse(teachingHours));
+        return new ApiResponse(Constants.DELETED, true, getTeachingHoursResponse(teachingHours));
     }
 
     private void setForDelete(TeachingHours teachingHours) {
@@ -175,5 +189,17 @@ public class TeachingHoursService implements BaseService<TeachingHoursRequest, I
         teachingHours.setTeacher(userRepository.findById(teachingHoursRequest.getTeacherId()).orElseThrow(() -> new RecordNotFoundException(Constants.USER_NOT_FOUND)));
         teachingHours.setTypeOfWork(typeOfWorkRepository.findById(teachingHoursRequest.getTypeOfWorkId()).orElseThrow(() -> new RecordNotFoundException(Constants.TYPE_OF_WORK_NOT_FOUND)));
         teachingHours.setSubject(subjectRepository.findById(teachingHoursRequest.getSubjectId()).orElseThrow(() -> new RecordNotFoundException(Constants.SUBJECT_NOT_FOUND)));
+    }
+
+    private TeachingHoursResponseForPage getTeachingHoursResponses(Page<TeachingHours> all) {
+        TeachingHoursResponseForPage teachingHoursResponseForPage = new TeachingHoursResponseForPage();
+        List<TeachingHoursResponse> response = new ArrayList<>();
+        all.forEach(teachingHours -> {
+            response.add(getTeachingHoursResponse(teachingHours));
+        });
+        teachingHoursResponseForPage.setTeachingHoursResponses(response);
+        teachingHoursResponseForPage.setTotalPage(all.getTotalPages());
+        teachingHoursResponseForPage.setTotalElement(all.getTotalElements());
+        return teachingHoursResponseForPage;
     }
 }

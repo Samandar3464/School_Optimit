@@ -1,52 +1,20 @@
 package com.example.model.response;
 
-import com.example.entity.*;
-import com.example.enums.Months;
-import com.example.enums.Position;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import lombok.Builder;
+import com.example.entity.Branch;
 import lombok.Data;
 
-import java.util.ArrayList;
-import java.util.List;
-
 @Data
-@Builder
 public class OverallReportResponse {
 
     private Integer id;
 
-    @Enumerated(EnumType.STRING)
-    private Months month;
+    private String date;
 
     private String classLeadership;
 
     private SalaryResponse salary;
 
-    private String fullName;
-
-    private List<TeachingHoursResponse> teachingHours;
+    private UserResponse userResponse;
 
     private Branch branch;
-
-
-    public static OverallReportResponse toOverallResponse(OverallReport overallReport) {
-        return OverallReportResponse
-                .builder()
-                .id(overallReport.getId())
-                .classLeadership(overallReport.getClassLeadership())
-                .branch(overallReport.getBranch())
-                .salary(SalaryResponse.toResponse(overallReport.getSalary()))
-                .fullName(overallReport.getUser().getName() + overallReport.getUser().getSurname())
-                .build();
-    }
-
-    public static List<OverallReportResponse> toAllOverallResponse(List<OverallReport> all) {
-        List<OverallReportResponse> overallReportResponses = new ArrayList<>();
-        all.forEach(overallReport -> {
-            overallReportResponses.add(toOverallResponse(overallReport));
-        });
-        return overallReportResponses;
-    }
 }

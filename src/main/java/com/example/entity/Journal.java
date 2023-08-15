@@ -6,6 +6,7 @@ import lombok.*;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
+import java.time.LocalDate;
 import java.util.List;
 
 
@@ -21,17 +22,17 @@ public class Journal {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
+    private boolean active;
+
+    private int startDate;
+
+    private int endDate;
+
     @OneToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
     private StudentClass studentClass;
 
-    @JsonIgnore
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Branch branch;
-
-    @ManyToMany
-    private List<Subject> subjectList;
-
-    private boolean active;
 }

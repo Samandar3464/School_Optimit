@@ -1,8 +1,5 @@
 package com.example.model.request;
 
-import com.example.enums.Months;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import lombok.*;
 
 import java.time.LocalDate;
@@ -20,4 +17,6 @@ public class OverallReportRequest {
     private LocalDate date;
 
     private Integer userId;
+
+    private Integer branchId;
 }

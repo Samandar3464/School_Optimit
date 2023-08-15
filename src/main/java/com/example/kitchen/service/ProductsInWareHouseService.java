@@ -12,6 +12,7 @@ import com.example.kitchen.model.response.ProductsInWareHouseResponse;
 import com.example.kitchen.model.request.DailyConsumedProductsRequest;
 import com.example.kitchen.model.request.ProductsInWareHouseRequest;
 import com.example.kitchen.model.request.PurchasedProductsRequest;
+import com.example.kitchen.model.response.ProductsInWareHouseResponsePage;
 import com.example.kitchen.repository.ProductsInWareHouseRepository;
 import com.example.kitchen.repository.WareHouseRepository;
 import com.example.model.common.ApiResponse;
@@ -97,23 +98,23 @@ public class ProductsInWareHouseService {
 
     public ApiResponse findByIdAndActiveTrue(Integer productInWarehouseId) {
         ProductsInWareHouse productsInWareHouse = productsInWareHouseRepository.findByIdAndActiveTrue(productInWarehouseId)
-                        .orElseThrow(() -> new RecordNotFoundException(Constants.PRODUCTS_IN_WAREHOUSE_NOT_FOUND));
+                .orElseThrow(() -> new RecordNotFoundException(Constants.PRODUCTS_IN_WAREHOUSE_NOT_FOUND));
         ProductsInWareHouseResponse wareHouseResponse =
                 modelMapper.map(productsInWareHouse, ProductsInWareHouseResponse.class);
         return new ApiResponse(Constants.SUCCESSFULLY, true, wareHouseResponse);
     }
 
-    public ApiResponse findAllByWarehouseIdAndActiveTrue(Integer wareHouseID, int page, int size) {
+    public ApiResponse getAllByWarehouseIdAndActiveTrue(Integer wareHouseID, int page, int size) {
         Page<ProductsInWareHouse> all = productsInWareHouseRepository
                 .findAllByWarehouseIdAndActiveTrue(wareHouseID, PageRequest.of(page, size));
-        List<ProductsInWareHouseResponse> wareHouseResponses = getResponses(all);
+        ProductsInWareHouseResponsePage wareHouseResponses = getResponses(all);
         return new ApiResponse(Constants.SUCCESSFULLY, true, wareHouseResponses);
     }
 
     public ApiResponse getAllByBranchId(Integer branchId, int page, int size) {
         Page<ProductsInWareHouse> all = productsInWareHouseRepository
                 .findAllByBranchIdAndActiveTrue(branchId, PageRequest.of(page, size));
-        List<ProductsInWareHouseResponse> wareHouseResponses = getResponses(all);
+        ProductsInWareHouseResponsePage wareHouseResponses = getResponses(all);
         return new ApiResponse(Constants.SUCCESSFULLY, true, wareHouseResponses);
     }
 
@@ -139,11 +140,15 @@ public class ProductsInWareHouseService {
         }
     }
 
-    private List<ProductsInWareHouseResponse> getResponses(Page<ProductsInWareHouse> all) {
+    private ProductsInWareHouseResponsePage getResponses(Page<ProductsInWareHouse> all) {
+        ProductsInWareHouseResponsePage page = new ProductsInWareHouseResponsePage();
         List<ProductsInWareHouseResponse> wareHouseResponses = new ArrayList<>();
         all.map(productsInWareHouse ->
                 wareHouseResponses.add(modelMapper.map(productsInWareHouse, ProductsInWareHouseResponse.class)));
-        return wareHouseResponses;
+        page.setProductsInWareHouseResponses(wareHouseResponses);
+        page.setTotalPage(all.getTotalPages());
+        page.setTotalElement(all.getTotalElements());
+        return page;
     }
 
     private ProductsInWareHouse getProductsInWareHouse(String name,

@@ -21,7 +21,7 @@ public class ProductsInWarehouseController {
     public ApiResponse getAllProductsInWarehouseByWarehouseId(@RequestParam(name = "page", defaultValue = "0") int page,
                                                               @RequestParam(name = "size", defaultValue = "5") int size,
                                                               @PathVariable Integer warehouseId) {
-        return productsInWareHouseService.findAllByWarehouseIdAndActiveTrue(warehouseId, page, size);
+        return productsInWareHouseService.getAllByWarehouseIdAndActiveTrue(warehouseId, page, size);
     }
 
     @GetMapping("getAllByBranchId/{branchId}")

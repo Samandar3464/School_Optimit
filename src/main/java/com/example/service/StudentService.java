@@ -5,6 +5,7 @@ import com.example.exception.*;
 import com.example.model.common.ApiResponse;
 import com.example.model.request.FamilyLoginDto;
 import com.example.model.request.StudentRequest;
+import com.example.model.response.StudentClassResponse;
 import com.example.model.response.StudentResponse;
 import com.example.model.response.StudentResponseListForAdmin;
 import com.example.repository.BranchRepository;
@@ -12,6 +13,7 @@ import com.example.repository.JournalRepository;
 import com.example.repository.StudentClassRepository;
 import com.example.repository.StudentRepository;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -36,6 +38,7 @@ public class StudentService implements BaseService<StudentRequest, Integer> {
     private final StudentClassRepository studentClassRepository;
     private final BranchRepository branchRepository;
     private final JournalRepository journalRepository;
+    private final ModelMapper modelMapper;
 
     @Override
     @ResponseStatus(HttpStatus.CREATED)
@@ -45,8 +48,8 @@ public class StudentService implements BaseService<StudentRequest, Integer> {
             throw new RecordNotFoundException(PHONE_NUMBER_ALREADY_REGISTERED);
         }
         Branch branch = branchRepository.findById(studentRequest.getBranchId()).orElseThrow(() -> new RecordNotFoundException(BRANCH_NOT_FOUND));
-        Student save = studentRepository.save(from(studentRequest, branch));
-        return new ApiResponse(from(save), true);
+        Student save = studentRepository.save(toEntity(studentRequest, branch));
+        return new ApiResponse(toEntity(save), true);
     }
 
     @Override
@@ -73,7 +76,7 @@ public class StudentService implements BaseService<StudentRequest, Integer> {
         Student student = studentRepository.findByIdAndActiveTrue(integer).orElseThrow(() -> new UserNotFoundException(STUDENT_NOT_FOUND));
         student.setActive(false);
         studentRepository.save(student);
-        return new ApiResponse(DELETED, true, StudentResponse.from(student));
+        return new ApiResponse(DELETED, true, getStudentResponse(student));
     }
 
     @ResponseStatus(HttpStatus.OK)
@@ -86,7 +89,8 @@ public class StudentService implements BaseService<StudentRequest, Integer> {
     }
 
     private StudentResponse getStudentResponse(Student student) {
-        StudentResponse studentResponse = StudentResponse.from(student);
+        StudentResponse studentResponse = modelMapper.map(student, StudentResponse.class);
+        studentResponse.setStudentClass(modelMapper.map(student.getStudentClass(), StudentClassResponse.class));
         studentResponse.setPhoto(student.getPhoto() == null ? null : attachmentService.getUrl(student.getPhoto()));
         studentResponse.setDocPhoto(student.getDocPhoto() == null ? null : attachmentService.getUrlList(student.getDocPhoto()));
         studentResponse.setMedDocPhoto(student.getMedDocPhoto() == null ? null : attachmentService.getUrl(student.getMedDocPhoto()));
@@ -114,11 +118,10 @@ public class StudentService implements BaseService<StudentRequest, Integer> {
     public ApiResponse studentLogIn(FamilyLoginDto dto) {
         Student student = studentRepository.findByPhoneNumberAndPassword(dto.getPhoneNumber(), dto.getPassword()).orElseThrow(() -> new RecordNotFoundException(STUDENT_NOT_FOUND));
         Journal journal = journalRepository.findByStudentClassIdAndActiveTrue(student.getStudentClass().getId()).orElseThrow(() -> new RecordNotFoundException(JOURNAL_NOT_FOUND));
-
-        return new ApiResponse(journal.getSubjectList(), true);
+        return new ApiResponse(SUCCESSFULLY, true,getStudentResponse(student));
     }
 
-    private Student from(StudentRequest student, Branch branch) {
+    private Student toEntity(StudentRequest student, Branch branch) {
         Student from = Student.from(student);
         from.setStudentClass(studentClassRepository.findById(student.getStudentClassId())
                 .orElseThrow(() -> new RecordNotFoundException(CLASS_NOT_FOUND)));
@@ -130,15 +133,17 @@ public class StudentService implements BaseService<StudentRequest, Integer> {
         return from;
     }
 
-    private StudentResponse from(Student student) {
-        StudentResponse from = StudentResponse.from(student);
+    private StudentResponse toEntity(Student student) {
+        StudentResponse response = modelMapper.map(student, StudentResponse.class);
+        response.setStudentClass(modelMapper.map(student.getStudentClass(), StudentClassResponse.class));
+        response.setBirthDate(student.getBirthDate().toString());
         List<String> docPhotoList = new ArrayList<>();
         student.getDocPhoto().forEach(obj -> docPhotoList.add(attachmentService.getUrl(obj)));
-        from.setPhoto(attachmentService.getUrl(student.getPhoto()));
-        from.setReference(attachmentService.getUrl(student.getReference()));
-        from.setMedDocPhoto(attachmentService.getUrl(student.getMedDocPhoto()));
-        from.setDocPhoto(docPhotoList);
-        return from;
+        response.setPhoto(attachmentService.getUrl(student.getPhoto()));
+        response.setReference(attachmentService.getUrl(student.getReference()));
+        response.setMedDocPhoto(attachmentService.getUrl(student.getMedDocPhoto()));
+        response.setDocPhoto(docPhotoList);
+        return response;
     }
 
     private Student update(StudentRequest studentRequest, Student student) {

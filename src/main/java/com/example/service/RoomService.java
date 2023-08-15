@@ -3,11 +3,10 @@ package com.example.service;
 import com.example.entity.Branch;
 import com.example.entity.Room;
 import com.example.entity.RoomType;
-import com.example.enums.Constants;
 import com.example.exception.RecordNotFoundException;
 import com.example.model.common.ApiResponse;
 import com.example.model.request.RoomRequestDto;
-import com.example.model.response.RoomResponseListForAdmin;
+import com.example.model.response.RoomResponsePage;
 import com.example.repository.BranchRepository;
 import com.example.repository.RoomRepository;
 import com.example.repository.RoomTypeRepository;
@@ -88,7 +87,7 @@ public class RoomService implements BaseService<RoomRequestDto, Integer> {
     public ApiResponse getRoomListByBranchId(int page, int size, Integer branchId) {
         Pageable pageable = PageRequest.of(page, size);
         Page<Room> all = roomRepository.findAllByBranchIdAndActiveTrue(branchId, pageable);
-        return new ApiResponse(new RoomResponseListForAdmin(
+        return new ApiResponse(new RoomResponsePage(
                 all.getContent(), all.getTotalElements(), all.getTotalPages(), all.getNumber()), true);
     }
 

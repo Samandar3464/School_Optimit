@@ -49,16 +49,4 @@ public class TransactionHistoryRequest {
     @Min(value = 1, message = "must be branchId")
     private Integer branchId;
 
-    public static TransactionHistoryRequest toTransactionHistoryRequest(String phoneNumber, double money, PaymentType paymentType, ExpenseType expenseType, Salary salary, String message) {
-        return TransactionHistoryRequest
-                .builder()
-                .moneyAmount(String.valueOf(money))
-                .paymentType(paymentType)
-                .phoneNumber(phoneNumber)
-                .branchId(salary.getBranch().getId())
-                .expenseType(expenseType)
-                .comment(message)
-                .mainBalanceId(salary.getMainBalance().getId())
-                .build();
-    }
 }

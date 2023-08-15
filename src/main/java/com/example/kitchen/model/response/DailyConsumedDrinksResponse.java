@@ -2,7 +2,7 @@ package com.example.kitchen.model.response;
 
 import com.example.entity.Branch;
 import com.example.kitchen.entity.Warehouse;
-import com.example.model.response.UserResponseDto;
+import com.example.model.response.UserResponse;
 import lombok.*;
 
 @Data
@@ -22,7 +22,7 @@ public class DailyConsumedDrinksResponse {
 
     private String localDateTime;
 
-    private UserResponseDto employee;
+    private UserResponse employee;
 
     private Branch branch;
 

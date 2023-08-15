@@ -1,7 +1,5 @@
 package com.example.entity;
 
-import com.example.model.request.SalaryRequest;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.OnDelete;
@@ -40,8 +38,6 @@ public class Salary {
     private double classLeaderSalary;
 
     @ManyToOne
-    @JsonIgnore
-    @OnDelete(action = OnDeleteAction.CASCADE)
     private User user;
 
     @ManyToOne
@@ -52,27 +48,4 @@ public class Salary {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private MainBalance mainBalance;
 
-    public static Salary toSalary(SalaryRequest salaryRequest) {
-        return Salary
-                .builder()
-                .fix(salaryRequest.getFix())
-                .active(true)
-                .date(salaryRequest.getDate())
-                .givenSalary(salaryRequest.getGivenSalary())
-                .partlySalary(salaryRequest.getPartlySalary())
-                .salary(salaryRequest.getSalary())
-                .cashAdvance(salaryRequest.getCashAdvance())
-                .amountDebt(salaryRequest.getDebtAmount())
-                .classLeaderSalary(salaryRequest.getClassLeaderSalary())
-                .build();
-    }
-
-    public static Salary toCreate(SalaryRequest salaryRequest) {
-        return Salary
-                .builder()
-                .fix(salaryRequest.getFix())
-                .active(true)
-                .date(salaryRequest.getDate())
-                .build();
-    }
 }

@@ -1,18 +1,21 @@
 package com.example.service;
 
 import com.example.entity.Achievement;
-import com.example.enums.Constants;
+import com.example.entity.Attachment;
+import com.example.entity.User;
 import com.example.exception.RecordNotFoundException;
 import com.example.model.common.ApiResponse;
 import com.example.model.request.AchievementDto;
 import com.example.model.response.AchievementResponse;
+import com.example.model.response.AchievementResponsePage;
 import com.example.repository.AchievementRepository;
 import com.example.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.ResponseStatus;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,74 +29,102 @@ public class AchievementService implements BaseService<AchievementDto, Integer> 
     private final AchievementRepository achievementRepository;
     private final AttachmentService attachmentService;
     private final UserRepository userRepository;
+    private final ModelMapper modelMapper;
 
 
     @Override
-    @ResponseStatus(HttpStatus.CREATED)
     public ApiResponse create(AchievementDto achievementDto) {
-        Achievement achievement = Achievement.toAchievement(achievementDto);
-        achievement.setUser(userRepository.findById(achievementDto.getUserId()).orElseThrow(() -> new RecordNotFoundException(Constants.USER_NOT_FOUND)));
-        if (achievementDto.getPhotoCertificate() != null) {
-            achievement.setPhotoCertificate(attachmentService.saveToSystem(achievementDto.getPhotoCertificate()));
-        }
+        Achievement achievement = modelMapper.map(achievementDto, Achievement.class);
+        setAchievement(achievementDto, achievement);
         achievementRepository.save(achievement);
-        return new ApiResponse(SUCCESSFULLY, true);
+        AchievementResponse response = getAchievementResponse(achievement);
+        return new ApiResponse(SUCCESSFULLY, true, response);
     }
 
     @Override
-    @ResponseStatus(HttpStatus.OK)
     public ApiResponse getById(Integer integer) {
         Achievement achievement = checkById(integer);
-        AchievementResponse response = AchievementResponse.toResponse(achievement);
-        response.setPhotoCertificate(achievement.getPhotoCertificate() == null ? null : attachmentService.getUrl(achievement.getPhotoCertificate()));
-        return new ApiResponse(response, true);
+        AchievementResponse response = getAchievementResponse(achievement);
+        return new ApiResponse(SUCCESSFULLY, true, response);
     }
 
 
     @Override
-    @ResponseStatus(HttpStatus.OK)
     public ApiResponse update(AchievementDto dto) {
         Achievement oldAchievement = checkById(dto.getId());
-        Achievement achievement = Achievement.toAchievement(dto);
+        Achievement achievement = modelMapper.map(dto, Achievement.class);
         setUpdate(dto, oldAchievement, achievement);
         achievementRepository.save(achievement);
-        return new ApiResponse(SUCCESSFULLY, true,AchievementResponse.toResponse(achievement));
-    }
-
-    private void setUpdate(AchievementDto dto, Achievement achievement1, Achievement achievement) {
-        achievement.setUser(userRepository.findById(dto.getUserId()).orElseThrow(() -> new RecordNotFoundException(Constants.USER_NOT_FOUND)));
-        if (dto.getPhotoCertificate() != null) {
-            if (achievement1.getPhotoCertificate() != null) {
-                attachmentService.deleteNewName(achievement1.getPhotoCertificate());
-            }
-            achievement.setPhotoCertificate(attachmentService.saveToSystem(dto.getPhotoCertificate()));
-        }
-        achievement.setId(dto.getId());
+        AchievementResponse response = getAchievementResponse(achievement);
+        return new ApiResponse(SUCCESSFULLY, true, response);
     }
 
     @Override
-    @ResponseStatus(HttpStatus.OK)
     public ApiResponse delete(Integer integer) {
         Achievement achievement = checkById(integer);
         if (achievement.getPhotoCertificate() != null) {
             attachmentService.deleteNewName(achievement.getPhotoCertificate());
         }
         achievementRepository.deleteById(integer);
-        return new ApiResponse(DELETED, true, AchievementResponse.toResponse(achievement));
+        AchievementResponse response = getAchievementResponse(achievement);
+        return new ApiResponse(DELETED, true, response);
     }
 
-    @ResponseStatus(HttpStatus.OK)
-    public ApiResponse getAllByUserId(Integer userId) {
+    public ApiResponse getAllByUserId(Integer userId, int page, int size) {
+        Page<Achievement> all = achievementRepository
+                .findAllByUserId(userId, PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "id")));
+        AchievementResponsePage achievementResponsePage = getAchievementResponsePage(all);
+        return new ApiResponse(SUCCESSFULLY, true,achievementResponsePage);
+    }
+
+    private AchievementResponsePage getAchievementResponsePage(Page<Achievement> all) {
+        AchievementResponsePage achievementResponsePage = new AchievementResponsePage();
         List<AchievementResponse> achievementResponses = new ArrayList<>();
-        achievementRepository.findAllByUserId(userId, Sort.by(Sort.Direction.DESC,"id")).forEach(achievement -> {
-            AchievementResponse response = AchievementResponse.toResponse(achievement);
-            response.setPhotoCertificate(achievement.getPhotoCertificate() == null ? null : attachmentService.getUrl(achievement.getPhotoCertificate()));
+        all.forEach(achievement -> {
+            AchievementResponse response = getAchievementResponse(achievement);
             achievementResponses.add(response);
         });
-        return new ApiResponse(achievementResponses, true);
+        achievementResponsePage.setAchievementResponses(achievementResponses);
+        achievementResponsePage.setTotalPage(all.getTotalPages());
+        achievementResponsePage.setTotalElement(all.getTotalElements());
+        return achievementResponsePage;
     }
 
     private Achievement checkById(Integer integer) {
-        return achievementRepository.findById(integer).orElseThrow(() -> new RecordNotFoundException(ACHIEVEMENT_NOT_FOUND));
+        return achievementRepository.findById(integer)
+                .orElseThrow(() -> new RecordNotFoundException(ACHIEVEMENT_NOT_FOUND));
+    }
+
+    private AchievementResponse getAchievementResponse(Achievement achievement) {
+        AchievementResponse response = modelMapper.map(achievement, AchievementResponse.class);
+        String url = attachmentService.getUrl(achievement.getPhotoCertificate());
+        User user = achievement.getUser();
+        response.setUserId(user.getId());
+        response.setUserName(user.getName() + user.getSurname());
+        response.setPhotoCertificate(url);
+        return response;
+    }
+
+    private void setUpdate(AchievementDto dto, Achievement oldAchievement, Achievement achievement) {
+        User user = userRepository.findById(dto.getUserId())
+                .orElseThrow(() -> new RecordNotFoundException(USER_NOT_FOUND));
+        if (dto.getPhotoCertificate() != null) {
+            if (oldAchievement.getPhotoCertificate() != null) {
+                attachmentService.deleteNewName(oldAchievement.getPhotoCertificate());
+            }
+            Attachment attachment = attachmentService.saveToSystem(dto.getPhotoCertificate());
+            achievement.setPhotoCertificate(attachment);
+        }
+        achievement.setUser(user);
+        achievement.setId(dto.getId());
+    }
+
+    private void setAchievement(AchievementDto achievementDto, Achievement achievement) {
+        if (achievementDto.getPhotoCertificate() != null) {
+            achievement.setPhotoCertificate(attachmentService.saveToSystem(achievementDto.getPhotoCertificate()));
+        }
+        User user = userRepository.findById(achievementDto.getUserId())
+                .orElseThrow(() -> new RecordNotFoundException(USER_NOT_FOUND));
+        achievement.setUser(user);
     }
 }

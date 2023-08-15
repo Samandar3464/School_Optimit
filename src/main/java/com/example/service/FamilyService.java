@@ -6,12 +6,11 @@ import com.example.entity.Student;
 import com.example.exception.RecordNotFoundException;
 import com.example.exception.UserNotFoundException;
 import com.example.model.common.ApiResponse;
-import com.example.model.request.FamilyAddStudentDto;
 import com.example.model.request.FamilyLoginDto;
 import com.example.model.request.FamilyRequest;
 import com.example.model.response.FamilyResponse;
 import com.example.model.response.FamilyResponseList;
-import com.example.model.response.StudentResponseDto;
+import com.example.model.response.StudentResponse;
 import com.example.repository.BranchRepository;
 import com.example.repository.FamilyRepository;
 import com.example.repository.StudentRepository;
@@ -21,9 +20,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.ResponseStatus;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -102,7 +99,7 @@ public class FamilyService implements BaseService<FamilyRequest, Integer> {
         Pageable pageable = PageRequest.of(page, size);
         Page<Family> familyList = familyRepository.findAllByBranchIdAndActiveTrue(branchId, pageable);
         List<FamilyResponse> familyResponses = new ArrayList<>();
-        familyList.getContent().forEach(obj -> familyResponses.add(FamilyResponse.from(obj)));
+//        familyList.getContent().forEach(obj -> familyResponses.add(FamilyResponse.from(obj)));
         return new ApiResponse(new FamilyResponseList(familyResponses, familyList.getTotalElements(), familyList.getTotalPages(), familyList.getNumber()), true);
     }
 
@@ -110,9 +107,9 @@ public class FamilyService implements BaseService<FamilyRequest, Integer> {
         Family family = familyRepository.findByPhoneNumberAndPassword(dto.getPhoneNumber(), dto.getPassword())
                 .orElseThrow(() -> new UserNotFoundException(FAMILY_NOT_FOUND));
         List<Student> allByFamily = studentRepository.findByFamiliesIn(List.of(Collections.singletonList(family)), Sort.by(Sort.Direction.DESC, "id"));
-        List<StudentResponseDto> studentResponseDtoList = new ArrayList<>();
+        List<StudentResponse> studentResponseDtoList = new ArrayList<>();
         allByFamily.forEach(student ->
-                studentResponseDtoList.add(StudentResponseDto.from(student)));
+                studentResponseDtoList.add(modelMapper.map(student, StudentResponse.class)));
         return new ApiResponse(studentResponseDtoList, true);
     }
 }

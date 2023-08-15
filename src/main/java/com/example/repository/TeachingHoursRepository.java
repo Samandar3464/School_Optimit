@@ -13,7 +13,7 @@ import java.util.Optional;
 public interface TeachingHoursRepository extends JpaRepository<TeachingHours, Integer> {
     Optional<TeachingHours> findByTeacherIdAndDateAndLessonHoursAndActiveTrue(Integer teacher_id, LocalDate date, int lessonHours);
 
-    List<TeachingHours> findAllByActiveTrue();
+    Page<TeachingHours> findAllByActiveTrue(Pageable pageable);
 
     Page<TeachingHours> findAllByTeacherIdAndActiveTrue(Integer teacherId, Pageable pageable);
 

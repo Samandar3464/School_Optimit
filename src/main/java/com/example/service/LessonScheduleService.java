@@ -9,7 +9,7 @@ import com.example.model.request.LessonScheduleRequest;
 import com.example.model.response.LessonScheduleResponse;
 import com.example.model.response.LessonScheduleResponsePage;
 import com.example.model.response.StudentClassResponse;
-import com.example.model.response.UserResponseDto;
+import com.example.model.response.UserResponse;
 import com.example.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -115,7 +115,7 @@ public class LessonScheduleService implements BaseService<LessonScheduleRequest,
     private LessonScheduleResponse getLessonScheduleResponse(LessonSchedule lessonSchedule) {
         LessonScheduleResponse response = modelMapper.map(lessonSchedule, LessonScheduleResponse.class);
         response.setDate(lessonSchedule.getDate().toString());
-        response.setTeacher(modelMapper.map(lessonSchedule.getTeacher(), UserResponseDto.class));
+        response.setTeacher(modelMapper.map(lessonSchedule.getTeacher(), UserResponse.class));
         response.setStudentClass(modelMapper.map(lessonSchedule.getStudentClass(), StudentClassResponse.class));
         return response;
     }
