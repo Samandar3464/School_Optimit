@@ -1,14 +1,9 @@
 package com.example.entity;
 
-import com.example.enums.SalaryType;
-import com.example.model.request.TypeOfWorkRequest;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
-
-import java.util.List;
 
 
 @Getter
@@ -30,14 +25,5 @@ public class TypeOfWork {
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Branch branch;
-
-
-    public static TypeOfWork toTypeOfWork(TypeOfWorkRequest typeOfWorkRequest) {
-        return TypeOfWork
-                .builder()
-                .name(typeOfWorkRequest.getName())
-                .price(typeOfWorkRequest.getPrice())
-                .build();
-    }
 }
 

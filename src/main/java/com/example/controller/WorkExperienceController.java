@@ -27,14 +27,12 @@ public class WorkExperienceController {
     }
 
     @GetMapping("getAllByUserId/{id}")
-    public ApiResponse getAllByUserId(@PathVariable Integer id) {
-        return workExperienceService.getAllByUserId(id);
+    public ApiResponse getAllByUserId(@PathVariable Integer id,
+                                      @RequestParam(name = "page", defaultValue = "0") int page,
+                                      @RequestParam(name = "size", defaultValue = "5") int size) {
+        return workExperienceService.getAllByUserId(id, page, size);
     }
 
-    @GetMapping("getAllById/{ids}")
-    public ApiResponse getAllById(@PathVariable List<Integer> ids) {
-        return workExperienceService.getAllById(ids);
-    }
 
     @PutMapping("update")
     public ApiResponse update(@RequestBody WorkExperienceRequest workExperience) {

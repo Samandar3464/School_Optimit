@@ -1,6 +1,6 @@
 package com.example.service;
 
-import com.example.entity.StudentHomework;
+import com.example.entity.*;
 import com.example.enums.Constants;
 import com.example.exception.RecordAlreadyExistException;
 import com.example.exception.RecordNotFoundException;
@@ -13,6 +13,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,11 +32,11 @@ public class StudentHomeworkService implements BaseService<StudentHomeworkReques
     @Override
     public ApiResponse create(StudentHomeworkRequest request) {
         checkingStudentHomeworkForExists(request);
-        StudentHomework studentHomework = StudentHomework.toEntity(request);
+        StudentHomework studentHomework = modelMapper.map(request, StudentHomework.class);
         setStudentHomework(request, studentHomework);
         studentHomeworkRepository.save(studentHomework);
         StudentHomeworkResponse response = getStudentHomeworkResponse(studentHomework);
-        return new ApiResponse(Constants.SUCCESSFULLY, true,response);
+        return new ApiResponse(Constants.SUCCESSFULLY, true, response);
     }
 
     private StudentHomeworkResponse getStudentHomeworkResponse(StudentHomework studentHomework) {
@@ -47,18 +48,20 @@ public class StudentHomeworkService implements BaseService<StudentHomeworkReques
     @Override
     public ApiResponse getById(Integer integer) {
         StudentHomework studentHomework = getStudentHomework(integer);
-        return new ApiResponse(Constants.SUCCESSFULLY, true, getStudentHomeworkResponse(studentHomework));
+        StudentHomeworkResponse response = getStudentHomeworkResponse(studentHomework);
+        return new ApiResponse(Constants.SUCCESSFULLY, true, response);
     }
 
     @Override
     public ApiResponse update(StudentHomeworkRequest request) {
         checkingStudentHomeworkForExists(request);
         getStudentHomework(request.getId());
-        StudentHomework studentHomework = StudentHomework.toEntity(request);
+        StudentHomework studentHomework = modelMapper.map(request, StudentHomework.class);
         studentHomework.setId(request.getId());
         setStudentHomework(request, studentHomework);
         studentHomeworkRepository.save(studentHomework);
-        return new ApiResponse(Constants.SUCCESSFULLY, true, getStudentHomeworkResponse(studentHomework));
+        StudentHomeworkResponse response = getStudentHomeworkResponse(studentHomework);
+        return new ApiResponse(Constants.SUCCESSFULLY, true, response);
     }
 
     public ApiResponse getList() {
@@ -76,9 +79,10 @@ public class StudentHomeworkService implements BaseService<StudentHomeworkReques
     }
 
     public ApiResponse getListByActive() {
-        List<StudentHomework> all = studentHomeworkRepository.findAllByActiveTrue( Sort.by(Sort.Direction.DESC,"id"));
+        List<StudentHomework> all = studentHomeworkRepository
+                .findAllByActiveTrue(Sort.by(Sort.Direction.DESC, "id"));
         List<StudentHomeworkResponse> studentHomeworkResponses = getStudentHomeworkResponses(all);
-        return new ApiResponse(Constants.SUCCESSFULLY, true,studentHomeworkResponses);
+        return new ApiResponse(Constants.SUCCESSFULLY, true, studentHomeworkResponses);
     }
 
     @Override
@@ -86,18 +90,34 @@ public class StudentHomeworkService implements BaseService<StudentHomeworkReques
         StudentHomework studentHomework = getStudentHomework(integer);
         studentHomework.setActive(false);
         studentHomeworkRepository.save(studentHomework);
-        return new ApiResponse(Constants.SUCCESSFULLY, true, getStudentHomeworkResponse(studentHomework));
+        StudentHomeworkResponse response = getStudentHomeworkResponse(studentHomework);
+        return new ApiResponse(Constants.SUCCESSFULLY, true, response);
     }
 
     private void setStudentHomework(StudentHomeworkRequest request, StudentHomework studentHomework) {
-        studentHomework.setTeacher(userRepository.findByIdAndBlockedFalse(request.getTeacherId()).orElseThrow(() -> new RecordNotFoundException(Constants.USER_NOT_FOUND)));
-        studentHomework.setStudentClass(studentClassRepository.findByIdAndActiveTrue(request.getStudentClassId()).orElseThrow(() -> new RecordNotFoundException(Constants.STUDENT_CLASS_NOT_FOUND)));
-        studentHomework.setSubject(subjectRepository.findByIdAndActiveTrue(request.getSubjectId()).orElseThrow(() -> new RecordNotFoundException(Constants.SUBJECT_NOT_FOUND)));
-        studentHomework.setBranch(branchRepository.findByIdAndDeleteFalse(request.getBranchId()).orElseThrow(() -> new RecordNotFoundException(Constants.BRANCH_NOT_FOUND)));
+        User user = userRepository.findByIdAndBlockedFalse(request.getTeacherId())
+                .orElseThrow(() -> new RecordNotFoundException(Constants.USER_NOT_FOUND));
+        StudentClass studentClass = studentClassRepository.findByIdAndActiveTrue(request.getStudentClassId())
+                .orElseThrow(() -> new RecordNotFoundException(Constants.STUDENT_CLASS_NOT_FOUND));
+        Subject subject = subjectRepository.findByIdAndActiveTrue(request.getSubjectId())
+                .orElseThrow(() -> new RecordNotFoundException(Constants.SUBJECT_NOT_FOUND));
+        Branch branch = branchRepository.findByIdAndDeleteFalse(request.getBranchId())
+                .orElseThrow(() -> new RecordNotFoundException(Constants.BRANCH_NOT_FOUND));
+
+        studentHomework.setActive(true);
+        studentHomework.setDate(LocalDate.now());
+        studentHomework.setTeacher(user);
+        studentHomework.setStudentClass(studentClass);
+        studentHomework.setSubject(subject);
+        studentHomework.setBranch(branch);
     }
 
     private void checkingStudentHomeworkForExists(StudentHomeworkRequest request) {
-        if (studentHomeworkRepository.findByDateAndLessonHourAndStudentClassIdAndActiveTrue(request.getDate(), request.getLessonHour(), request.getStudentClassId()).isPresent()) {
+        if (studentHomeworkRepository.findByDateAndLessonHourAndStudentClassIdAndActiveTrue(
+                        request.getDate(),
+                        request.getLessonHour(),
+                        request.getStudentClassId())
+                .isPresent()) {
             throw new RecordAlreadyExistException(Constants.STUDENT_HOMEWORK_ALREADY_EXISTS);
         }
     }

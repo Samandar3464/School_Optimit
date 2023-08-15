@@ -1,13 +1,5 @@
 package com.example.entity;
 
-import com.example.model.request.StudentClassDto;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
-import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
-import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
-import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.OnDelete;
@@ -31,7 +23,6 @@ public class StudentClass {
     @ManyToOne
     private Level level;
 
-    @Column(nullable = false)
     private String className;
 
     private LocalDate startDate;
@@ -40,30 +31,16 @@ public class StudentClass {
 
     private boolean active;
 
-    @JsonIgnore
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Room room;
 
-    @JsonSerialize(using = LocalDateTimeSerializer.class)
-    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     private LocalDateTime createdDate;
 
-    @JsonIgnore
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Branch branch;
 
     @OneToOne
     private User classLeader;
-
-    public static StudentClass from(StudentClassDto studentClass) {
-        return StudentClass.builder()
-                .className(studentClass.getClassName())
-                .createdDate(LocalDateTime.now())
-                .startDate(studentClass.getStartDate())
-                .endDate(studentClass.getEndDate())
-                .active(true)
-                .build();
-    }
 }

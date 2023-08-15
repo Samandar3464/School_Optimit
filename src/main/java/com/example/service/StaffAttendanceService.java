@@ -61,7 +61,6 @@ public class StaffAttendanceService implements BaseService<StaffAttendanceReques
     public ApiResponse getAllByUserId(Integer id, int page, int size) {
         Page<StaffAttendance> all = attendanceRepository
                 .findAllByUserId(id, PageRequest.of(page, size, Sort.Direction.DESC, "id"));
-
         StaffAttendanceResponsePage staffAttendanceResponsePage = getStaffAttendanceResponsePage(all);
         return new ApiResponse(Constants.SUCCESSFULLY, true, staffAttendanceResponsePage);
     }
@@ -97,16 +96,22 @@ public class StaffAttendanceService implements BaseService<StaffAttendanceReques
     private void dailyWageSetting(StaffAttendance staffAttendance) {
         Salary salary = salaryRepository.findByUserPhoneNumberAndActiveTrue(staffAttendance.getUser().getPhoneNumber()).orElseThrow(() -> new RecordNotFoundException(Constants.SALARY_NOT_FOUND));
         double dailyWage = (salary.getFix() + salary.getClassLeaderSalary()) / salary.getUser().getWorkDays();
-        dailyWage = Math.round(dailyWage * 100) / 100D;
-        salary.setSalary(salary.getSalary() + dailyWage);
+        double allSalary = salary.getSalary() + Math.round(dailyWage * 100) / 100D;
+        salary.setSalary(allSalary);
         salaryRepository.save(salary);
     }
 
     private void checkAndDeleteDailyWage(StaffAttendance staffAttendance) {
         if (staffAttendance.getDate().equals(LocalDate.now())) {
-            Salary salary = salaryRepository.findByUserPhoneNumberAndActiveTrue(staffAttendance.getUser().getPhoneNumber()).orElseThrow(() -> new RecordNotFoundException(Constants.SALARY_NOT_FOUND));
+
+            Salary salary = salaryRepository.findByUserPhoneNumberAndActiveTrue(
+                    staffAttendance.getUser().getPhoneNumber())
+                    .orElseThrow(() -> new RecordNotFoundException(Constants.SALARY_NOT_FOUND));
+
             double dailyWage = (salary.getFix() + salary.getClassLeaderSalary()) / salary.getUser().getWorkDays();
+
             dailyWage = Math.round(dailyWage * 100) / 100D;
+
             if (salary.getSalary() > dailyWage) {
                 salary.setSalary(salary.getSalary() - dailyWage);
             } else {

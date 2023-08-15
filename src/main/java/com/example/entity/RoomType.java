@@ -27,7 +27,4 @@ public class RoomType {
     private Branch branch;
 
     private boolean active;
-
-    @Transient
-    private Integer comingBranchId;
 }

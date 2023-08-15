@@ -1,5 +1,6 @@
 package com.example.service;
 
+import com.example.entity.Permission;
 import com.example.entity.Tariff;
 import com.example.enums.Constants;
 import com.example.enums.Lifetime;
@@ -9,6 +10,7 @@ import com.example.model.request.TariffDto;
 import com.example.repository.PermissionRepository;
 import com.example.repository.TariffRepository;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
@@ -21,15 +23,23 @@ import static com.example.enums.Constants.*;
 public class TariffService implements BaseService<TariffDto, Integer> {
 
     private final TariffRepository repository;
-
+    private final ModelMapper modelMapper;
     private final PermissionRepository permissionRepository;
 
 
     @Override
     public ApiResponse create(TariffDto tariffDto) {
-        Tariff tariff = Tariff.toEntity(tariffDto,permissionRepository.findAllById(tariffDto.getPermissionsList()));
+        Tariff tariff = modelMapper.map(tariffDto, Tariff.class);
+        setTariff(tariffDto, tariff);
         repository.save(tariff);
-        return new ApiResponse(Constants.SUCCESSFULLY, true);
+        return new ApiResponse(Constants.SUCCESSFULLY, true, tariff);
+    }
+
+    private void setTariff(TariffDto tariffDto, Tariff tariff) {
+        tariff.setActive(true);
+        tariff.setDelete(false);
+        List<Permission> permissions = permissionRepository.findAllById(tariffDto.getPermissionsList());
+        tariff.setPermissions(permissions);
     }
 
     @Override
@@ -40,10 +50,11 @@ public class TariffService implements BaseService<TariffDto, Integer> {
     @Override
     public ApiResponse update(TariffDto tariffDto) {
         checkById(tariffDto.getId());
-        Tariff tariff = Tariff.toEntity(tariffDto,permissionRepository.findAllById(tariffDto.getPermissionsList()));
+        Tariff tariff = modelMapper.map(tariffDto, Tariff.class);
+        setTariff(tariffDto, tariff);
         tariff.setId(tariffDto.getId());
         repository.save(tariff);
-        return new ApiResponse(Constants.SUCCESSFULLY, true);
+        return new ApiResponse(Constants.SUCCESSFULLY, true, tariff);
     }
 
     @Override
@@ -55,33 +66,38 @@ public class TariffService implements BaseService<TariffDto, Integer> {
     }
 
     public ApiResponse deActivate(Integer id) {
-        Tariff tariff = repository.findByIdAndDeleteFalse(id).orElseThrow(() -> new RecordNotFoundException(TARIFF_NOT_FOUND));
+        Tariff tariff = repository.findByIdAndDeleteFalse(id)
+                .orElseThrow(() -> new RecordNotFoundException(TARIFF_NOT_FOUND));
         tariff.setActive(false);
         repository.save(tariff);
-        return new ApiResponse(DEACTIVATED, true);
+        return new ApiResponse(DEACTIVATED, true, tariff);
     }
 
     public ApiResponse activate(Integer id) {
-        Tariff tariff = repository.findByIdAndDeleteFalse(id).orElseThrow(() -> new RecordNotFoundException(TARIFF_NOT_FOUND));
+        Tariff tariff = repository.findByIdAndDeleteFalse(id)
+                .orElseThrow(() -> new RecordNotFoundException(TARIFF_NOT_FOUND));
         tariff.setActive(true);
         repository.save(tariff);
-        return new ApiResponse(ACTIVATED, true);
+        return new ApiResponse(ACTIVATED, true, tariff);
     }
 
     public ApiResponse getTariffListForAdmin() {
-        List<Tariff> tariffList = repository.findAllByDelete(false, Sort.by(Sort.Direction.DESC,"id"));
+        List<Tariff> tariffList = repository
+                .findAllByDelete(false, Sort.by(Sort.Direction.DESC, "id"));
         tariffList.sort(Comparator.comparing(Tariff::getPrice));
         return new ApiResponse(SUCCESSFULLY, true, tariffList);
     }
 
 
     public ApiResponse getTariffListForUser() {
-        List<Tariff> tariffList = repository.findAllByActiveAndDelete(true, false, Sort.by(Sort.Direction.DESC,"id"));
+        List<Tariff> tariffList = repository
+                .findAllByActiveAndDelete(true, false, Sort.by(Sort.Direction.DESC, "id"));
         tariffList.sort(Comparator.comparing(Tariff::getPrice));
         return new ApiResponse(SUCCESSFULLY, true, tariffList);
     }
 
     private Tariff checkById(Integer id) {
-        return repository.findById(id).orElseThrow(() -> new RecordNotFoundException(Constants.TARIFF_NOT_FOUND));
+        return repository.findById(id)
+                .orElseThrow(() -> new RecordNotFoundException(Constants.TARIFF_NOT_FOUND));
     }
 }

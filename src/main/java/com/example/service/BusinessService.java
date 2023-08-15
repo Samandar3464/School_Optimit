@@ -8,6 +8,7 @@ import com.example.model.request.BusinessRequest;
 import com.example.model.response.BusinessResponseListForAdmin;
 import com.example.repository.BusinessRepository;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -22,19 +23,21 @@ import static com.example.enums.Constants.*;
 public class BusinessService implements BaseService<BusinessRequest, Integer> {
 
     private final BusinessRepository businessRepository;
+    private final ModelMapper modelMapper;
 
     @Override
-    @ResponseStatus(HttpStatus.CREATED)
-    public ApiResponse create(BusinessRequest business) {
-        if (businessRepository.existsByName(business.getName())) {
+    public ApiResponse create(BusinessRequest businessRequest) {
+        if (businessRepository.existsByName(businessRequest.getName())) {
             throw new RecordAlreadyExistException(BUSINESS_NAME_ALREADY_EXIST);
         }
-        Business from = Business.from(business);
-        return new ApiResponse(businessRepository.save(from), true);
+        Business business = modelMapper.map(businessRequest, Business.class);
+        business.setActive(true);
+        business.setDelete(false);
+        businessRepository.save(business);
+        return new ApiResponse(SUCCESSFULLY, true, business);
     }
 
     @Override
-    @ResponseStatus(HttpStatus.OK)
     public ApiResponse getById(Integer integer) {
         Business business = businessRepository.findById(integer)
                 .orElseThrow(() -> new RecordNotFoundException(BUSINESS_NOT_FOUND));
@@ -42,28 +45,26 @@ public class BusinessService implements BaseService<BusinessRequest, Integer> {
     }
 
     @Override
-    @ResponseStatus(HttpStatus.OK)
     public ApiResponse update(BusinessRequest newBusiness) {
-        Business business = businessRepository.findById(newBusiness.getId())
+        businessRepository.findById(newBusiness.getId())
                 .orElseThrow(() -> new RecordNotFoundException(BUSINESS_NOT_FOUND));
-        business.setPhoneNumber(newBusiness.getPhoneNumber());
-        business.setName(newBusiness.getName());
-        business.setDescription(newBusiness.getDescription());
+        Business business = modelMapper.map(newBusiness, Business.class);
+        business.setId(newBusiness.getId());
+        business.setActive(true);
+        business.setDelete(false);
         businessRepository.save(business);
-        return new ApiResponse(SUCCESSFULLY, true);
+        return new ApiResponse(SUCCESSFULLY, true,business);
     }
 
     @Override
-    @ResponseStatus(HttpStatus.OK)
     public ApiResponse delete(Integer integer) {
         Business business = businessRepository.findById(integer)
                 .orElseThrow(() -> new RecordNotFoundException(BUSINESS_NOT_FOUND));
         business.setDelete(true);
         businessRepository.save(business);
-        return new ApiResponse(DELETED, true);
+        return new ApiResponse(DELETED, true,business);
     }
 
-    @ResponseStatus(HttpStatus.OK)
     public ApiResponse getAll(int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         Page<Business> all = businessRepository.findAllByDeleteFalse(pageable);
@@ -71,7 +72,6 @@ public class BusinessService implements BaseService<BusinessRequest, Integer> {
                 all.getContent(), all.getTotalElements(), all.getTotalPages(), all.getNumber()), true);
     }
 
-    @ResponseStatus(HttpStatus.OK)
     public ApiResponse deActivate(Integer integer) {
         Business business = businessRepository.findById(integer)
                 .orElseThrow(() -> new RecordNotFoundException(BUSINESS_NOT_FOUND));
@@ -79,7 +79,7 @@ public class BusinessService implements BaseService<BusinessRequest, Integer> {
         businessRepository.save(business);
         return new ApiResponse(DEACTIVATED, true);
     }
-    @ResponseStatus(HttpStatus.OK)
+
     public ApiResponse activate(Integer integer) {
         Business business = businessRepository.findById(integer)
                 .orElseThrow(() -> new RecordNotFoundException(BUSINESS_NOT_FOUND));

@@ -1,6 +1,5 @@
 package com.example.entity;
 
-import com.example.model.request.StudentHomeworkRequest;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.OnDelete;
@@ -47,16 +46,4 @@ public class StudentHomework {
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Branch branch;
-
-    public static StudentHomework toEntity(StudentHomeworkRequest request){
-        return StudentHomework
-                .builder()
-                .homework(request.getHomework())
-                .date(request.getDate())
-                .description(request.getDescription())
-                .lessonHour(request.getLessonHour())
-                .topicNumber(request.getTopicNumber())
-                .active(true)
-                .build();
-    }
 }

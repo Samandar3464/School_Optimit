@@ -20,9 +20,8 @@ public class SubjectController {
 
     @GetMapping("getById")
     public ApiResponse getById(
-            @RequestParam(name = "subjectId") Integer subjectId,
-            @RequestParam(name = "levelId") Integer levelId) {
-        return subjectService.getById(subjectId, levelId);
+            @RequestParam(name = "subjectId") Integer subjectId) {
+        return subjectService.getById(subjectId);
     }
 
 
@@ -41,5 +40,4 @@ public class SubjectController {
     public ApiResponse delete(@PathVariable Integer id) {
         return subjectService.delete(id);
     }
-
 }

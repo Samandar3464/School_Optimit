@@ -1,6 +1,5 @@
 package com.example.entity;
 
-import com.example.model.request.MainBalanceRequest;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.OnDelete;
@@ -12,7 +11,6 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @Getter
 @Setter
-@Builder
 @Entity
 public class MainBalance {
 
@@ -35,17 +33,4 @@ public class MainBalance {
     @OneToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Branch branch;
-
-
-    public static MainBalance toEntity(MainBalanceRequest mainBalanceRequest) {
-        return MainBalance
-                .builder()
-                .balance(mainBalanceRequest.getBalance())
-                .plasticBalance(mainBalanceRequest.getPlasticBalance())
-                .cashBalance(mainBalanceRequest.getCashBalance())
-                .accountNumber(mainBalanceRequest.getAccountNumber())
-                .date(LocalDate.now())
-                .active(true)
-                .build();
-    }
 }

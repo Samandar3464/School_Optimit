@@ -1,6 +1,5 @@
 package com.example.entity;
 
-import com.example.model.request.SubjectRequestDto;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
@@ -11,8 +10,8 @@ import org.hibernate.annotations.OnDeleteAction;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
 @Entity
+@Builder
 public class Subject {
 
     @Id
@@ -27,12 +26,4 @@ public class Subject {
     @JsonIgnore
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Branch branch;
-
-    public static Subject toEntity(SubjectRequestDto subjectRequestDto) {
-        return Subject
-                .builder()
-                .name(subjectRequestDto.getName())
-                .active(true)
-                .build();
-    }
 }

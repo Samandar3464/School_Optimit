@@ -1,13 +1,7 @@
 package com.example.entity;
 
 import com.example.enums.Gender;
-import com.example.enums.Position;
-import com.example.model.request.UserRegisterDto;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
 import lombok.*;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
@@ -112,24 +106,5 @@ public class User implements UserDetails {
     @Override
     public boolean isEnabled() {
         return true;
-    }
-
-    public static User from(UserRegisterDto userRegisterDto) {
-        return User.builder()
-                .name(userRegisterDto.getName())
-                .surname(userRegisterDto.getSurname())
-                .fatherName(userRegisterDto.getFatherName())
-                .phoneNumber(userRegisterDto.getPhoneNumber())
-                .birthDate(userRegisterDto.getBirthDate())
-                .workDays(userRegisterDto.getWorkDays())
-                .inn(userRegisterDto.getInn())
-                .inps(userRegisterDto.getInps())
-                .biography(userRegisterDto.getBiography())
-                .registeredDate(LocalDateTime.now())
-                .email(userRegisterDto.getEmail())
-                .married(userRegisterDto.isMarried())
-                .gender(userRegisterDto.getGender())
-                .blocked(false)
-                .build();
     }
 }

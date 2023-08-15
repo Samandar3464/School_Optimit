@@ -35,7 +35,6 @@ public class DataLoaderTest implements CommandLineRunner {
     private final TypeOfWorkRepository typeOfWorkRepository;
     private final SubjectRepository subjectRepository;
     private final LevelRepository levelRepository;
-    private final SubjectLevelRepository subjectLevelRepository;
     private final MainBalanceService mainBalanceService;
     private final WareHouseRepository wareHouseRepository;
 
@@ -143,18 +142,7 @@ public class DataLoaderTest implements CommandLineRunner {
                     .branch(saveBranch)
                     .active(true)
                     .build();
-            Subject subject = subjectRepository.save(matemetika);
-
-            SubjectLevel subjectLevel = SubjectLevel.builder()
-                    .subject(subject)
-                    .level(savedLavel)
-                    .branch(saveBranch)
-                    .teachingHour(10)
-                    .build();
-
-            subjectLevelRepository.save(subjectLevel);
+            subjectRepository.save(matemetika);
         }
-
-
     }
 }

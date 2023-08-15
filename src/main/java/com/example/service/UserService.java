@@ -1,8 +1,7 @@
 package com.example.service;
 
 import com.example.config.jwtConfig.JwtGenerate;
-import com.example.entity.Attachment;
-import com.example.entity.User;
+import com.example.entity.*;
 import com.example.exception.RecordAlreadyExistException;
 import com.example.exception.RecordNotFoundException;
 import com.example.exception.UserNotFoundException;
@@ -17,10 +16,10 @@ import com.example.repository.RoleRepository;
 import com.example.repository.SubjectRepository;
 import com.example.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -30,8 +29,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.ResponseStatus;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -44,31 +43,33 @@ import static com.example.enums.Constants.*;
 @RequiredArgsConstructor
 public class UserService implements BaseService<UserRegisterDto, Integer> {
 
-    private final UserRepository userRepository;
-    private final AttachmentService attachmentService;
-    private final SubjectRepository subjectRepository;
-    private final PasswordEncoder passwordEncoder;
-    private final AuthenticationManager authenticationManager;
     private final SmsService service;
-    private final FireBaseMessagingService fireBaseMessagingService;
+    private final ModelMapper modelMapper;
+    private final UserRepository userRepository;
     private final RoleRepository roleRepository;
+    private final PasswordEncoder passwordEncoder;
     private final BranchRepository branchRepository;
+    private final SubjectRepository subjectRepository;
+    private final AttachmentService attachmentService;
+    private final AuthenticationManager authenticationManager;
+    private final FireBaseMessagingService fireBaseMessagingService;
 
 
-    @ResponseStatus(HttpStatus.CREATED)
     @Transactional(rollbackFor = {Exception.class})
     @Override
     public ApiResponse create(UserRegisterDto userRegisterDto) {
         User user = setAndCheckUser(userRegisterDto);
         user.setProfilePhoto(userRegisterDto.getProfilePhoto() == null ? null : attachmentService.saveToSystem(userRegisterDto.getProfilePhoto()));
         userRepository.save(user);
-        return new ApiResponse(SUCCESSFULLY, true);
+        UserResponse response = toUserResponse(user);
+        return new ApiResponse(SUCCESSFULLY, true, response);
     }
+
 
     @Override
     public ApiResponse getById(Integer id) {
         User user = getUserById(id);
-        return new ApiResponse(SUCCESSFULLY, true,toUserResponse(user));
+        return new ApiResponse(SUCCESSFULLY, true, toUserResponse(user));
     }
 
     @Override
@@ -89,7 +90,6 @@ public class UserService implements BaseService<UserRegisterDto, Integer> {
         return new ApiResponse(DELETED, true);
     }
 
-    @ResponseStatus(HttpStatus.OK)
     public ApiResponse verify(UserVerifyDto userVerifyRequestDto) {
         User user = userRepository.findByPhoneNumberAndVerificationCode(userVerifyRequestDto.getPhoneNumber(), userVerifyRequestDto.getVerificationCode())
                 .orElseThrow(() -> new UserNotFoundException(USER_NOT_FOUND));
@@ -99,7 +99,6 @@ public class UserService implements BaseService<UserRegisterDto, Integer> {
         return new ApiResponse(USER_VERIFIED_SUCCESSFULLY, true, new TokenResponse(JwtGenerate.generateAccessToken(user), toUserResponse(user)));
     }
 
-    @ResponseStatus(HttpStatus.OK)
     public ApiResponse login(UserDto userLoginRequestDto) {
         try {
             Authentication authentication = new UsernamePasswordAuthenticationToken(userLoginRequestDto.getPhoneNumber(), userLoginRequestDto.getPassword());
@@ -111,15 +110,12 @@ public class UserService implements BaseService<UserRegisterDto, Integer> {
         }
     }
 
-    @ResponseStatus(HttpStatus.OK)
     public ApiResponse forgetPassword(String number) {
         User user = getUserByNumber(number);
         sendSms(getUserByNumber(number).getPhoneNumber(), verificationCodeGenerator());
         return new ApiResponse(SUCCESSFULLY, true, user);
     }
 
-
-    @ResponseStatus(HttpStatus.OK)
     @Transactional(rollbackFor = {Exception.class})
     public ApiResponse addBlockUserByID(Integer id) {
         User user = getUserById(id);
@@ -129,7 +125,6 @@ public class UserService implements BaseService<UserRegisterDto, Integer> {
         return new ApiResponse(BLOCKED, true);
     }
 
-    @ResponseStatus(HttpStatus.OK)
     @Transactional(rollbackFor = {Exception.class})
     public ApiResponse openToBlockUserByID(Integer id) {
         User user = getUserById(id);
@@ -139,8 +134,6 @@ public class UserService implements BaseService<UserRegisterDto, Integer> {
         return new ApiResponse(OPEN, true);
     }
 
-
-    @ResponseStatus(HttpStatus.OK)
     public ApiResponse saveFireBaseToken(FireBaseTokenRegisterDto fireBaseTokenRegisterDto) {
         User user = getUserById(fireBaseTokenRegisterDto.getUserId());
         user.setFireBaseToken(fireBaseTokenRegisterDto.getFireBaseToken());
@@ -148,8 +141,6 @@ public class UserService implements BaseService<UserRegisterDto, Integer> {
         return new ApiResponse(SUCCESSFULLY, true);
     }
 
-
-    @ResponseStatus(HttpStatus.OK)
     public ApiResponse changePassword(String number, String password) {
         User user = getUserByNumber(number);
         user.setPassword(passwordEncoder.encode(password));
@@ -157,8 +148,6 @@ public class UserService implements BaseService<UserRegisterDto, Integer> {
         return new ApiResponse(user, true);
     }
 
-
-    @ResponseStatus(HttpStatus.OK)
     public ApiResponse getUserList(int page, int size) {
         Page<User> all = userRepository.findAll(PageRequest.of(page, size));
         List<UserResponse> userResponseList = new ArrayList<>();
@@ -166,21 +155,20 @@ public class UserService implements BaseService<UserRegisterDto, Integer> {
         return new ApiResponse(new UserResponsePage(userResponseList, all.getTotalElements(), all.getTotalPages(), all.getNumber()), true);
     }
 
-    public ApiResponse getUserListByBranchId(int page, int size,Integer branchId) {
-        Page<User> all = userRepository.findAllByBranch_IdAndBlockedFalse(branchId,PageRequest.of(page, size));
+    public ApiResponse getUserListByBranchId(int page, int size, Integer branchId) {
+        Page<User> all = userRepository.findAllByBranch_IdAndBlockedFalse(branchId, PageRequest.of(page, size));
         List<UserResponse> userResponseList = new ArrayList<>();
         all.forEach(obj -> userResponseList.add(toUserResponse(obj)));
         return new ApiResponse(new UserResponsePage(userResponseList, all.getTotalElements(), all.getTotalPages(), all.getNumber()), true);
     }
 
     public ApiResponse getUserListByBranchId(Integer branchId) {
-        List<User> all = userRepository.findAllByBranch_IdAndBlockedFalse(branchId, Sort.by(Sort.Direction.DESC,"id"));
+        List<User> all = userRepository.findAllByBranch_IdAndBlockedFalse(branchId, Sort.by(Sort.Direction.DESC, "id"));
         List<UserResponse> responseDtoList = new ArrayList<>();
         all.forEach(obj -> responseDtoList.add(toUserResponse(obj)));
         return new ApiResponse(responseDtoList, true);
     }
 
-    @ResponseStatus(HttpStatus.OK)
     public ApiResponse getUserList() {
         List<User> all = userRepository.findAll();
         List<UserResponse> userResponseList = new ArrayList<>();
@@ -188,14 +176,11 @@ public class UserService implements BaseService<UserRegisterDto, Integer> {
         return new ApiResponse(userResponseList, true);
     }
 
-    @ResponseStatus(HttpStatus.OK)
     public ApiResponse checkUserResponseExistById() {
         User user = checkUserExistByContext();
         return new ApiResponse(toUserResponse(user), true);
     }
 
-
-    @ResponseStatus(HttpStatus.OK)
     public ApiResponse removeUserFromContext() {
         User user = checkUserExistByContext();
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -204,7 +189,6 @@ public class UserService implements BaseService<UserRegisterDto, Integer> {
         }
         return new ApiResponse(DELETED, true);
     }
-
 
     public User checkUserExistByContext() {
         User user = getUserFromContext();
@@ -227,12 +211,14 @@ public class UserService implements BaseService<UserRegisterDto, Integer> {
     }
 
     public UserResponse toUserResponse(User user) {
-        UserResponse userResponse = getResponse(user);
-        userResponse.setProfilePhotoUrl(getPhotoLink(user.getProfilePhoto()));
-        return userResponse;
+        UserResponse response = modelMapper.map(user, UserResponse.class);
+        response.setBirthDate(user.getBirthDate().toString());
+        response.setRegisteredDate(user.getRegisteredDate().toString());
+        response.setProfilePhotoUrl(attachmentService.getUrl(user.getProfilePhoto()));
+        response.setProfilePhotoUrl(getPhotoLink(user.getProfilePhoto()));
+        return response;
     }
 
-    @ResponseStatus(HttpStatus.OK)
     public ApiResponse reSendSms(String number) {
         sendSms(number, verificationCodeGenerator());
         return new ApiResponse(SUCCESSFULLY, true);
@@ -269,7 +255,6 @@ public class UserService implements BaseService<UserRegisterDto, Integer> {
         }
     }
 
-
     private void sendNotificationByToken(User user, String message) {
         NotificationMessageResponse notificationMessageResponse = NotificationMessageResponse.from(user.getFireBaseToken(), message, new HashMap<>());
         fireBaseMessagingService.sendNotificationByToken(notificationMessageResponse);
@@ -288,16 +273,22 @@ public class UserService implements BaseService<UserRegisterDto, Integer> {
         if (userRepository.existsByPhoneNumberAndBlockedFalse(userRegisterDto.getPhoneNumber())) {
             throw new RecordAlreadyExistException(PHONE_NUMBER_ALREADY_REGISTERED);
         }
-        User user = User.from(userRegisterDto);
-        user.setBranch(branchRepository.findById(userRegisterDto.getBranchId()).orElseThrow(() -> new RecordNotFoundException(BRANCH_NOT_FOUND)));
-        user.setRole(roleRepository.findById(userRegisterDto.getRoleId()).orElseThrow(() -> new RecordNotFoundException(ROLE_NOT_FOUND)));
-        user.setPassword(passwordEncoder.encode(userRegisterDto.getPassword()));
-        user.setSubjects(userRegisterDto.getSubjectsIds() == null ? null : subjectRepository.findAllById(userRegisterDto.getSubjectsIds()));
-        return user;
-    }
+        User user = modelMapper.map(userRegisterDto, User.class);
+        String encode = passwordEncoder.encode(userRegisterDto.getPassword());
+        Branch branch = branchRepository.findById(userRegisterDto.getBranchId())
+                .orElseThrow(() -> new RecordNotFoundException(BRANCH_NOT_FOUND));
+        Role role = roleRepository.findById(userRegisterDto.getRoleId())
+                .orElseThrow(() -> new RecordNotFoundException(ROLE_NOT_FOUND));
+        List<Subject> subjects = userRegisterDto.getSubjectsIds() == null
+                ? null : subjectRepository.findAllById(userRegisterDto.getSubjectsIds());
 
-    public UserResponse getResponse(User user) {
-        return null;
+        user.setBlocked(false);
+        user.setRegisteredDate(LocalDateTime.now());
+        user.setBranch(branch);
+        user.setRole(role);
+        user.setPassword(encode);
+        user.setSubjects(subjects);
+        return user;
     }
 }
 

@@ -58,7 +58,6 @@ public class ScoreService implements BaseService<ScoreRequest, Integer> {
         return new ApiResponse(SUCCESSFULLY, true, response);
     }
 
-
     @Override
     public ApiResponse delete(Integer id) {
         Score score = scoreRepository.findById(id)
@@ -82,9 +81,9 @@ public class ScoreService implements BaseService<ScoreRequest, Integer> {
         return new ApiResponse(SUCCESSFULLY, true, scoreResponsePage);
     }
 
-    public ApiResponse getAllByStudentIdAndSubjectId(Integer studentId,Integer subjectId, int page, int size) {
+    public ApiResponse getAllByStudentIdAndSubjectId(Integer studentId, Integer subjectId, int page, int size) {
         Page<Score> all = scoreRepository.
-                findAllByStudentIdAndSubjectId(studentId,subjectId, PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "id")));
+                findAllByStudentIdAndSubjectId(studentId, subjectId, PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "id")));
         ScoreResponsePage scoreResponsePage = getScoreResponsePage(all);
         return new ApiResponse(SUCCESSFULLY, true, scoreResponsePage);
     }

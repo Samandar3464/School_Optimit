@@ -24,7 +24,6 @@ public class TeachingHoursRequest {
     @Min(value = 1)
     private int lessonHours;
 
-
     @JsonSerialize(using = LocalDateSerializer.class)
     @JsonDeserialize(using = LocalDateDeserializer.class)
     @Column(nullable = false)
