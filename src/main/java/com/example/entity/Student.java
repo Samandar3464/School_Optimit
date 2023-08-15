@@ -1,6 +1,5 @@
 package com.example.entity;
 
-import com.example.model.request.StudentRequest;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -84,18 +83,4 @@ public class Student {
     @OneToOne(cascade = CascadeType.ALL)
     private Attachment medDocPhoto;  // med sprafka rasmi
 
-    public static Student from(StudentRequest studentRequest) {
-        return Student.builder()
-                .firstName(studentRequest.getFirstName())
-                .lastName(studentRequest.getLastName())
-                .paymentAmount(studentRequest.getPaymentAmount())
-                .fatherName(studentRequest.getFatherName())
-                .birthDate(studentRequest.getBirthDate())
-                .docNumber(studentRequest.getDocNumber())
-                .addedTime(LocalDateTime.now())
-                .phoneNumber(studentRequest.getPhoneNumber())
-                .password(studentRequest.getPassword())
-                .active(true)
-                .build();
-    }
 }

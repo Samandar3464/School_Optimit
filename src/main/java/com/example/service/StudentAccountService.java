@@ -1,7 +1,6 @@
 package com.example.service;
 
-import com.example.entity.StudentAccount;
-import com.example.entity.TransactionHistory;
+import com.example.entity.*;
 import com.example.enums.Constants;
 import com.example.exception.RecordAlreadyExistException;
 import com.example.exception.RecordNotFoundException;
@@ -63,11 +62,23 @@ public class StudentAccountService implements BaseService<StudentAccountCreate, 
 
     private StudentAccount getStudentAccount(StudentAccountCreate request) {
         StudentAccount studentAccount = new StudentAccount();
-        set(request.getAccountNumber(), request.getBranchId(), request.getMainBalanceId(), request.getDiscount(), request.getStudentId(), studentAccount);
-        studentAccount.getStudent().setAccountNumber(studentAccount.getAccountNumber());
-        studentAccount.setDate(LocalDate.now());
+        MainBalance mainBalance = mainBalanceRepository.findByIdAndActiveTrue(request.getMainBalanceId())
+                .orElseThrow(() -> new RecordNotFoundException(Constants.MAIN_BALANCE_NOT_FOUND));
+        Student student = studentRepository.findByIdAndActiveTrue(request.getStudentId())
+                .orElseThrow(() -> new RecordNotFoundException(Constants.STUDENT_NOT_FOUND));
+        Branch branch = branchRepository.findById(request.getBranchId())
+                .orElseThrow(() -> new RecordNotFoundException(Constants.BRANCH_NOT_FOUND));
+
         studentAccount.setActive(true);
+        studentAccount.setBranch(branch);
         studentAccount.setPaidInFull(false);
+        studentAccount.setStudent(student);
+        studentAccount.setDate(LocalDate.now());
+        studentAccount.setMainBalance(mainBalance);
+        studentAccount.getStudent().setAccountNumber(request.getAccountNumber());
+        studentAccount.setAccountNumber(request.getAccountNumber());
+        studentAccount.setDiscount(Integer.parseInt(request.getDiscount()));
+        studentAccount.getStudent().setAccountNumber(studentAccount.getAccountNumber());
         return studentAccount;
     }
 
@@ -142,31 +153,25 @@ public class StudentAccountService implements BaseService<StudentAccountCreate, 
 
     public ApiResponse updatePayment(StudentAccountRequest request) {
 
-        StudentAccount studentAccount = studentAccountRepository.findByAccountNumberAndActiveTrue(request.getAccountNumber()).orElseThrow(() -> new RecordNotFoundException(Constants.STUDENT_ACCOUNT_NOT_FOUND));
+        StudentAccount studentAccount = studentAccountRepository
+                .findByAccountNumberAndActiveTrue(request.getAccountNumber())
+                .orElseThrow(() -> new RecordNotFoundException(Constants.STUDENT_ACCOUNT_NOT_FOUND));
 
-        TransactionHistory transactionHistory = transactionHistoryRepository.findFirstByStudentIdAndActiveTrue(studentAccount.getStudent().getId(), Sort.by(Sort.Direction.DESC, "id")).orElseThrow(() -> new RecordNotFoundException(Constants.TRANSACTION_HISTORY_NOT_FOUND));
+        TransactionHistory transactionHistory = transactionHistoryRepository
+                .findFirstByStudentIdAndActiveTrue(
+                        studentAccount.getStudent().getId(),
+                        Sort.by(Sort.Direction.DESC, "id"))
+                .orElseThrow(() -> new RecordNotFoundException(Constants.TRANSACTION_HISTORY_NOT_FOUND));
 
         setStudentAccountBalance(request.getMoney(), studentAccount, transactionHistory.getMoneyAmount());
 
         transactionHistoryService.rollBackTransaction(transactionHistory);
-
         setTransaction(request, transactionHistory);
 
-        transactionHistoryRepository.save(transactionHistory);
-
-//        setStudentAccount(request, studentAccount, transactionHistory);
-
         studentAccountRepository.save(studentAccount);
-
         return new ApiResponse(Constants.SUCCESSFULLY, true, getStudentAccountResponse(studentAccount));
     }
 
-//    private void setStudentAccount(StudentAccountRequest request, StudentAccount studentAccount, TransactionHistory transactionHistory) {
-//        studentAccount.setPaidInFull(request.isPaidInFull());
-//        studentAccount.setMainBalance(mainBalanceRepository.findByIdAndDeleteFalse(request.getMainBalanceId()).orElseThrow(() -> new RecordNotFoundException(Constants.MAIN_BALANCE_NOT_FOUND)));
-//        studentAccount.setStudent(transactionHistory.getStudent());
-//        studentAccount.setBranch(transactionHistory.getBranch());
-//    }
 
     private void setStudentAccountBalance(String moneyRequest, StudentAccount studentAccount, double moneyAmount) {
 
@@ -197,14 +202,20 @@ public class StudentAccountService implements BaseService<StudentAccountCreate, 
 
 
     private void setTransaction(StudentAccountRequest request, TransactionHistory transactionHistory) {
+        Branch branch = branchRepository.findByIdAndDeleteFalse(request.getBranchId())
+                .orElseThrow(() -> new RecordNotFoundException(Constants.BRANCH_NOT_FOUND));
+        Student student = studentRepository.findByAccountNumberAndActiveTrue(request.getAccountNumber())
+                .orElseThrow(() -> new RecordNotFoundException(Constants.STUDENT_NOT_FOUND));
+
         transactionHistory.setDate(LocalDateTime.now());
         transactionHistory.setComment(request.getComment());
         transactionHistory.setExpenseType(request.getExpenseType());
         transactionHistory.setPaymentType(request.getPaymentType());
         transactionHistory.setMoneyAmount(Double.parseDouble(request.getMoney()));
-        transactionHistory.setBranch(branchRepository.findByIdAndDeleteFalse(request.getBranchId()).orElseThrow(() -> new RecordNotFoundException(Constants.BRANCH_NOT_FOUND)));
-        transactionHistory.setStudent(studentRepository.findByAccountNumberAndActiveTrue(request.getAccountNumber()).orElseThrow(() -> new RecordNotFoundException(Constants.STUDENT_NOT_FOUND)));
+        transactionHistory.setBranch(branch);
+        transactionHistory.setStudent(student);
         transactionHistoryService.transactionWithBalance(transactionHistory);
+        transactionHistoryRepository.save(transactionHistory);
     }
 
 
@@ -218,38 +229,24 @@ public class StudentAccountService implements BaseService<StudentAccountCreate, 
             double paymentAmount = studentAccount.getStudent().getPaymentAmount();
 
             if (studentAccount.getDiscount() > 0) {
-
                 if (!studentAccount.isPaidInFull()) {
 
                     double withoutDiscount = paymentAmount - (paymentAmount % studentAccount.getDiscount());
 
                     if (studentAccount.getBalance() >= withoutDiscount) {
-
                         studentAccount.setBalance(studentAccount.getBalance() - withoutDiscount);
-
                     } else {
-
                         studentAccount.setAmountOfDebit(withoutDiscount - studentAccount.getBalance());
-
                         studentAccount.setBalance(0);
-
                     }
                 }
-
             } else {
-
                 if (studentAccount.getBalance() >= paymentAmount) {
-
                     studentAccount.setBalance(studentAccount.getBalance() - paymentAmount);
-
                 } else {
-
                     studentAccount.setAmountOfDebit(paymentAmount - studentAccount.getBalance());
-
                     studentAccount.setBalance(0);
-
                 }
-
             }
             studentAccountRepository.save(studentAccount);
         });
@@ -270,7 +267,9 @@ public class StudentAccountService implements BaseService<StudentAccountCreate, 
 
     @Override
     public ApiResponse getById(Integer accountNumber) {
-        StudentAccount studentAccount = studentAccountRepository.findByAccountNumberAndActiveTrue(accountNumber.toString()).orElseThrow(() -> new RecordNotFoundException(Constants.STUDENT_TRANSACTION_NOT_FOUND));
+        StudentAccount studentAccount = studentAccountRepository
+                .findByAccountNumberAndActiveTrue(accountNumber.toString())
+                .orElseThrow(() -> new RecordNotFoundException(Constants.STUDENT_TRANSACTION_NOT_FOUND));
         StudentAccountResponse response = getStudentAccountResponse(studentAccount);
         return new ApiResponse(Constants.SUCCESSFULLY, true, response);
     }
@@ -291,34 +290,29 @@ public class StudentAccountService implements BaseService<StudentAccountCreate, 
     }
 
     public ApiResponse getAllByDebtActive() {
-        List<StudentAccount> all = studentAccountRepository.findAllByActiveTrueAndAmountOfDebitIsNotNull(Sort.by(Sort.Direction.DESC, "id"));
+        List<StudentAccount> all = studentAccountRepository
+                .findAllByActiveTrueAndAmountOfDebitIsNotNull(Sort.by(Sort.Direction.DESC, "id"));
         List<StudentAccountResponse> allResponse = getStudentAccountResponses(all);
         return new ApiResponse(Constants.SUCCESSFULLY, true, allResponse);
     }
 
     @Override
     public ApiResponse update(StudentAccountCreate request) {
-        StudentAccount studentAccount = studentAccountRepository.findByAccountNumberAndActiveTrue(request.getAccountNumber()).orElseThrow(() -> new RecordNotFoundException(Constants.STUDENT_TRANSACTION_NOT_FOUND));
-        set(Integer.parseInt(request.getNewAccountNumber()) == 0 ? request.getAccountNumber() : request.getNewAccountNumber(), request.getBranchId(), request.getMainBalanceId(), request.getDiscount(), request.getStudentId(), studentAccount);
-        studentAccount.getStudent().setAccountNumber(studentAccount.getAccountNumber());
+        studentAccountRepository.findByAccountNumberAndActiveTrue(request.getAccountNumber())
+                .orElseThrow(() -> new RecordNotFoundException(Constants.STUDENT_TRANSACTION_NOT_FOUND));
+        StudentAccount studentAccount = getStudentAccount(request);
         studentAccountRepository.save(studentAccount);
-        return new ApiResponse(Constants.SUCCESSFULLY, true,getStudentAccountResponse(studentAccount));
+        StudentAccountResponse response = getStudentAccountResponse(studentAccount);
+        return new ApiResponse(Constants.SUCCESSFULLY, true, response);
     }
 
     @Override
     public ApiResponse delete(Integer accountNumber) {
-        StudentAccount studentAccount = studentAccountRepository.findByAccountNumberAndActiveTrue(accountNumber.toString()).orElseThrow(() -> new RecordNotFoundException(Constants.SUCCESSFULLY));
+        StudentAccount studentAccount = studentAccountRepository.findByAccountNumberAndActiveTrue(accountNumber.toString())
+                .orElseThrow(() -> new RecordNotFoundException(Constants.SUCCESSFULLY));
         studentAccount.setActive(false);
         studentAccountRepository.save(studentAccount);
-        return new ApiResponse(Constants.SUCCESSFULLY, true,getStudentAccountResponse(studentAccount));
-    }
-
-
-    private void set(String accountNumber, Integer branchId, Integer mainBalanceId, String discount, Integer studentId, StudentAccount studentAccount) {
-        studentAccount.setDiscount(Integer.parseInt(discount));
-        studentAccount.setAccountNumber(accountNumber);
-        studentAccount.setMainBalance(mainBalanceRepository.findByIdAndActiveTrue(mainBalanceId).orElseThrow(() -> new RecordNotFoundException(Constants.MAIN_BALANCE_NOT_FOUND)));
-        studentAccount.setStudent(studentRepository.findByIdAndActiveTrue(studentId).orElseThrow(() -> new RecordNotFoundException(Constants.STUDENT_NOT_FOUND)));
-        studentAccount.setBranch(branchRepository.findById(branchId).orElseThrow(() -> new RecordNotFoundException(Constants.BRANCH_NOT_FOUND)));
+        StudentAccountResponse response = getStudentAccountResponse(studentAccount);
+        return new ApiResponse(Constants.SUCCESSFULLY, true, response);
     }
 }

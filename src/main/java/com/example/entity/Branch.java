@@ -1,27 +1,23 @@
 package com.example.entity;
 
-import com.example.model.request.BranchDto;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
-import java.util.List;
-
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
 @Entity
+@Builder
 public class Branch {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(nullable = false)
     private String name;
 
     private String address;
@@ -32,13 +28,4 @@ public class Branch {
     private Business business;
 
     private boolean delete;
-
-    public static Branch from(BranchDto branchDto, Business business) {
-        return Branch.builder()
-                .name(branchDto.getName())
-                .business(business)
-                .address(branchDto.getAddress())
-                .delete(false)
-                .build();
-    }
 }

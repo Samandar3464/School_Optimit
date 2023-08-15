@@ -1,15 +1,15 @@
 package com.example.service;
 
+import com.example.entity.Branch;
 import com.example.entity.Subject;
 import com.example.exception.RecordAlreadyExistException;
 import com.example.exception.RecordNotFoundException;
 import com.example.model.common.ApiResponse;
 import com.example.model.request.SubjectRequestDto;
-import com.example.model.response.SubjectResponse;
-import com.example.model.response.TopicResponse;
 import com.example.repository.BranchRepository;
 import com.example.repository.SubjectRepository;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
@@ -22,7 +22,7 @@ import static com.example.enums.Constants.*;
 public class SubjectService implements BaseService<SubjectRequestDto, Integer> {
 
     private final SubjectRepository subjectRepository;
-    private final TopicService topicService;
+    private final ModelMapper modelMapper;
     private final BranchRepository branchRepository;
 
     @Override
@@ -30,28 +30,22 @@ public class SubjectService implements BaseService<SubjectRequestDto, Integer> {
         if (subjectRepository.findByName(dto.getName()).isPresent()) {
             throw new RecordAlreadyExistException(SUBJECT_ALREADY_EXIST);
         }
-        Subject subject = Subject.toEntity(dto);
-        subject.setBranch(branchRepository.findById(dto.getBranchId()).orElseThrow(() -> new RecordNotFoundException(BRANCH_NOT_FOUND)));
+        Subject subject = modelMapper.map(dto, Subject.class);
+        setSubject(dto, subject);
         subjectRepository.save(subject);
         return new ApiResponse(SUCCESSFULLY, true, subject);
     }
 
     @Override
     public ApiResponse getById(Integer subjectId) {
-        return null;
-    }
-
-    public ApiResponse getById(Integer subjectId, Integer levelId) {
         Subject subject = checkById(subjectId);
-        List<TopicResponse> topicResponses = topicService.findALLBySubjectId(subject.getId(), levelId);
-        return new ApiResponse(SUCCESSFULLY, true, new SubjectResponse(subject, topicResponses));
+        return new ApiResponse(SUCCESSFULLY, true, subject);
     }
 
     @Override
     public ApiResponse update(SubjectRequestDto subjectRequestDto) {
         Subject subject = checkById(subjectRequestDto.getId());
-        subject.setName(subjectRequestDto.getName());
-        subject.setBranch(branchRepository.findByIdAndDeleteFalse(subjectRequestDto.getBranchId()).orElseThrow(() -> new RecordNotFoundException(BRANCH_NOT_FOUND)));
+        setSubject(subjectRequestDto, subject);
         subjectRepository.save(subject);
         return new ApiResponse(SUCCESSFULLY, true, subject);
     }
@@ -65,10 +59,20 @@ public class SubjectService implements BaseService<SubjectRequestDto, Integer> {
     }
 
     public ApiResponse getAllSubjectByBranchId(Integer branchId) {
-        return new ApiResponse(subjectRepository.findAllByBranchId(branchId, Sort.by(Sort.Direction.DESC, "id")), true);
+        List<Subject> all = subjectRepository
+                .findAllByBranchId(branchId, Sort.by(Sort.Direction.DESC, "id"));
+        return new ApiResponse(SUCCESSFULLY, true, all);
     }
 
     public Subject checkById(Integer id) {
-        return subjectRepository.findById(id).orElseThrow(() -> new RecordNotFoundException(SUBJECT_NOT_FOUND));
+        return subjectRepository.findById(id)
+                .orElseThrow(() -> new RecordNotFoundException(SUBJECT_NOT_FOUND));
+    }
+
+    private void setSubject(SubjectRequestDto dto, Subject subject) {
+        subject.setActive(true);
+        Branch branch = branchRepository.findById(dto.getBranchId())
+                .orElseThrow(() -> new RecordNotFoundException(BRANCH_NOT_FOUND));
+        subject.setBranch(branch);
     }
 }

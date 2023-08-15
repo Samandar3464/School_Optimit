@@ -71,7 +71,6 @@ public class LessonScheduleService implements BaseService<LessonScheduleRequest,
 
 
     @Override
-    @ResponseStatus(HttpStatus.OK)
     public ApiResponse delete(Integer integer) {
         LessonSchedule lessonSchedule = lessonScheduleRepository.findById(integer)
                 .orElseThrow(() -> new RecordNotFoundException(LESSON_SCHEDULE_NOT_FOUND));

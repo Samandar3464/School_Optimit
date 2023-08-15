@@ -22,13 +22,36 @@ public class ScoreController {
         return scoreService.create(scoreRequest);
     }
 
-//    @GetMapping("/findByIdAndDeleteFalse/{id}")
-//    public ApiResponse findByIdAndDeleteFalse(@PathVariable Integer id) {
-//        return scoreService.findByIdAndDeleteFalse(id);
-//    }
+    @GetMapping("/getById/{id}")
+    public ApiResponse getById(@PathVariable Integer id) {
+        return scoreService.getById(id);
+    }
+
+    @GetMapping("/getAllByJournalId/{journalId}")
+    public ApiResponse getAllByJournalId(@PathVariable Integer journalId,
+                                         @RequestParam(name = "page", defaultValue = "0") int page,
+                                         @RequestParam(name = "size", defaultValue = "5") int size) {
+        return scoreService.getAllByJournalId(journalId, page, size);
+    }
+
+    @GetMapping("/getAllByStudentId/{studentId}")
+    public ApiResponse getAllByStudentId(@PathVariable Integer studentId,
+                                         @RequestParam(name = "page", defaultValue = "0") int page,
+                                         @RequestParam(name = "size", defaultValue = "5") int size) {
+        return scoreService.getAllByStudentId(studentId, page, size);
+    }
+
+    @GetMapping("/getAllByStudentIdAndSubjectId/{studentId}/{subjectId}")
+    public ApiResponse getAllByStudentId(@PathVariable Integer studentId,
+                                         @PathVariable Integer subjectId,
+                                         @RequestParam(name = "page", defaultValue = "0") int page,
+                                         @RequestParam(name = "size", defaultValue = "5") int size) {
+        return scoreService.getAllByStudentIdAndSubjectId(studentId, subjectId, page, size);
+    }
+
 
     @PutMapping("/update")
-    public ApiResponse update(@RequestBody @Validated ScoreRequest scoreRequest) {
+    public ApiResponse update(@RequestBody ScoreRequest scoreRequest) {
         return scoreService.update(scoreRequest);
     }
 
@@ -36,5 +59,4 @@ public class ScoreController {
     public ApiResponse delete(@PathVariable Integer id) {
         return scoreService.delete(id);
     }
-
 }

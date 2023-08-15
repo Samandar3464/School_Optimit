@@ -1,6 +1,5 @@
 package com.example.model.request;
 
-import com.example.entity.StudentClass;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
@@ -14,8 +13,7 @@ import java.time.LocalDate;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
-public class StudentClassDto {
+public class StudentClassRequest {
 
     private Integer id;
 
@@ -37,19 +35,5 @@ public class StudentClassDto {
     private Integer classLeaderId;
 
     private Integer levelId;
-
-    public static StudentClassDto toResponse(StudentClass studentClass) {
-        if (studentClass==null)return null;
-
-        return StudentClassDto
-                .builder()
-                .id(studentClass.getId())
-                .className(studentClass.getClassName())
-                .classLeaderId(studentClass.getClassLeader().getId())
-                .roomId(studentClass.getRoom().getId())
-                .branchId(studentClass.getBranch().getId())
-                .levelId(studentClass.getLevel().getId())
-                .build();
-    }
 }
 

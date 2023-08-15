@@ -2,7 +2,6 @@ package com.example.entity;
 
 import com.example.enums.ExpenseType;
 import com.example.enums.PaymentType;
-import com.example.model.request.TransactionHistoryRequest;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -45,17 +44,4 @@ public class TransactionHistory {
 
     @OneToOne
     private Branch branch;
-
-    public static TransactionHistory toEntity(TransactionHistoryRequest transactionHistoryRequest){
-        return TransactionHistory
-                .builder()
-                .active(true)
-                .date(LocalDateTime.now())
-                .comment(transactionHistoryRequest.getComment())
-                .paidInFull(transactionHistoryRequest.isPaidInFull())
-                .paymentType(transactionHistoryRequest.getPaymentType())
-                .moneyAmount(Double.parseDouble(transactionHistoryRequest.getMoneyAmount()))
-                .expenseType(transactionHistoryRequest.getExpenseType())
-                .build();
-    }
 }

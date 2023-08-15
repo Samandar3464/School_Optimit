@@ -1,9 +1,6 @@
 package com.example.service;
 
-import com.example.entity.MainBalance;
-import com.example.entity.Student;
-import com.example.entity.TransactionHistory;
-import com.example.entity.User;
+import com.example.entity.*;
 import com.example.enums.Constants;
 import com.example.enums.ExpenseType;
 import com.example.enums.PaymentType;
@@ -21,9 +18,9 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -45,15 +42,6 @@ public class TransactionHistoryService implements BaseService<TransactionHistory
         transactionHistoryRepository.save(transactionHistory);
         TransactionHistoryResponse response = getTransactionHistoryResponse(transactionHistory);
         return new ApiResponse(Constants.SUCCESSFULLY, true, response);
-    }
-
-    private TransactionHistoryResponse getTransactionHistoryResponse(TransactionHistory transactionHistory) {
-        TransactionHistoryResponse response = modelMapper.map(transactionHistory, TransactionHistoryResponse.class);
-        response.setDate(transactionHistory.getDate().toString());
-        response.setStudent(transactionHistory.getStudent() == null ? null : modelMapper.map(transactionHistory.getStudent(), StudentResponse.class));
-        response.setTaker(transactionHistory.getTaker() == null ? null : modelMapper.map(transactionHistory.getTaker(), UserResponse.class));
-        response.setMainBalanceResponse(modelMapper.map(transactionHistory.getMainBalance(), MainBalanceResponse.class));
-        return response;
     }
 
     @Override
@@ -84,18 +72,18 @@ public class TransactionHistoryService implements BaseService<TransactionHistory
 
     @Override
     public ApiResponse update(TransactionHistoryRequest request) {
-
         TransactionHistory oldTransaction = getTransactionHistory(request.getId());
-        TransactionHistory newTransactionHistory = TransactionHistory.toEntity(request);
+        TransactionHistory transactionHistory = modelMapper.map(request,TransactionHistory.class);
 
-        newTransactionHistory.setId(request.getId());
-        setTransactionHistory(request, newTransactionHistory);
+        transactionHistory.setId(request.getId());
+        setTransactionHistory(request, transactionHistory);
 
         rollBackTransaction(oldTransaction);
-        transactionWithBalance(newTransactionHistory);
+        transactionWithBalance(transactionHistory);
 
-        transactionHistoryRepository.save(newTransactionHistory);
-        return new ApiResponse(Constants.SUCCESSFULLY, true, getTransactionHistoryResponse(newTransactionHistory));
+        transactionHistoryRepository.save(transactionHistory);
+        TransactionHistoryResponse response = getTransactionHistoryResponse(transactionHistory);
+        return new ApiResponse(Constants.SUCCESSFULLY, true, response);
     }
 
     @Override
@@ -104,7 +92,8 @@ public class TransactionHistoryService implements BaseService<TransactionHistory
         transactionHistory.setActive(false);
         rollBackTransaction(transactionHistory);
         transactionHistoryRepository.save(transactionHistory);
-        return new ApiResponse(Constants.SUCCESSFULLY, true, getTransactionHistoryResponse(transactionHistory));
+        TransactionHistoryResponse response = getTransactionHistoryResponse(transactionHistory);
+        return new ApiResponse(Constants.SUCCESSFULLY, true, response);
     }
 
     public void transactionWithBalance(TransactionHistory transactionHistory) {
@@ -258,13 +247,43 @@ public class TransactionHistoryService implements BaseService<TransactionHistory
     }
 
     private void setTransactionHistory(TransactionHistoryRequest request, TransactionHistory transactionHistory) {
-        transactionHistory.setMainBalance(mainBalanceRepository.findByIdAndActiveTrue(request.getMainBalanceId()).orElseThrow(() -> new RecordNotFoundException(Constants.MAIN_BALANCE_NOT_FOUND)));
-        transactionHistory.setBranch(branchRepository.findByIdAndDeleteFalse(request.getBranchId()).orElseThrow(() -> new RecordNotFoundException(Constants.BRANCH_NOT_FOUND)));
-        transactionHistory.setTaker(request.getPhoneNumber() == null ? null : userRepository.findByPhoneNumberAndBlockedFalse(request.getPhoneNumber()).orElseThrow(() -> new RecordNotFoundException(Constants.USER_NOT_FOUND)));
-        transactionHistory.setStudent(request.getAccountNumber() == null ? null : studentRepository.findByAccountNumberAndActiveTrue(request.getAccountNumber()).orElseThrow(() -> new RecordNotFoundException(Constants.STUDENT_NOT_FOUND)));
+        MainBalance mainBalance = mainBalanceRepository.findByIdAndActiveTrue(request.getMainBalanceId())
+                .orElseThrow(() -> new RecordNotFoundException(Constants.MAIN_BALANCE_NOT_FOUND));
+        Branch branch = branchRepository.findByIdAndDeleteFalse(request.getBranchId())
+                .orElseThrow(() -> new RecordNotFoundException(Constants.BRANCH_NOT_FOUND));
+        User user = request.getPhoneNumber() == null ? null
+                : userRepository.findByPhoneNumberAndBlockedFalse(request.getPhoneNumber())
+                .orElseThrow(() -> new RecordNotFoundException(Constants.USER_NOT_FOUND));
+        Student student = request.getAccountNumber() == null ? null
+                : studentRepository.findByAccountNumberAndActiveTrue(request.getAccountNumber())
+                .orElseThrow(() -> new RecordNotFoundException(Constants.STUDENT_NOT_FOUND));
+
+        transactionHistory.setActive(true);
+        transactionHistory.setDate(LocalDateTime.now());
+        transactionHistory.setMainBalance(mainBalance);
+        transactionHistory.setBranch(branch);
+        transactionHistory.setTaker(user);
+        transactionHistory.setStudent(student);
     }
 
     private TransactionHistory getTransactionHistory(Integer integer) {
-        return transactionHistoryRepository.findByIdAndActiveTrue(integer).orElseThrow(() -> new RecordNotFoundException(Constants.TRANSACTION_HISTORY_NOT_FOUND));
+        return transactionHistoryRepository.findByIdAndActiveTrue(integer)
+                .orElseThrow(() -> new RecordNotFoundException(Constants.TRANSACTION_HISTORY_NOT_FOUND));
+    }
+
+    private TransactionHistoryResponse getTransactionHistoryResponse(TransactionHistory transactionHistory) {
+        TransactionHistoryResponse response = modelMapper.map(transactionHistory, TransactionHistoryResponse.class);
+
+        StudentResponse studentResponse = transactionHistory.getStudent() == null ? null
+                : modelMapper.map(transactionHistory.getStudent(), StudentResponse.class);
+        UserResponse userResponse = transactionHistory.getTaker() == null ? null
+                : modelMapper.map(transactionHistory.getTaker(), UserResponse.class);
+        MainBalanceResponse mainBalanceResponse = modelMapper.map(transactionHistory.getMainBalance(), MainBalanceResponse.class);
+
+        response.setDate(transactionHistory.getDate().toString());
+        response.setStudent(studentResponse);
+        response.setTaker(userResponse);
+        response.setMainBalanceResponse(mainBalanceResponse);
+        return response;
     }
 }

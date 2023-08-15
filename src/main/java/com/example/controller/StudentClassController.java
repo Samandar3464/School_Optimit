@@ -1,8 +1,7 @@
 package com.example.controller;
 
-import com.example.entity.StudentClass;
 import com.example.model.common.ApiResponse;
-import com.example.model.request.StudentClassDto;
+import com.example.model.request.StudentClassRequest;
 import com.example.service.StudentClassService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -17,7 +16,7 @@ public class StudentClassController {
     private final StudentClassService service;
 
     @PostMapping("/create")
-    public ApiResponse create(@RequestBody StudentClassDto studentClass) {
+    public ApiResponse create(@RequestBody StudentClassRequest studentClass) {
         return service.create(studentClass);
     }
 
@@ -27,7 +26,7 @@ public class StudentClassController {
     }
 
     @PutMapping("/update")
-    public ApiResponse update(@RequestBody StudentClassDto studentClass) {
+    public ApiResponse update(@RequestBody StudentClassRequest studentClass) {
         return service.update(studentClass);
     }
 

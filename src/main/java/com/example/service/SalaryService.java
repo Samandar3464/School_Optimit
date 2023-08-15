@@ -68,15 +68,6 @@ public class SalaryService implements BaseService<SalaryRequest, String> {
         return new ApiResponse(Constants.SUCCESSFULLY, true, response);
     }
 
-    private void checkingUpdate(SalaryRequest salaryRequest) {
-        Salary old = salaryRepository.findById(salaryRequest.getId())
-                .orElseThrow(() -> new RecordNotFoundException(Constants.SALARY_NOT_FOUND));
-
-        if (old.getDate().getDayOfMonth() != LocalDate.now().getDayOfMonth()) {
-            throw new RecordNotFoundException(Constants.DO_NOT_CHANGE_BECAUSE_TIME_EXPIRED);
-        }
-    }
-
 
     @Override
     public ApiResponse delete(String phoneNumber) {
@@ -97,19 +88,12 @@ public class SalaryService implements BaseService<SalaryRequest, String> {
 
 
     private void toDoGiveCash(double cashSalary, Salary salary, PaymentType paymentType) {
-
         salary.setCashAdvance(salary.getCashAdvance() + cashSalary);
-
         salary.setGivenSalary(salary.getGivenSalary() + cashSalary);
-
         if (salary.getSalary() >= cashSalary) {
-
             salary.setSalary(salary.getSalary() - cashSalary);
-
         } else {
-
             throw new RecordNotFoundException(Constants.SALARY_NOT_ENOUGH);
-
         }
         transaction(salary.getUser().getPhoneNumber(), cashSalary, paymentType, salary, "Hodimga naqd pul berildi");
     }
@@ -125,21 +109,13 @@ public class SalaryService implements BaseService<SalaryRequest, String> {
 
 
     private void toDoGivePartlySalary(double partlySalary, Salary salary, PaymentType paymentType) {
-
         salary.setPartlySalary(salary.getPartlySalary() + partlySalary);
-
         salary.setGivenSalary(salary.getGivenSalary() + partlySalary);
-
         if (salary.getSalary() >= partlySalary) {
-
             salary.setSalary(salary.getSalary() - partlySalary);
-
         } else {
-
             throw new RecordNotFoundException(Constants.SALARY_NOT_ENOUGH);
-
         }
-
         salary.setActive(false);
         transaction(salary.getUser().getPhoneNumber(), partlySalary, paymentType, salary, "Hodimga qisman oylik berildi");
     }
@@ -147,22 +123,15 @@ public class SalaryService implements BaseService<SalaryRequest, String> {
 
     @Transactional(rollbackFor = {Exception.class, RecordNotFoundException.class})
     public ApiResponse giveSalary(String phoneNumber, boolean debtCollection, PaymentType paymentType) {
-
         Salary salary = getByUserPhoneNumberAndActiveTrue(phoneNumber);
 
         if (salary.getDate().getMonth() != LocalDate.now().getMonth()) {
-
             throw new RecordAlreadyExistException(Constants.SALARY_ALREADY_GIVEN_FOR_THIS_MONTH);
-
         }
         double salaryWithoutDebt = salary.getSalary() - salary.getAmountDebt();
-
         if (salaryWithoutDebt > 0) {
-
             transaction(phoneNumber, salaryWithoutDebt, paymentType, salary, "Hodimga oylik berildi");
-
         }
-
         repaymentOfDebtIfAny(debtCollection, salary);
 
         salary.setGivenSalary(salary.getGivenSalary() + salary.getSalary());
@@ -170,11 +139,8 @@ public class SalaryService implements BaseService<SalaryRequest, String> {
         salary.setActive(false);
 
         createNewSalary(salary);
-
         salaryRepository.save(salary);
-
         String message = getMessage(debtCollection, salary, salaryWithoutDebt > 0 ? salaryWithoutDebt : 0);
-
         return new ApiResponse(message, true, getResponse(salary));
     }
 
@@ -189,23 +155,14 @@ public class SalaryService implements BaseService<SalaryRequest, String> {
     }
 
     private void toDoGiveDebt(double debtAmount, Salary salary) {
-
         double money = salary.getSalary() - debtAmount;
-
         if (money >= 0) {
-
             salary.setSalary(money);
-
         } else {
-
             salary.setSalary(0);
-
             salary.setAmountDebt(salary.getAmountDebt() + Math.abs(money));
-
         }
-
         salary.setGivenSalary(salary.getGivenSalary() + debtAmount);
-
     }
 
     @Transactional(rollbackFor = {Exception.class, RecordNotFoundException.class})
@@ -250,23 +207,14 @@ public class SalaryService implements BaseService<SalaryRequest, String> {
     }
 
     private void repaymentOfDebtIfAny(boolean debtCollection, Salary salary) {
-
         if (debtCollection) {
-
             double salaryWithoutDebit = salary.getSalary() - salary.getAmountDebt();
-
             if (salaryWithoutDebit >= 0) {
-
                 salary.setSalary(salaryWithoutDebit);
-
                 salary.setAmountDebt(0);
-
             } else {
-
                 salary.setSalary(0);
-
                 salary.setAmountDebt(Math.abs(salaryWithoutDebit));
-
             }
         }
     }
@@ -279,6 +227,7 @@ public class SalaryService implements BaseService<SalaryRequest, String> {
         Branch branch = branchRepository.findByIdAndDeleteFalse(salaryRequest.getBranchId())
                 .orElseThrow(() -> new RecordNotFoundException(Constants.BRANCH_NOT_FOUND));
 
+        salary.setActive(true);
         salary.setUser(user);
         salary.setMainBalance(mainBalance);
         salary.setBranch(branch);
@@ -304,5 +253,13 @@ public class SalaryService implements BaseService<SalaryRequest, String> {
     private Salary getByUserPhoneNumberAndActiveTrue(String phoneNumber) {
         return salaryRepository.findByUserPhoneNumberAndActiveTrue(phoneNumber)
                 .orElseThrow(() -> new RecordNotFoundException(Constants.SALARY_NOT_FOUND));
+    }
+
+    private void checkingUpdate(SalaryRequest salaryRequest) {
+        Salary old = salaryRepository.findById(salaryRequest.getId())
+                .orElseThrow(() -> new RecordNotFoundException(Constants.SALARY_NOT_FOUND));
+        if (old.getDate().getDayOfMonth() != LocalDate.now().getDayOfMonth()) {
+            throw new RecordNotFoundException(Constants.DO_NOT_CHANGE_BECAUSE_TIME_EXPIRED);
+        }
     }
 }

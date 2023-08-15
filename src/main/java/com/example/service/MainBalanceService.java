@@ -14,6 +14,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,10 +28,17 @@ public class MainBalanceService implements BaseService<MainBalanceRequest, Integ
 
     @Override
     public ApiResponse create(MainBalanceRequest mainBalanceRequest) {
-        MainBalance mainBalance = MainBalance.toEntity(mainBalanceRequest);
-        mainBalance.setBranch(getBranch(mainBalanceRequest.getBranchId()));
+        MainBalance mainBalance = modelMapper.map(mainBalanceRequest, MainBalance.class);
+        setMainBalance(mainBalanceRequest, mainBalance);
         mainBalanceRepository.save(mainBalance);
-        return new ApiResponse(Constants.SUCCESSFULLY, true);
+        MainBalanceResponse response = getMainBalanceResponse(mainBalance);
+        return new ApiResponse(Constants.SUCCESSFULLY, true, response);
+    }
+
+    private void setMainBalance(MainBalanceRequest mainBalanceRequest, MainBalance mainBalance) {
+        mainBalance.setActive(true);
+        mainBalance.setDate(LocalDate.now());
+        mainBalance.setBranch(getBranch(mainBalanceRequest.getBranchId()));
     }
 
     @Override
@@ -54,8 +62,8 @@ public class MainBalanceService implements BaseService<MainBalanceRequest, Integ
     @Override
     public ApiResponse update(MainBalanceRequest mainBalanceRequest) {
         getMainBalance(mainBalanceRequest.getId());
-        MainBalance mainBalance = MainBalance.toEntity(mainBalanceRequest);
-        mainBalance.setBranch(getBranch(mainBalanceRequest.getBranchId()));
+        MainBalance mainBalance = modelMapper.map(mainBalanceRequest, MainBalance.class);
+        setMainBalance(mainBalanceRequest, mainBalance);
         mainBalance.setId(mainBalanceRequest.getId());
         mainBalanceRepository.save(mainBalance);
         MainBalanceResponse response = getMainBalanceResponse(mainBalance);

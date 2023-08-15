@@ -8,10 +8,13 @@ import com.example.exception.UserNotFoundException;
 import com.example.model.common.ApiResponse;
 import com.example.model.request.WorkExperienceRequest;
 import com.example.model.response.WorkExperienceResponse;
+import com.example.model.response.WorkExperienceResponsePage;
 import com.example.repository.UserRepository;
 import com.example.repository.WorkExperienceRepository;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -31,10 +34,12 @@ public class WorkExperienceService implements BaseService<WorkExperienceRequest,
     @Override
     public ApiResponse create(WorkExperienceRequest workExperienceRequest) {
         checkIfExist(workExperienceRequest);
-        WorkExperience workExperience = WorkExperience.toWorkExperience(workExperienceRequest);
-        workExperience.setEmployee(userRepository.findById(workExperienceRequest.getEmployeeId()).orElseThrow(() -> new UserNotFoundException(Constants.USER_NOT_FOUND)));
+        WorkExperience workExperience = modelMapper.map(workExperienceRequest,WorkExperience.class);
+        workExperience.setEmployee(userRepository.findById(workExperienceRequest.getEmployeeId())
+                .orElseThrow(() -> new UserNotFoundException(Constants.USER_NOT_FOUND)));
         workExperienceRepository.save(workExperience);
-        return new ApiResponse(Constants.SUCCESSFULLY, true, getWorkExperienceResponse(workExperience));
+        WorkExperienceResponse response = getWorkExperienceResponse(workExperience);
+        return new ApiResponse(Constants.SUCCESSFULLY, true, response);
     }
 
     @Override
@@ -44,51 +49,45 @@ public class WorkExperienceService implements BaseService<WorkExperienceRequest,
         return new ApiResponse(Constants.SUCCESSFULLY, true, response);
     }
 
-    private WorkExperienceResponse getWorkExperienceResponse(WorkExperience workExperience) {
-        WorkExperienceResponse response = modelMapper.map(workExperience, WorkExperienceResponse.class);
-        response.setStartDate(workExperience.getStartDate().toString());
-        response.setEndDate(workExperience.getEndDate().toString());
-        return response;
-    }
-
     @Override
     public ApiResponse update(WorkExperienceRequest workExperienceRequest) {
         checkById(workExperienceRequest.getId());
-        WorkExperience workExperience = WorkExperience.toWorkExperience(workExperienceRequest);
-        workExperience.setEmployee(userRepository.findById(workExperienceRequest.getEmployeeId()).orElseThrow(() -> new UserNotFoundException(Constants.USER_NOT_FOUND)));
+        WorkExperience workExperience = modelMapper.map(workExperienceRequest,WorkExperience.class);
+        workExperience.setEmployee(userRepository.findById(workExperienceRequest.getEmployeeId())
+                .orElseThrow(() -> new UserNotFoundException(Constants.USER_NOT_FOUND)));
         workExperience.setId(workExperienceRequest.getId());
         workExperienceRepository.save(workExperience);
-        return new ApiResponse(Constants.SUCCESSFULLY, true, getWorkExperienceResponse(workExperience));
+        WorkExperienceResponse response = getWorkExperienceResponse(workExperience);
+        return new ApiResponse(Constants.SUCCESSFULLY, true, response);
     }
 
     @Override
     public ApiResponse delete(Integer id) {
         WorkExperience workExperience = checkById(id);
         workExperienceRepository.deleteById(id);
-        return new ApiResponse(Constants.DELETED, true, getWorkExperienceResponse(workExperience));
+        WorkExperienceResponse response = getWorkExperienceResponse(workExperience);
+        return new ApiResponse(Constants.DELETED, true, response);
     }
 
+
     @ResponseStatus(HttpStatus.OK)
-    public ApiResponse getAllById(List<Integer> workExperiences) {
-        List<WorkExperience> all = workExperienceRepository.findAllById(workExperiences);
-        List<WorkExperienceResponse> allResponse = getWorkExperienceResponses(all);
+    public ApiResponse getAllByUserId(Integer id, int page, int size) {
+        Page<WorkExperience> all = workExperienceRepository
+                .findAllByEmployeeId(id, PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "id")));
+        WorkExperienceResponsePage allResponse = getWorkExperienceResponses(all);
         return new ApiResponse(Constants.SUCCESSFULLY, true, allResponse);
     }
 
-    @ResponseStatus(HttpStatus.OK)
-    public ApiResponse getAllByUserId(Integer id) {
-        List<WorkExperience> all = workExperienceRepository
-                .findAllByEmployeeId(id, Sort.by(Sort.Direction.DESC, "id"));
-        List<WorkExperienceResponse> allResponse = getWorkExperienceResponses(all);
-        return new ApiResponse(Constants.SUCCESSFULLY, true, allResponse);
-    }
-
-    private List<WorkExperienceResponse> getWorkExperienceResponses(List<WorkExperience> all) {
+    private WorkExperienceResponsePage getWorkExperienceResponses(Page<WorkExperience> all) {
+        WorkExperienceResponsePage page = new WorkExperienceResponsePage();
         List<WorkExperienceResponse> allResponse = new ArrayList<>();
         all.forEach(workExperience -> {
             allResponse.add(getWorkExperienceResponse(workExperience));
         });
-        return allResponse;
+        page.setWorkExperienceResponses(allResponse);
+        page.setTotalPage(all.getTotalPages());
+        page.setTotalElement(all.getTotalElements());
+        return page;
     }
 
     private void checkIfExist(WorkExperienceRequest workExperienceRequest) {
@@ -105,6 +104,14 @@ public class WorkExperienceService implements BaseService<WorkExperienceRequest,
     }
 
     public WorkExperience checkById(Integer id) {
-        return workExperienceRepository.findById(id).orElseThrow(() -> new RecordNotFoundException(Constants.WORK_EXPERIENCE_NOT_FOUND));
+        return workExperienceRepository.findById(id)
+                .orElseThrow(() -> new RecordNotFoundException(Constants.WORK_EXPERIENCE_NOT_FOUND));
+    }
+
+    private WorkExperienceResponse getWorkExperienceResponse(WorkExperience workExperience) {
+        WorkExperienceResponse response = modelMapper.map(workExperience, WorkExperienceResponse.class);
+        response.setStartDate(workExperience.getStartDate().toString());
+        response.setEndDate(workExperience.getEndDate().toString());
+        return response;
     }
 }

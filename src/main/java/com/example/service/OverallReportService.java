@@ -106,7 +106,7 @@ public class OverallReportService implements BaseService<OverallReportRequest, I
 
     private OverallReportResponse getOverallReportResponse(OverallReport overallReport) {
         OverallReportResponse response = modelMapper.map(overallReport, OverallReportResponse.class);
-        UserResponse userResponse = userService.getResponse(overallReport.getUser());
+        UserResponse userResponse = userService.toUserResponse(overallReport.getUser());
         SalaryResponse salaryResponse = salaryService.getResponse(overallReport.getSalary());
         response.setSalary(salaryResponse);
         response.setUserResponse(userResponse);

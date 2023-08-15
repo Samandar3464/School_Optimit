@@ -40,16 +40,4 @@ public class Family {
 
     @ManyToOne
     private Branch branch;
-
-
-    public static Family from(Family family){
-        return Family.builder()
-                .fullName(family.getFullName())
-                .phoneNumber(family.getPhoneNumber())
-                .password(family.getPassword())
-                .registeredDate(LocalDateTime.now())
-                .gender(family.getGender())
-                .active(true)
-                .build();
-    }
 }

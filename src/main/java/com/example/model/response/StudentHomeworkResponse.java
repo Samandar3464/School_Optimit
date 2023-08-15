@@ -1,11 +1,7 @@
 package com.example.model.response;
 
-import com.example.entity.StudentHomework;
 import com.example.entity.Subject;
 import lombok.Data;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Data
 public class StudentHomeworkResponse {

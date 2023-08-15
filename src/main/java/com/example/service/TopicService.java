@@ -1,5 +1,8 @@
 package com.example.service;
 
+import com.example.entity.Attachment;
+import com.example.entity.Level;
+import com.example.entity.Subject;
 import com.example.entity.Topic;
 import com.example.exception.RecordAlreadyExistException;
 import com.example.exception.RecordNotFoundException;
@@ -12,10 +15,9 @@ import com.example.repository.TopicRepository;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.ResponseStatus;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,24 +38,17 @@ public class TopicService implements BaseService<TopicRequest, Integer> {
         if (topicRepository.existsByNameAndSubjectIdAndLevelId(dto.getName(), dto.getSubjectId(), dto.getLevelId())) {
             throw new RecordAlreadyExistException(TOPIC_ALREADY_EXIST);
         }
-        Topic topic = Topic.toEntity(dto);
+        Topic topic = modelMapper.map(dto,Topic.class);
         setTopic(dto, topic);
         topicRepository.save(topic);
         TopicResponse response = getTopicResponse(topic);
         return new ApiResponse(SUCCESSFULLY, true,response);
     }
 
-    private TopicResponse getTopicResponse(Topic topic) {
-        TopicResponse response = modelMapper.map(topic, TopicResponse.class);
-        List<String> urlList = attachmentService.getUrlList(topic.getLessonFiles());
-        response.setLessonFiles(urlList);
-        return response;
-    }
-
-
     @Override
     public ApiResponse getById(Integer id) {
-        Topic topic = topicRepository.findById(id).orElseThrow(() -> new RecordNotFoundException(TOPIC_NOT_FOUND));
+        Topic topic = topicRepository.findById(id)
+                .orElseThrow(() -> new RecordNotFoundException(TOPIC_NOT_FOUND));
         TopicResponse topicResponse = getTopicResponse(topic);
         return new ApiResponse(SUCCESSFULLY, true, topicResponse);
     }
@@ -61,7 +56,7 @@ public class TopicService implements BaseService<TopicRequest, Integer> {
     @Override
     public ApiResponse update(TopicRequest dto) {
         checkingTopicByExists(dto);
-        Topic topic = Topic.toEntity(dto);
+        Topic topic = modelMapper.map(dto,Topic.class);
         topic.setId(dto.getId());
         setTopic(dto, topic);
         topicRepository.save(topic);
@@ -71,14 +66,17 @@ public class TopicService implements BaseService<TopicRequest, Integer> {
 
     @Override
     public ApiResponse delete(Integer id) {
-        Topic oldTopic = topicRepository.findById(id).orElseThrow(() -> new RecordNotFoundException(TOPIC_NOT_FOUND));
+        Topic oldTopic = topicRepository.findById(id)
+                .orElseThrow(() -> new RecordNotFoundException(TOPIC_NOT_FOUND));
         oldTopic.getLessonFiles().forEach(attachmentService::deleteNewName);
         topicRepository.deleteById(id);
         return new ApiResponse(DELETED, true, getTopicResponse(oldTopic));
     }
 
-    public List<TopicResponse> findALLBySubjectId(Integer subjectId, Integer levelId) {
-        List<Topic> all = topicRepository.findAllBySubjectIdAndLevelId(subjectId, levelId, Sort.by(Sort.Direction.DESC, "id"));
+    public List<TopicResponse> findAllBySubjectId(Integer subjectId, Integer levelId) {
+        List<Topic> all = topicRepository.findAllBySubjectIdAndLevelId(
+                subjectId,levelId,
+                Sort.by(Sort.Direction.DESC, "id"));
         List<TopicResponse> responses = new ArrayList<>();
         all.forEach(topic -> {
             responses.add(getTopicResponse(topic));
@@ -87,9 +85,17 @@ public class TopicService implements BaseService<TopicRequest, Integer> {
     }
 
     private void setTopic(TopicRequest dto, Topic topic) {
-        topic.setLevel(levelRepository.findById(dto.getLevelId()).orElseThrow(() -> new RecordNotFoundException(LEVEL_NOT_FOUND)));
-        topic.setSubject(subjectRepository.findById(dto.getSubjectId()).orElseThrow(() -> new RecordNotFoundException(SUBJECT_NOT_FOUND)));
-        topic.setLessonFiles(attachmentService.saveToSystemListFile(dto.getLessonFiles()));
+        Level level = levelRepository.findById(dto.getLevelId())
+                .orElseThrow(() -> new RecordNotFoundException(LEVEL_NOT_FOUND));
+        Subject subject = subjectRepository.findById(dto.getSubjectId())
+                .orElseThrow(() -> new RecordNotFoundException(SUBJECT_NOT_FOUND));
+        List<Attachment> attachments =
+                attachmentService.saveToSystemListFile(dto.getLessonFiles());
+
+        topic.setCreationDate(LocalDateTime.now());
+        topic.setLevel(level);
+        topic.setSubject(subject);
+        topic.setLessonFiles(attachments);
     }
 
     private void checkingTopicByExists(TopicRequest dto) {
@@ -98,5 +104,12 @@ public class TopicService implements BaseService<TopicRequest, Integer> {
                 && topicRepository.existsByNameAndSubjectIdAndLevelId(dto.getName(), dto.getSubjectId(), dto.getLevelId())) {
             throw new RecordNotFoundException(TOPIC_ALREADY_EXIST);
         }
+    }
+
+    private TopicResponse getTopicResponse(Topic topic) {
+        TopicResponse response = modelMapper.map(topic, TopicResponse.class);
+        List<String> urlList = attachmentService.getUrlList(topic.getLessonFiles());
+        response.setLessonFiles(urlList);
+        return response;
     }
 }
