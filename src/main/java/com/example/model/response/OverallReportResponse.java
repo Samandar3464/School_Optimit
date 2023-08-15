@@ -36,7 +36,6 @@ public class OverallReportResponse {
                 .builder()
                 .id(overallReport.getId())
                 .classLeadership(overallReport.getClassLeadership())
-                .month(overallReport.getMonth())
                 .branch(overallReport.getBranch())
                 .salary(SalaryResponse.toResponse(overallReport.getSalary()))
                 .fullName(overallReport.getUser().getName() + overallReport.getUser().getSurname())

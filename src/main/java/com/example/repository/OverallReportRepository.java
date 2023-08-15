@@ -6,5 +6,4 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface OverallReportRepository extends JpaRepository<OverallReport,Integer> {
 
-    OverallReport findByIdAndMonth(Integer integer, Months months);
 }

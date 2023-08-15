@@ -52,7 +52,7 @@ public class OverallReportService implements BaseService<OverallReportRequest, I
     }
 
     public ApiResponse getByIdAndMonth(Integer integer, Months months) {
-        OverallReport overallReport = overallReportRepository.findByIdAndMonth(integer, months);
+        OverallReport overallReport = overallReportRepository.findById(integer).orElseThrow(()->new RecordNotFoundException(Constants.OVERALL_REPORT_NOT_FOUND));
         OverallReportResponse overallReportResponse = OverallReportResponse.toOverallResponse(overallReport);
         return new ApiResponse(Constants.SUCCESSFULLY, true, overallReportResponse);
     }

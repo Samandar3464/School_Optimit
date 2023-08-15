@@ -55,7 +55,7 @@ public class StudentResponse {
                 .phoneNumber(student.getPhoneNumber())
                 .birthDate(student.getBirthDate().toString())
                 .docNumber(student.getDocNumber())
-                .families(student.getFamily())
+                .families(student.getFamilies())
                 .studentClass(StudentClassResponse.toResponse(student.getStudentClass()))
                 .active(student.isActive())
                 .addedTime(student.getAddedTime().toString())
