@@ -1,5 +1,6 @@
 package com.example.entity;
 
+import com.example.model.request.BusinessRequest;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -26,7 +27,7 @@ public class Business {
 
     private boolean delete;
 
-    public static Business from(Business business){
+    public static Business from(BusinessRequest business){
         return Business.builder()
                 .name(business.getName())
                 .description(business.getDescription())

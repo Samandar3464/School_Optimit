@@ -10,12 +10,18 @@ import com.example.enums.PaymentType;
 import com.example.exception.RecordNotFoundException;
 import com.example.model.common.ApiResponse;
 import com.example.model.request.TransactionHistoryRequest;
+import com.example.model.response.MainBalanceResponse;
+import com.example.model.response.StudentResponse;
 import com.example.model.response.TransactionHistoryResponse;
+import com.example.model.response.UserResponse;
 import com.example.repository.*;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -24,34 +30,56 @@ import java.util.Optional;
 public class TransactionHistoryService implements BaseService<TransactionHistoryRequest, Integer> {
 
     private final MainBalanceRepository mainBalanceRepository;
+    private final ModelMapper modelMapper;
     private final BranchRepository branchRepository;
     private final UserRepository userRepository;
     private final StudentRepository studentRepository;
     private final TransactionHistoryRepository transactionHistoryRepository;
 
     @Override
+    @Transactional(rollbackFor = {Exception.class, RecordNotFoundException.class})
     public ApiResponse create(TransactionHistoryRequest request) {
-        TransactionHistory transactionHistory = TransactionHistory.toEntity(request);
+        TransactionHistory transactionHistory = modelMapper.map(request, TransactionHistory.class);
         setTransactionHistory(request, transactionHistory);
         transactionWithBalance(transactionHistory);
         transactionHistoryRepository.save(transactionHistory);
-        return new ApiResponse(Constants.SUCCESSFULLY, true, TransactionHistoryResponse.toResponse(transactionHistory));
+        TransactionHistoryResponse response = getTransactionHistoryResponse(transactionHistory);
+        return new ApiResponse(Constants.SUCCESSFULLY, true, response);
+    }
+
+    private TransactionHistoryResponse getTransactionHistoryResponse(TransactionHistory transactionHistory) {
+        TransactionHistoryResponse response = modelMapper.map(transactionHistory, TransactionHistoryResponse.class);
+        response.setDate(transactionHistory.getDate().toString());
+        response.setStudent(transactionHistory.getStudent() == null ? null : modelMapper.map(transactionHistory.getStudent(), StudentResponse.class));
+        response.setTaker(transactionHistory.getTaker() == null ? null : modelMapper.map(transactionHistory.getTaker(), UserResponse.class));
+        response.setMainBalanceResponse(modelMapper.map(transactionHistory.getMainBalance(), MainBalanceResponse.class));
+        return response;
     }
 
     @Override
     public ApiResponse getById(Integer integer) {
         TransactionHistory transactionHistory = getTransactionHistory(integer);
-        return new ApiResponse(Constants.SUCCESSFULLY, true, TransactionHistoryResponse.toResponse(transactionHistory));
+        TransactionHistoryResponse response = getTransactionHistoryResponse(transactionHistory);
+        return new ApiResponse(Constants.SUCCESSFULLY, true, response);
     }
 
     public ApiResponse findAllByBranch_IdAndActiveTrue(Integer branchId) {
-        List<TransactionHistory> transactionHistories = transactionHistoryRepository.findAllByBranch_IdAndActiveTrue(branchId, Sort.by(Sort.Direction.DESC, "id"));
-        return new ApiResponse(Constants.SUCCESSFULLY, true, TransactionHistoryResponse.toAllResponse(transactionHistories));
+        List<TransactionHistory> transactionHistories = transactionHistoryRepository
+                .findAllByBranch_IdAndActiveTrue(branchId, Sort.by(Sort.Direction.DESC, "id"));
+        List<TransactionHistoryResponse> transactionHistoryResponses = new ArrayList<>();
+        transactionHistories.forEach(transactionHistory -> {
+            transactionHistoryResponses.add(getTransactionHistoryResponse(transactionHistory));
+        });
+        return new ApiResponse(Constants.SUCCESSFULLY, true, transactionHistoryResponses);
     }
 
     public ApiResponse findAllByActiveTrue() {
         List<TransactionHistory> transactionHistories = transactionHistoryRepository.findAllByActiveTrue(Sort.by(Sort.Direction.DESC, "id"));
-        return new ApiResponse(Constants.SUCCESSFULLY, true, TransactionHistoryResponse.toAllResponse(transactionHistories));
+        List<TransactionHistoryResponse> transactionHistoryResponses = new ArrayList<>();
+        transactionHistories.forEach(transactionHistory -> {
+            transactionHistoryResponses.add(getTransactionHistoryResponse(transactionHistory));
+        });
+        return new ApiResponse(Constants.SUCCESSFULLY, true, transactionHistoryResponses);
     }
 
     @Override
@@ -67,7 +95,7 @@ public class TransactionHistoryService implements BaseService<TransactionHistory
         transactionWithBalance(newTransactionHistory);
 
         transactionHistoryRepository.save(newTransactionHistory);
-        return new ApiResponse(Constants.SUCCESSFULLY, true, TransactionHistoryResponse.toResponse(newTransactionHistory));
+        return new ApiResponse(Constants.SUCCESSFULLY, true, getTransactionHistoryResponse(newTransactionHistory));
     }
 
     @Override
@@ -76,7 +104,7 @@ public class TransactionHistoryService implements BaseService<TransactionHistory
         transactionHistory.setActive(false);
         rollBackTransaction(transactionHistory);
         transactionHistoryRepository.save(transactionHistory);
-        return new ApiResponse(Constants.SUCCESSFULLY, true, TransactionHistoryResponse.toResponse(transactionHistory));
+        return new ApiResponse(Constants.SUCCESSFULLY, true, getTransactionHistoryResponse(transactionHistory));
     }
 
     public void transactionWithBalance(TransactionHistory transactionHistory) {

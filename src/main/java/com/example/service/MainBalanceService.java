@@ -10,9 +10,11 @@ import com.example.model.response.MainBalanceResponse;
 import com.example.repository.BranchRepository;
 import com.example.repository.MainBalanceRepository;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -21,6 +23,7 @@ public class MainBalanceService implements BaseService<MainBalanceRequest, Integ
 
     private final MainBalanceRepository mainBalanceRepository;
     private final BranchRepository branchRepository;
+    private final ModelMapper modelMapper;
 
     @Override
     public ApiResponse create(MainBalanceRequest mainBalanceRequest) {
@@ -32,13 +35,19 @@ public class MainBalanceService implements BaseService<MainBalanceRequest, Integ
 
     @Override
     public ApiResponse getById(Integer id) {
-        MainBalance mainBalance = mainBalanceRepository.findByIdAndActiveTrue(id).orElseThrow(() -> new RecordNotFoundException(Constants.MAIN_BALANCE_NOT_FOUND));
-        return new ApiResponse(Constants.SUCCESSFULLY, true, MainBalanceResponse.toResponse(mainBalance));
+        MainBalance mainBalance = mainBalanceRepository
+                .findByIdAndActiveTrue(id).orElseThrow(() -> new RecordNotFoundException(Constants.MAIN_BALANCE_NOT_FOUND));
+        MainBalanceResponse response = getMainBalanceResponse(mainBalance);
+        return new ApiResponse(Constants.SUCCESSFULLY, true, response);
     }
 
+
     public ApiResponse getByBranchId(Integer branchId) {
-        List<MainBalance> all = mainBalanceRepository.findAllByBranch_IdAndActiveTrue(branchId, Sort.by(Sort.Direction.DESC,"id"));
-        List<MainBalanceResponse> allResponse = MainBalanceResponse.toAllResponse(all);
+        List<MainBalance> all = mainBalanceRepository.findAllByBranch_IdAndActiveTrue(branchId, Sort.by(Sort.Direction.DESC, "id"));
+        List<MainBalanceResponse> allResponse = new ArrayList<>();
+        all.forEach(mainBalance -> {
+            allResponse.add(getMainBalanceResponse(mainBalance));
+        });
         return new ApiResponse(Constants.SUCCESSFULLY, true, allResponse);
     }
 
@@ -49,7 +58,8 @@ public class MainBalanceService implements BaseService<MainBalanceRequest, Integ
         mainBalance.setBranch(getBranch(mainBalanceRequest.getBranchId()));
         mainBalance.setId(mainBalanceRequest.getId());
         mainBalanceRepository.save(mainBalance);
-        return new ApiResponse(Constants.SUCCESSFULLY, true, MainBalanceResponse.toResponse(mainBalance));
+        MainBalanceResponse response = getMainBalanceResponse(mainBalance);
+        return new ApiResponse(Constants.SUCCESSFULLY, true, response);
     }
 
     @Override
@@ -57,14 +67,23 @@ public class MainBalanceService implements BaseService<MainBalanceRequest, Integ
         MainBalance mainBalance = getMainBalance(integer);
         mainBalance.setActive(false);
         mainBalanceRepository.save(mainBalance);
-        return new ApiResponse(Constants.SUCCESSFULLY, true, MainBalanceResponse.toResponse(mainBalance));
+        MainBalanceResponse response = getMainBalanceResponse(mainBalance);
+        return new ApiResponse(Constants.SUCCESSFULLY, true, response);
+    }
+
+    private MainBalanceResponse getMainBalanceResponse(MainBalance mainBalance) {
+        MainBalanceResponse response = modelMapper.map(mainBalance, MainBalanceResponse.class);
+        response.setDate(mainBalance.getDate().toString());
+        return response;
     }
 
     private MainBalance getMainBalance(Integer integer) {
-        return mainBalanceRepository.findByIdAndActiveTrue(integer).orElseThrow(() -> new RecordNotFoundException(Constants.MAIN_BALANCE_NOT_FOUND));
+        return mainBalanceRepository.findByIdAndActiveTrue(integer)
+                .orElseThrow(() -> new RecordNotFoundException(Constants.MAIN_BALANCE_NOT_FOUND));
     }
 
     private Branch getBranch(Integer branchId) {
-        return branchRepository.findByIdAndDeleteFalse(branchId).orElseThrow(() -> new RecordNotFoundException(Constants.BRANCH_NOT_FOUND));
+        return branchRepository.findByIdAndDeleteFalse(branchId)
+                .orElseThrow(() -> new RecordNotFoundException(Constants.BRANCH_NOT_FOUND));
     }
 }

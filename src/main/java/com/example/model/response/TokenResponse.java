@@ -10,7 +10,7 @@ import lombok.Setter;
 public class TokenResponse {
     private String accessToken;
 
-    private UserResponseDto userResponseDto;
+    private UserResponse userResponse;
      public TokenResponse(String accessToken) {
           this.accessToken=accessToken;
      }

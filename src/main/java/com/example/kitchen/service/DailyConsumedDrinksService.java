@@ -6,8 +6,9 @@ import com.example.enums.Constants;
 import com.example.exception.RecordNotFoundException;
 import com.example.kitchen.entity.DailyConsumedDrinks;
 import com.example.kitchen.entity.Warehouse;
-import com.example.kitchen.model.Response.DailyConsumedDrinksResponse;
+import com.example.kitchen.model.response.DailyConsumedDrinksResponse;
 import com.example.kitchen.model.request.DailyConsumedDrinksRequest;
+import com.example.kitchen.model.response.DailyConsumedDrinksResponsePage;
 import com.example.kitchen.repository.DailyConsumedDrinksRepository;
 import com.example.kitchen.repository.WareHouseRepository;
 import com.example.model.common.ApiResponse;
@@ -78,30 +79,35 @@ public class DailyConsumedDrinksService implements BaseService<DailyConsumedDrin
     public ApiResponse getAllByBranchId(Integer branchId, int page, int size) {
         Page<DailyConsumedDrinks> all = dailyConsumedDrinksRepository
                 .findAllByBranch_IdAndDeleteFalse(branchId, PageRequest.of(page, size));
-        List<DailyConsumedDrinksResponse> responses = toAllResponse(all);
-        return new ApiResponse(Constants.SUCCESSFULLY, true, responses);
+        DailyConsumedDrinksResponsePage allResponse = toAllResponse(all);
+        return new ApiResponse(Constants.SUCCESSFULLY, true, allResponse);
     }
 
     public ApiResponse getAllByWarehouseId(Integer warehouseId, int page, int size) {
         Page<DailyConsumedDrinks> all = dailyConsumedDrinksRepository
                 .findAllByWarehouseIdAndDeleteFalse(warehouseId, PageRequest.of(page, size));
-        List<DailyConsumedDrinksResponse> responses = toAllResponse(all);
-        return new ApiResponse(Constants.SUCCESSFULLY, true, responses);
+        DailyConsumedDrinksResponsePage allResponse = toAllResponse(all);
+        return new ApiResponse(Constants.SUCCESSFULLY, true, allResponse);
     }
 
-    private List<DailyConsumedDrinksResponse> toAllResponse(Page<DailyConsumedDrinks> all) {
+    private DailyConsumedDrinksResponsePage toAllResponse(Page<DailyConsumedDrinks> all) {
+        DailyConsumedDrinksResponsePage responsePage = new DailyConsumedDrinksResponsePage();
+        responsePage.setTotalElement(all.getTotalElements());
+        responsePage.setTotalPage(all.getTotalPages());
+
         List<DailyConsumedDrinksResponse> drinksResponses = new ArrayList<>();
         all.forEach(dailyConsumedDrinks -> {
             DailyConsumedDrinksResponse response = getResponse(dailyConsumedDrinks);
             drinksResponses.add(response);
         });
-        return drinksResponses;
+        responsePage.setResponseList(drinksResponses);
+        return responsePage;
     }
 
     private DailyConsumedDrinksResponse getResponse(DailyConsumedDrinks dailyConsumedDrinks) {
         DailyConsumedDrinksResponse response =
                 modelMapper.map(dailyConsumedDrinks, DailyConsumedDrinksResponse.class);
-        response.setLocalDateTime(dailyConsumedDrinks.getLocalDateTime());
+        response.setLocalDateTime(dailyConsumedDrinks.getLocalDateTime().toString());
         return response;
     }
 

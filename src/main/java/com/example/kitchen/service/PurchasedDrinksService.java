@@ -6,8 +6,9 @@ import com.example.enums.Constants;
 import com.example.exception.RecordNotFoundException;
 import com.example.kitchen.entity.PurchasedDrinks;
 import com.example.kitchen.entity.Warehouse;
-import com.example.kitchen.model.Response.PurchasedDrinksResponse;
+import com.example.kitchen.model.response.PurchasedDrinksResponse;
 import com.example.kitchen.model.request.PurchasedDrinksRequest;
+import com.example.kitchen.model.response.PurchasedDrinksResponsePage;
 import com.example.kitchen.repository.PurchasedDrinksRepository;
 import com.example.kitchen.repository.WareHouseRepository;
 import com.example.model.common.ApiResponse;
@@ -20,6 +21,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -83,29 +85,34 @@ public class PurchasedDrinksService implements BaseService<PurchasedDrinksReques
     public ApiResponse getAllByBranchId(Integer branchId, int page, int size) {
         Page<PurchasedDrinks> all = purchasedDrinksRepository
                 .findAllByBranch_IdAndDeleteFalse(branchId, PageRequest.of(page, size));
-        List<PurchasedDrinksResponse> drinksResponses = getDrinksResponses(all);
+        PurchasedDrinksResponsePage drinksResponses = getDrinksResponses(all);
         return new ApiResponse(Constants.SUCCESSFULLY, true, drinksResponses);
     }
 
     public ApiResponse getAllByWarehouseId(Integer warehouseId, int page, int size) {
         Page<PurchasedDrinks> all = purchasedDrinksRepository
                 .findAllByWarehouseIdAndDeleteFalse(warehouseId, PageRequest.of(page, size));
-        List<PurchasedDrinksResponse> responses = getDrinksResponses(all);
+        PurchasedDrinksResponsePage responses = getDrinksResponses(all);
         return new ApiResponse(Constants.SUCCESSFULLY, true, responses);
     }
 
-    private List<PurchasedDrinksResponse> getDrinksResponses(Page<PurchasedDrinks> all) {
+    private PurchasedDrinksResponsePage getDrinksResponses(Page<PurchasedDrinks> all) {
+        PurchasedDrinksResponsePage responsePage = new PurchasedDrinksResponsePage();
+        responsePage.setTotalPage(all.getTotalPages());
+        responsePage.setTotalElements(all.getTotalElements());
+
         List<PurchasedDrinksResponse> responses = new ArrayList<>();
         all.forEach(purchasedDrinks -> {
             PurchasedDrinksResponse response = getResponse(purchasedDrinks);
             responses.add(response);
         });
-        return responses;
+        responsePage.setPurchasedDrinksResponses(responses);
+        return responsePage;
     }
 
     private PurchasedDrinksResponse getResponse(PurchasedDrinks purchasedDrinks) {
         PurchasedDrinksResponse response = modelMapper.map(purchasedDrinks, PurchasedDrinksResponse.class);
-        response.setLocalDateTime(purchasedDrinks.getLocalDateTime());
+        response.setLocalDateTime(purchasedDrinks.getLocalDateTime().toString());
         return response;
     }
 
@@ -121,6 +128,7 @@ public class PurchasedDrinksService implements BaseService<PurchasedDrinksReques
         purchasedDrinks.setBranch(branch);
         purchasedDrinks.setEmployee(user);
         purchasedDrinks.setWarehouse(warehouse);
+        purchasedDrinks.setLocalDateTime(LocalDateTime.now());
     }
 
     private PurchasedDrinks getByPurchasedDrinksId(Integer integer) {

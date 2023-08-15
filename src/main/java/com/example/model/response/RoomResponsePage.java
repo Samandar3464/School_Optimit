@@ -10,7 +10,7 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class RoomResponseListForAdmin {
+public class RoomResponsePage {
 
     private List<Room> roomResponseDtoList;
     private long allSize;

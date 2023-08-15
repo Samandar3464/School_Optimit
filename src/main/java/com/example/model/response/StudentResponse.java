@@ -1,16 +1,11 @@
 package com.example.model.response;
 
 import com.example.entity.Family;
-import com.example.entity.Student;
-import lombok.*;
+import lombok.Data;
 
 import java.util.List;
 
-@Getter
-@Setter
-@AllArgsConstructor
-@NoArgsConstructor
-@Builder
+@Data
 public class StudentResponse {
 
     private Integer id;
@@ -44,21 +39,4 @@ public class StudentResponse {
     private String addedTime;
 
     private String medDocPhoto;
-
-    public static StudentResponse from(Student student){
-        return StudentResponse.builder()
-                .id(student.getId())
-                .firstName(student.getFirstName())
-                .lastName(student.getLastName())
-                .paymentAmount(student.getPaymentAmount())
-                .fatherName(student.getFatherName())
-                .phoneNumber(student.getPhoneNumber())
-                .birthDate(student.getBirthDate().toString())
-                .docNumber(student.getDocNumber())
-                .families(student.getFamily())
-                .studentClass(StudentClassResponse.toResponse(student.getStudentClass()))
-                .active(student.isActive())
-                .addedTime(student.getAddedTime().toString())
-                .build();
-    }
 }

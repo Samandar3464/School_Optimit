@@ -12,16 +12,16 @@ public class ProductsInWarehouseController {
 
     private final ProductsInWareHouseService productsInWareHouseService;
 
-    @GetMapping("{drinksInWareHouseId}")
-    public ApiResponse getById(@PathVariable Integer drinksInWareHouseId) {
-        return productsInWareHouseService.findByIdAndActiveTrue(drinksInWareHouseId);
+    @GetMapping("{productsInWarehouseId}")
+    public ApiResponse getById(@PathVariable Integer productsInWarehouseId) {
+        return productsInWareHouseService.findByIdAndActiveTrue(productsInWarehouseId);
     }
 
     @GetMapping("getAllByWarehouseId/{warehouseId}")
     public ApiResponse getAllProductsInWarehouseByWarehouseId(@RequestParam(name = "page", defaultValue = "0") int page,
                                                               @RequestParam(name = "size", defaultValue = "5") int size,
                                                               @PathVariable Integer warehouseId) {
-        return productsInWareHouseService.findAllByWarehouseIdAndActiveTrue(warehouseId, page, size);
+        return productsInWareHouseService.getAllByWarehouseIdAndActiveTrue(warehouseId, page, size);
     }
 
     @GetMapping("getAllByBranchId/{branchId}")

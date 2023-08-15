@@ -2,6 +2,7 @@ package com.example.controller;
 
 import com.example.entity.RoomType;
 import com.example.model.common.ApiResponse;
+import com.example.model.request.RoomTypeRequest;
 import com.example.service.RoomTypeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -14,7 +15,7 @@ public class RoomTypeController {
     private final RoomTypeService roomTypeService;
 
     @PostMapping("/create")
-    public ApiResponse create(@RequestBody RoomType roomType) {
+    public ApiResponse create(@RequestBody RoomTypeRequest roomType) {
         return roomTypeService.create(roomType);
     }
 
@@ -24,7 +25,7 @@ public class RoomTypeController {
     }
 
     @PutMapping("/update")
-    public ApiResponse update(@RequestBody RoomType roomType) {
+    public ApiResponse update(@RequestBody RoomTypeRequest roomType) {
         return roomTypeService.update(roomType);
     }
 

@@ -5,6 +5,7 @@ import com.example.entity.RoomType;
 import com.example.exception.RecordAlreadyExistException;
 import com.example.exception.RecordNotFoundException;
 import com.example.model.common.ApiResponse;
+import com.example.model.request.RoomTypeRequest;
 import com.example.repository.BranchRepository;
 import com.example.repository.RoomTypeRepository;
 import lombok.RequiredArgsConstructor;
@@ -19,18 +20,18 @@ import static com.example.enums.Constants.*;
 
 @Service
 @RequiredArgsConstructor
-public class RoomTypeService implements BaseService<RoomType, Integer> {
+public class RoomTypeService implements BaseService<RoomTypeRequest, Integer> {
 
     private final RoomTypeRepository roomTypeRepository;
     private final BranchRepository branchRepository;
 
     @Override
     @ResponseStatus(HttpStatus.CREATED)
-    public ApiResponse create(RoomType newRoomType) {
-        if (roomTypeRepository.existsByBranchIdAndName(newRoomType.getComingBranchId(), newRoomType.getName())) {
+    public ApiResponse create(RoomTypeRequest newRoomType) {
+        if (roomTypeRepository.existsByBranchIdAndName(newRoomType.getBranchId(), newRoomType.getName())) {
             throw new RecordAlreadyExistException(ROOM_TYPE_ALREADY_EXIST);
         }
-        Branch branch = branchRepository.findById(newRoomType.getComingBranchId())
+        Branch branch = branchRepository.findById(newRoomType.getBranchId())
                 .orElseThrow(() -> new RecordNotFoundException(BRANCH_NOT_FOUND));
         RoomType roomType = RoomType.builder()
                 .name(newRoomType.getName())
@@ -51,7 +52,7 @@ public class RoomTypeService implements BaseService<RoomType, Integer> {
 
     @Override
     @ResponseStatus(HttpStatus.OK)
-    public ApiResponse update(RoomType update) {
+    public ApiResponse update(RoomTypeRequest update) {
         RoomType roomType = roomTypeRepository.findById(update.getId())
                 .orElseThrow(() -> new RecordNotFoundException(ROOM_TYPE_NOT_FOUND));
         roomType.setName(update.getName());
@@ -68,6 +69,8 @@ public class RoomTypeService implements BaseService<RoomType, Integer> {
         roomTypeRepository.save(roomType);
         return new ApiResponse(DELETED, true);
     }
+
+
     @ResponseStatus(HttpStatus.OK)
     public ApiResponse getListRoomsByBranchId(Integer id) {
         List<RoomType> allByBranchId = roomTypeRepository.findAllByBranchIdAndActiveTrue(id, Sort.by(Sort.Direction.DESC,"id"));

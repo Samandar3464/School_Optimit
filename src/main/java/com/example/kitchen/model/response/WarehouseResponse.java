@@ -1,4 +1,4 @@
-package com.example.kitchen.model.Response;
+package com.example.kitchen.model.response;
 
 import com.example.kitchen.entity.Warehouse;
 import lombok.AllArgsConstructor;

@@ -4,6 +4,7 @@ import com.example.entity.Family;
 import com.example.model.common.ApiResponse;
 import com.example.model.request.FamilyAddStudentDto;
 import com.example.model.request.FamilyLoginDto;
+import com.example.model.request.FamilyRequest;
 import com.example.service.FamilyService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
@@ -17,7 +18,7 @@ public class FamilyController {
     private final FamilyService familyService;
 
     @PostMapping("/create")
-    public ApiResponse create(@RequestBody  Family family) {
+    public ApiResponse create(@RequestBody FamilyRequest family) {
         return familyService.create(family);
     }
 
@@ -26,8 +27,9 @@ public class FamilyController {
         return familyService.getById(id);
     }
 
+
     @PutMapping("/update")
-    public ApiResponse update(@RequestBody @Validated Family family) {
+    public ApiResponse update(@RequestBody FamilyRequest family) {
         return familyService.update(family);
     }
 
@@ -36,6 +38,7 @@ public class FamilyController {
         return familyService.delete(id);
     }
 
+
     @GetMapping("/getAllActiveFamily")
     public ApiResponse getAllActiveClasses(
             @RequestParam(name = "page", defaultValue = "0") int page,
@@ -43,10 +46,7 @@ public class FamilyController {
             @RequestParam(name = "branchId") int branchId) {
         return familyService.getList(page, size,branchId);
     }
-    @PostMapping("/add")
-    public ApiResponse add(@RequestBody @Validated FamilyAddStudentDto family) {
-        return familyService.add(family);
-    }
+
     @PostMapping("/loginFamily")
     public ApiResponse loginFamily(@RequestBody FamilyLoginDto familyLoginDto){
        return familyService.familyLogIn(familyLoginDto);

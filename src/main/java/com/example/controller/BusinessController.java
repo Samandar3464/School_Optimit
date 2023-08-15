@@ -2,6 +2,7 @@ package com.example.controller;
 
 import com.example.entity.Business;
 import com.example.model.common.ApiResponse;
+import com.example.model.request.BusinessRequest;
 import com.example.service.BusinessService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
@@ -15,7 +16,7 @@ public class BusinessController {
     private final BusinessService businessService;
 
     @PostMapping("/create")
-    public ApiResponse create(@RequestBody Business business) {
+    public ApiResponse create(@RequestBody BusinessRequest business) {
         return businessService.create(business);
     }
 
@@ -25,7 +26,7 @@ public class BusinessController {
     }
 
     @PutMapping("/update")
-    public ApiResponse update(@RequestBody @Validated Business business) {
+    public ApiResponse update(@RequestBody BusinessRequest business) {
         return businessService.update(business);
     }
 

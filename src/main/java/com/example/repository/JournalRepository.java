@@ -1,6 +1,8 @@
 package com.example.repository;
 
 import com.example.entity.Journal;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -10,9 +12,12 @@ import java.util.Optional;
 
 public interface JournalRepository extends JpaRepository<Journal, Integer> {
 
-    List<Journal> findAllByBranchIdAndActiveTrue(Integer branchId, Sort sort);
+    Page<Journal> findAllByBranchIdAndActiveTrue(Integer branchId, Pageable pageable);
+    Page<Journal> findAllByBranchId(Integer branchId, Pageable pageable);
 
     Optional<Journal> findByStudentClassIdAndActiveTrue(Integer studentClass_id);
 
     boolean existsByStudentClassIdAndActiveTrue(Integer studentClassId);
+
+    Optional<Journal> findByIdAndActiveTrue(Integer integer);
 }

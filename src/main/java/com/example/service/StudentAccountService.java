@@ -9,15 +9,19 @@ import com.example.model.common.ApiResponse;
 import com.example.model.request.StudentAccountCreate;
 import com.example.model.request.StudentAccountRequest;
 import com.example.model.request.TransactionHistoryRequest;
+import com.example.model.response.MainBalanceResponse;
 import com.example.model.response.StudentAccountResponse;
+import com.example.model.response.StudentResponse;
 import com.example.repository.*;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Sort;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -30,6 +34,7 @@ public class StudentAccountService implements BaseService<StudentAccountCreate, 
     private final StudentRepository studentRepository;
     private final MainBalanceRepository mainBalanceRepository;
     private final BranchRepository branchRepository;
+    private final ModelMapper modelMapper;
 
 
     @Override
@@ -37,7 +42,16 @@ public class StudentAccountService implements BaseService<StudentAccountCreate, 
         checkingCreate(request);
         StudentAccount studentAccount = getStudentAccount(request);
         studentAccountRepository.save(studentAccount);
-        return new ApiResponse(Constants.SUCCESSFULLY, true, StudentAccountResponse.toResponse(studentAccount));
+        StudentAccountResponse response = getStudentAccountResponse(studentAccount);
+        return new ApiResponse(Constants.SUCCESSFULLY, true, response);
+    }
+
+    private StudentAccountResponse getStudentAccountResponse(StudentAccount studentAccount) {
+        StudentAccountResponse response = modelMapper.map(studentAccount, StudentAccountResponse.class);
+        response.setDate(studentAccount.getDate().toString());
+        response.setStudent(modelMapper.map(studentAccount.getStudent(), StudentResponse.class));
+        response.setMainBalance(modelMapper.map(studentAccount.getMainBalance(), MainBalanceResponse.class));
+        return response;
     }
 
     private void checkingCreate(StudentAccountCreate request) {
@@ -71,7 +85,7 @@ public class StudentAccountService implements BaseService<StudentAccountCreate, 
 
         studentAccountRepository.save(studentAccount);
 
-        return new ApiResponse(Constants.SUCCESSFULLY, true, StudentAccountResponse.toResponse(studentAccount));
+        return new ApiResponse(Constants.SUCCESSFULLY, true, getStudentAccountResponse(studentAccount));
     }
 
     private void debtCollectionIfAny(StudentAccount studentAccount) {
@@ -144,7 +158,7 @@ public class StudentAccountService implements BaseService<StudentAccountCreate, 
 
         studentAccountRepository.save(studentAccount);
 
-        return new ApiResponse(Constants.SUCCESSFULLY, true, StudentAccountResponse.toResponse(studentAccount));
+        return new ApiResponse(Constants.SUCCESSFULLY, true, getStudentAccountResponse(studentAccount));
     }
 
 //    private void setStudentAccount(StudentAccountRequest request, StudentAccount studentAccount, TransactionHistory transactionHistory) {
@@ -257,19 +271,28 @@ public class StudentAccountService implements BaseService<StudentAccountCreate, 
     @Override
     public ApiResponse getById(Integer accountNumber) {
         StudentAccount studentAccount = studentAccountRepository.findByAccountNumberAndActiveTrue(accountNumber.toString()).orElseThrow(() -> new RecordNotFoundException(Constants.STUDENT_TRANSACTION_NOT_FOUND));
-        StudentAccountResponse response = StudentAccountResponse.toResponse(studentAccount);
+        StudentAccountResponse response = getStudentAccountResponse(studentAccount);
         return new ApiResponse(Constants.SUCCESSFULLY, true, response);
     }
 
     public ApiResponse getByBranchId(Integer branchId) {
-        List<StudentAccount> all = studentAccountRepository.findAllByBranch_IdAndActiveTrue(branchId, Sort.by(Sort.Direction.DESC, "id"));
-        List<StudentAccountResponse> allResponse = StudentAccountResponse.toAllResponse(all);
+        List<StudentAccount> all = studentAccountRepository
+                .findAllByBranch_IdAndActiveTrue(branchId, Sort.by(Sort.Direction.DESC, "id"));
+        List<StudentAccountResponse> allResponse = getStudentAccountResponses(all);
         return new ApiResponse(Constants.SUCCESSFULLY, true, allResponse);
+    }
+
+    private List<StudentAccountResponse> getStudentAccountResponses(List<StudentAccount> all) {
+        List<StudentAccountResponse> allResponse = new ArrayList<>();
+        all.forEach(studentAccount -> {
+            allResponse.add(getStudentAccountResponse(studentAccount));
+        });
+        return allResponse;
     }
 
     public ApiResponse getAllByDebtActive() {
         List<StudentAccount> all = studentAccountRepository.findAllByActiveTrueAndAmountOfDebitIsNotNull(Sort.by(Sort.Direction.DESC, "id"));
-        List<StudentAccountResponse> allResponse = StudentAccountResponse.toAllResponse(all);
+        List<StudentAccountResponse> allResponse = getStudentAccountResponses(all);
         return new ApiResponse(Constants.SUCCESSFULLY, true, allResponse);
     }
 
@@ -279,7 +302,7 @@ public class StudentAccountService implements BaseService<StudentAccountCreate, 
         set(Integer.parseInt(request.getNewAccountNumber()) == 0 ? request.getAccountNumber() : request.getNewAccountNumber(), request.getBranchId(), request.getMainBalanceId(), request.getDiscount(), request.getStudentId(), studentAccount);
         studentAccount.getStudent().setAccountNumber(studentAccount.getAccountNumber());
         studentAccountRepository.save(studentAccount);
-        return new ApiResponse(Constants.SUCCESSFULLY, true, StudentAccountResponse.toResponse(studentAccount));
+        return new ApiResponse(Constants.SUCCESSFULLY, true,getStudentAccountResponse(studentAccount));
     }
 
     @Override
@@ -287,7 +310,7 @@ public class StudentAccountService implements BaseService<StudentAccountCreate, 
         StudentAccount studentAccount = studentAccountRepository.findByAccountNumberAndActiveTrue(accountNumber.toString()).orElseThrow(() -> new RecordNotFoundException(Constants.SUCCESSFULLY));
         studentAccount.setActive(false);
         studentAccountRepository.save(studentAccount);
-        return new ApiResponse(Constants.SUCCESSFULLY, true, StudentAccountResponse.toResponse(studentAccount));
+        return new ApiResponse(Constants.SUCCESSFULLY, true,getStudentAccountResponse(studentAccount));
     }
 
 

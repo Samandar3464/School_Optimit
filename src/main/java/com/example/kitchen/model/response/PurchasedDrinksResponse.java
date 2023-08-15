@@ -1,11 +1,9 @@
-package com.example.kitchen.model.Response;
+package com.example.kitchen.model.response;
 
 import com.example.entity.Branch;
 import com.example.kitchen.entity.Warehouse;
-import com.example.model.response.UserResponseDto;
+import com.example.model.response.UserResponse;
 import lombok.*;
-
-import java.time.LocalDateTime;
 
 @Data
 public class PurchasedDrinksResponse {
@@ -24,11 +22,11 @@ public class PurchasedDrinksResponse {
 
     private String description;
 
-    private boolean active;
+    private boolean delete;
 
-    private LocalDateTime localDateTime;
+    private String localDateTime;
 
-    private UserResponseDto employee;
+    private UserResponse employee;
 
     private Branch branch;
 

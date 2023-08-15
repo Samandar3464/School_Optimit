@@ -11,11 +11,13 @@ import com.example.model.response.WorkExperienceResponse;
 import com.example.repository.UserRepository;
 import com.example.repository.WorkExperienceRepository;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -24,6 +26,7 @@ public class WorkExperienceService implements BaseService<WorkExperienceRequest,
 
     private final WorkExperienceRepository workExperienceRepository;
     private final UserRepository userRepository;
+    private final ModelMapper modelMapper;
 
     @Override
     public ApiResponse create(WorkExperienceRequest workExperienceRequest) {
@@ -31,13 +34,21 @@ public class WorkExperienceService implements BaseService<WorkExperienceRequest,
         WorkExperience workExperience = WorkExperience.toWorkExperience(workExperienceRequest);
         workExperience.setEmployee(userRepository.findById(workExperienceRequest.getEmployeeId()).orElseThrow(() -> new UserNotFoundException(Constants.USER_NOT_FOUND)));
         workExperienceRepository.save(workExperience);
-        return new ApiResponse(Constants.SUCCESSFULLY, true, WorkExperienceResponse.toResponse(workExperience));
+        return new ApiResponse(Constants.SUCCESSFULLY, true, getWorkExperienceResponse(workExperience));
     }
 
     @Override
     public ApiResponse getById(Integer id) {
         WorkExperience workExperience = checkById(id);
-        return new ApiResponse(Constants.SUCCESSFULLY, true, WorkExperienceResponse.toResponse(workExperience));
+        WorkExperienceResponse response = getWorkExperienceResponse(workExperience);
+        return new ApiResponse(Constants.SUCCESSFULLY, true, response);
+    }
+
+    private WorkExperienceResponse getWorkExperienceResponse(WorkExperience workExperience) {
+        WorkExperienceResponse response = modelMapper.map(workExperience, WorkExperienceResponse.class);
+        response.setStartDate(workExperience.getStartDate().toString());
+        response.setEndDate(workExperience.getEndDate().toString());
+        return response;
     }
 
     @Override
@@ -47,26 +58,37 @@ public class WorkExperienceService implements BaseService<WorkExperienceRequest,
         workExperience.setEmployee(userRepository.findById(workExperienceRequest.getEmployeeId()).orElseThrow(() -> new UserNotFoundException(Constants.USER_NOT_FOUND)));
         workExperience.setId(workExperienceRequest.getId());
         workExperienceRepository.save(workExperience);
-        return new ApiResponse(Constants.SUCCESSFULLY, true, WorkExperienceResponse.toResponse(workExperience));
+        return new ApiResponse(Constants.SUCCESSFULLY, true, getWorkExperienceResponse(workExperience));
     }
 
     @Override
     public ApiResponse delete(Integer id) {
         WorkExperience workExperience = checkById(id);
         workExperienceRepository.deleteById(id);
-        return new ApiResponse(Constants.DELETED, true, WorkExperienceResponse.toResponse(workExperience));
+        return new ApiResponse(Constants.DELETED, true, getWorkExperienceResponse(workExperience));
     }
 
     @ResponseStatus(HttpStatus.OK)
     public ApiResponse getAllById(List<Integer> workExperiences) {
-        List<WorkExperienceResponse> allResponse = WorkExperienceResponse.toAllResponse(workExperienceRepository.findAllById(workExperiences));
+        List<WorkExperience> all = workExperienceRepository.findAllById(workExperiences);
+        List<WorkExperienceResponse> allResponse = getWorkExperienceResponses(all);
         return new ApiResponse(Constants.SUCCESSFULLY, true, allResponse);
     }
 
     @ResponseStatus(HttpStatus.OK)
     public ApiResponse getAllByUserId(Integer id) {
-        List<WorkExperienceResponse> all = WorkExperienceResponse.toAllResponse(workExperienceRepository.findAllByEmployeeId(id, Sort.by(Sort.Direction.DESC, "id")));
-        return new ApiResponse(Constants.SUCCESSFULLY, true, all);
+        List<WorkExperience> all = workExperienceRepository
+                .findAllByEmployeeId(id, Sort.by(Sort.Direction.DESC, "id"));
+        List<WorkExperienceResponse> allResponse = getWorkExperienceResponses(all);
+        return new ApiResponse(Constants.SUCCESSFULLY, true, allResponse);
+    }
+
+    private List<WorkExperienceResponse> getWorkExperienceResponses(List<WorkExperience> all) {
+        List<WorkExperienceResponse> allResponse = new ArrayList<>();
+        all.forEach(workExperience -> {
+            allResponse.add(getWorkExperienceResponse(workExperience));
+        });
+        return allResponse;
     }
 
     private void checkIfExist(WorkExperienceRequest workExperienceRequest) {

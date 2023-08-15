@@ -3,6 +3,8 @@ package com.example.config;
 
 import com.example.entity.*;
 import com.example.enums.Gender;
+import com.example.kitchen.entity.Warehouse;
+import com.example.kitchen.repository.WareHouseRepository;
 import com.example.repository.*;
 import com.example.service.MainBalanceService;
 import lombok.RequiredArgsConstructor;
@@ -35,6 +37,7 @@ public class DataLoaderTest implements CommandLineRunner {
     private final LevelRepository levelRepository;
     private final SubjectLevelRepository subjectLevelRepository;
     private final MainBalanceService mainBalanceService;
+    private final WareHouseRepository wareHouseRepository;
 
 
     @Value("${spring.sql.init.mode}")
@@ -67,6 +70,8 @@ public class DataLoaderTest implements CommandLineRunner {
             Role teacher1 = Role.builder().id(2).name("TEACHER").permissions(List.of(p1)).active(true).build();
             Branch saveBranch = branchRepository.save(branch);
 
+            wareHouseRepository.save(new Warehouse(1, "maktab", true, saveBranch));
+
             teacher1.setBranch(saveBranch);
 
             Role savedRole = roleRepository.save(teacher1);
@@ -88,7 +93,6 @@ public class DataLoaderTest implements CommandLineRunner {
             User savedTeacher = userRepository.save(teacher);
 
 
-
             RoomType roomType = RoomType.builder()
                     .name("O'quv xona")
                     .active(true)
@@ -107,7 +111,7 @@ public class DataLoaderTest implements CommandLineRunner {
 
             Level savedLavel = levelRepository.getById(6);
 
-            mainBalanceRepository.save(new MainBalance(1,0,0,0,1,LocalDate.now(),true,saveBranch));
+            mainBalanceRepository.save(new MainBalance(1, 0, 0, 0, 1, LocalDate.now(), true, saveBranch));
 
 
             StudentClass studentClass = StudentClass.builder()
@@ -124,7 +128,7 @@ public class DataLoaderTest implements CommandLineRunner {
 
             StudentClass savedStudentClass = studentClassRepository.save(studentClass);
 
-            studentRepository.save(new Student(1,"aaa","a","a","907403767","111111",LocalDate.now(),"wefs",true,3_000_000,"1",LocalDateTime.now(),null,null,null,savedStudentClass,null,saveBranch,null));
+            studentRepository.save(new Student(1, "aaa", "a", "a", "907403767", "111111", LocalDate.now(), "wefs", true, 3_000_000, "1", LocalDateTime.now(), null, null, null, savedStudentClass, null, saveBranch, null));
 
             TypeOfWork typeOfWork = TypeOfWork.builder()
                     .branch(saveBranch)

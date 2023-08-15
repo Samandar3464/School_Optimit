@@ -6,14 +6,17 @@ import com.example.exception.UserNotFoundException;
 import com.example.model.common.ApiResponse;
 import com.example.model.request.StudentClassDto;
 import com.example.model.response.StudentClassResponse;
+import com.example.model.response.UserResponse;
 import com.example.repository.*;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.example.enums.Constants.*;
@@ -27,25 +30,35 @@ public class StudentClassService implements BaseService<StudentClassDto, Integer
     private final RoomRepository roomRepository;
     private final UserRepository userRepository;
     private final LevelRepository levelRepository;
+    private final ModelMapper modelMapper;
 
     @Override
     @ResponseStatus(HttpStatus.CREATED)
-    public ApiResponse create(StudentClassDto studentClass) {
-        Branch branch = branchRepository.findById(studentClass.getBranchId())
+    public ApiResponse create(StudentClassDto studentClassDto) {
+        Branch branch = branchRepository.findById(studentClassDto.getBranchId())
                 .orElseThrow(() -> new RecordNotFoundException(BRANCH_NOT_FOUND));
-        Room room = roomRepository.findById(studentClass.getRoomId())
+        Room room = roomRepository.findById(studentClassDto.getRoomId())
                 .orElseThrow(() -> new RecordNotFoundException(ROOM_NOT_FOUND));
-        User teacher = userRepository.findById(studentClass.getClassLeaderId())
+        User teacher = userRepository.findById(studentClassDto.getClassLeaderId())
                 .orElseThrow(() -> new UserNotFoundException(USER_NOT_FOUND));
-        Level level = levelRepository.findById(studentClass.getLevelId())
+        Level level = levelRepository.findById(studentClassDto.getLevelId())
                 .orElseThrow(() -> new RecordNotFoundException(LEVEL_NOT_FOUND));
-        StudentClass from = StudentClass.from(studentClass);
-        from.setBranch(branch);
-        from.setRoom(room);
-        from.setClassLeader(teacher);
-        from.setLevel(level);
-        studentClassRepository.save(from);
-        return new ApiResponse(SUCCESSFULLY, true);
+        StudentClass studentClass = StudentClass.from(studentClassDto);
+        studentClass.setBranch(branch);
+        studentClass.setRoom(room);
+        studentClass.setClassLeader(teacher);
+        studentClass.setLevel(level);
+        studentClassRepository.save(studentClass);
+        StudentClassResponse response = getStudentClassResponse(studentClass);
+        return new ApiResponse(SUCCESSFULLY, true, response);
+    }
+
+    private StudentClassResponse getStudentClassResponse(StudentClass studentClass) {
+        StudentClassResponse response = modelMapper.map(studentClass, StudentClassResponse.class);
+        response.setClassLeader(modelMapper.map(studentClass.getClassLeader(), UserResponse.class));
+        response.setStartDate(studentClass.getStartDate().toString());
+        response.setEndDate(studentClass.getEndDate().toString());
+        return response;
     }
 
 
@@ -53,7 +66,7 @@ public class StudentClassService implements BaseService<StudentClassDto, Integer
     @ResponseStatus(HttpStatus.OK)
     public ApiResponse getById(Integer integer) {
         StudentClass studentClass = studentClassRepository.findById(integer).orElseThrow(() -> new RecordNotFoundException(CLASS_NOT_FOUND));
-        return new ApiResponse(SUCCESSFULLY, true, StudentClassResponse.toResponse(studentClass));
+        return new ApiResponse(SUCCESSFULLY, true, getStudentClassResponse(studentClass));
     }
 
     @Override
@@ -80,7 +93,7 @@ public class StudentClassService implements BaseService<StudentClassDto, Integer
         studentClass.setStartDate(studentClassDto.getStartDate());
         studentClass.setEndDate(studentClassDto.getEndDate());
         studentClassRepository.save(studentClass);
-        return new ApiResponse(SUCCESSFULLY, true, StudentClassResponse.toResponse(studentClass));
+        return new ApiResponse(SUCCESSFULLY, true, getStudentClassResponse(studentClass));
     }
 
     @Override
@@ -94,15 +107,23 @@ public class StudentClassService implements BaseService<StudentClassDto, Integer
 
     @ResponseStatus(HttpStatus.OK)
     public ApiResponse getAllActiveClasses(Integer branchId) {
-        List<StudentClass> allByActiveTrue = studentClassRepository.findAllByActiveTrueAndBranchId(branchId, Sort.by(Sort.Direction.DESC,"id"));
-        List<StudentClassResponse> allResponse = StudentClassResponse.toAllResponse(allByActiveTrue);
-        return new ApiResponse(allResponse, true);
+        List<StudentClass> allByActiveTrue = studentClassRepository.findAllByActiveTrueAndBranchId(branchId, Sort.by(Sort.Direction.DESC, "id"));
+        List<StudentClassResponse> allResponse = getStudentClassResponses(allByActiveTrue);
+        return new ApiResponse(SUCCESSFULLY, true, allResponse);
+    }
+
+    private List<StudentClassResponse> getStudentClassResponses(List<StudentClass> allByActiveTrue) {
+        List<StudentClassResponse> allResponse = new ArrayList<>();
+        allByActiveTrue.forEach(studentClass -> {
+            allResponse.add(getStudentClassResponse(studentClass));
+        });
+        return allResponse;
     }
 
     @ResponseStatus(HttpStatus.OK)
     public ApiResponse getAllNeActiveClassesByYear(LocalDate startDate, LocalDate endDate, int id) {
-        List<StudentClass> all = studentClassRepository.findAllByBranchIdAndStartDateAfterAndEndDateBeforeAndActiveFalse(id, startDate, endDate, Sort.by(Sort.Direction.DESC,"id"));
-        List<StudentClassResponse> allResponse = StudentClassResponse.toAllResponse(all);
-        return new ApiResponse(allResponse, true);
+        List<StudentClass> all = studentClassRepository.findAllByBranchIdAndStartDateAfterAndEndDateBeforeAndActiveFalse(id, startDate, endDate, Sort.by(Sort.Direction.DESC, "id"));
+        List<StudentClassResponse> responses = getStudentClassResponses(all);
+        return new ApiResponse(SUCCESSFULLY, true,responses);
     }
 }

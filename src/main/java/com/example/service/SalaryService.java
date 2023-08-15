@@ -8,10 +8,13 @@ import com.example.exception.RecordAlreadyExistException;
 import com.example.exception.RecordNotFoundException;
 import com.example.model.common.ApiResponse;
 import com.example.model.request.SalaryRequest;
+import com.example.model.request.Transaction;
 import com.example.model.request.TransactionHistoryRequest;
 import com.example.model.response.SalaryResponse;
+import com.example.model.response.UserResponse;
 import com.example.repository.*;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,8 +25,9 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class SalaryService implements BaseService<SalaryRequest, String> {
-    private final SalaryRepository salaryRepository;
 
+    private final ModelMapper modelMapper;
+    private final SalaryRepository salaryRepository;
     private final UserRepository userRepository;
     private final BranchRepository branchRepository;
     private final MainBalanceRepository mainBalanceRepository;
@@ -35,75 +39,64 @@ public class SalaryService implements BaseService<SalaryRequest, String> {
         if (salaryRepository.findByUserPhoneNumberAndActiveTrue(salaryRequest.getPhoneNumber()).isPresent()) {
             throw new RecordAlreadyExistException(Constants.SALARY_ALREADY_EXISTS);
         }
-        Salary salary = Salary.toCreate(salaryRequest);
-        setSalaryForCreate(salaryRequest, salary);
-        salaryRepository.save(salary);
-        return new ApiResponse(Constants.SUCCESSFULLY, true, SalaryResponse.toResponse(salary));
-    }
-
-    private void setSalaryForCreate(SalaryRequest salaryRequest, Salary salary) {
+        Salary salary = modelMapper.map(salaryRequest, Salary.class);
         if (studentClassRepository.findByClassLeaderPhoneNumberAndActiveTrue(salaryRequest.getPhoneNumber()).isPresent()) {
             salary.setClassLeaderSalary(salaryRequest.getClassLeaderSalary());
             salary.setSalary(salary.getSalary() + salary.getClassLeaderSalary());
         }
         setSalary(salaryRequest, salary);
+        salaryRepository.save(salary);
+        return new ApiResponse(Constants.SUCCESSFULLY, true, getResponse(salary));
     }
+
 
     @Override
     public ApiResponse getById(String phoneNumber) {
-        SalaryResponse response = SalaryResponse.toResponse(findByUserPhoneNumberAndActiveTrue(phoneNumber));
+        Salary salary = getByUserPhoneNumberAndActiveTrue(phoneNumber);
+        SalaryResponse response = getResponse(salary);
         return new ApiResponse(Constants.SUCCESSFULLY, true, response);
     }
 
     @Override
     public ApiResponse update(SalaryRequest salaryRequest) {
-        Salary salary1 = findByUserPhoneNumberAndActiveTrue(salaryRequest.getPhoneNumber());
-        Salary salary = Salary.toSalary(salaryRequest);
-        if (salary1.getDate().getDayOfMonth() != salary.getDate().getDayOfMonth()) {
-            throw new RecordNotFoundException(Constants.DO_NOT_CHANGE);
-        }
+        Salary salary = modelMapper.map(salaryRequest, Salary.class);
+        checkingUpdate(salaryRequest);
         salary.setId(salaryRequest.getId());
         setSalary(salaryRequest, salary);
         salaryRepository.save(salary);
-        return new ApiResponse(Constants.SUCCESSFULLY, true, SalaryResponse.toResponse(salary));
+        SalaryResponse response = getResponse(salary);
+        return new ApiResponse(Constants.SUCCESSFULLY, true, response);
+    }
+
+    private void checkingUpdate(SalaryRequest salaryRequest) {
+        Salary old = salaryRepository.findById(salaryRequest.getId())
+                .orElseThrow(() -> new RecordNotFoundException(Constants.SALARY_NOT_FOUND));
+
+        if (old.getDate().getDayOfMonth() != LocalDate.now().getDayOfMonth()) {
+            throw new RecordNotFoundException(Constants.DO_NOT_CHANGE_BECAUSE_TIME_EXPIRED);
+        }
     }
 
 
     @Override
     public ApiResponse delete(String phoneNumber) {
-        Salary salary = findByUserPhoneNumberAndActiveTrue(phoneNumber);
+        Salary salary = getByUserPhoneNumberAndActiveTrue(phoneNumber);
         salary.setActive(false);
         salaryRepository.save(salary);
-        return new ApiResponse(Constants.DELETED, true, SalaryResponse.toResponse(salary));
+        SalaryResponse response = getResponse(salary);
+        return new ApiResponse(Constants.DELETED, true, response);
     }
 
+    @Transactional(rollbackFor = {RecordNotFoundException.class, Exception.class})
     public ApiResponse giveCashAdvance(String phoneNumber, double cashSalary, PaymentType paymentType) {
-
-        Salary salary = findByUserPhoneNumberAndActiveTrue(phoneNumber);
-
-        setSalaryForGiveCashAdvanceMethod(cashSalary, salary);
-
-        ApiResponse response = transactionForGiveCashAdvanceMethod(phoneNumber, cashSalary, paymentType, salary);
-
-        if (response != null) return response;
-
+        Salary salary = getByUserPhoneNumberAndActiveTrue(phoneNumber);
+        toDoGiveCash(cashSalary, salary, paymentType);
         salaryRepository.save(salary);
-
-        return new ApiResponse(Constants.SUCCESSFULLY, true, SalaryResponse.toResponse(salary));
+        return new ApiResponse(Constants.SUCCESSFULLY, true, getResponse(salary));
     }
 
-    private ApiResponse transactionForGiveCashAdvanceMethod(String phoneNumber, double cashSalary, PaymentType paymentType, Salary salary) {
-        if (salary.getSalary() >= cashSalary) {
-            try {
-                transactionHistoryService.create(TransactionHistoryRequest.toTransactionHistoryRequest(phoneNumber, cashSalary, paymentType, ExpenseType.ADDITIONAL_EXPENSE, salary, "Hodim naqd shaklida pul oldi"));
-            } catch (Exception e) {
-                return new ApiResponse(e.getMessage(), false);
-            }
-        }
-        return null;
-    }
 
-    private void setSalaryForGiveCashAdvanceMethod(double cashSalary, Salary salary) {
+    private void toDoGiveCash(double cashSalary, Salary salary, PaymentType paymentType) {
 
         salary.setCashAdvance(salary.getCashAdvance() + cashSalary);
 
@@ -118,38 +111,20 @@ public class SalaryService implements BaseService<SalaryRequest, String> {
             throw new RecordNotFoundException(Constants.SALARY_NOT_ENOUGH);
 
         }
+        transaction(salary.getUser().getPhoneNumber(), cashSalary, paymentType, salary, "Hodimga naqd pul berildi");
     }
 
     @Transactional(rollbackFor = {RecordNotFoundException.class, RecordNotFoundException.class})
     public ApiResponse givePartlySalary(String phoneNumber, double partlySalary, PaymentType paymentType) {
-
-        Salary salary = findByUserPhoneNumberAndActiveTrue(phoneNumber);
-
-        setSalaryForGivePartlySalaryMethod(partlySalary, salary);
-
-        ApiResponse response = transactionForGivePartlySalaryMethod(phoneNumber, partlySalary, paymentType, salary);
-
-        if (response != null) return response;
-
+        Salary salary = getByUserPhoneNumberAndActiveTrue(phoneNumber);
+        toDoGivePartlySalary(partlySalary, salary, paymentType);
         salaryRepository.save(salary);
-
         createNewSalary(salary);
-
-        return new ApiResponse(Constants.SUCCESSFULLY, true, SalaryResponse.toResponse(salary));
+        return new ApiResponse(Constants.SUCCESSFULLY, true, getResponse(salary));
     }
 
-    private ApiResponse transactionForGivePartlySalaryMethod(String phoneNumber, double partlySalary, PaymentType paymentType, Salary salary) {
-        if (salary.getSalary() >= partlySalary) {
-            try {
-                transactionHistoryService.create(TransactionHistoryRequest.toTransactionHistoryRequest(phoneNumber, partlySalary, paymentType, ExpenseType.ADDITIONAL_EXPENSE, salary, "Hodimga qisman oylik berildi"));
-            } catch (Exception e) {
-                return new ApiResponse(e.getMessage(), false);
-            }
-        }
-        return null;
-    }
 
-    private void setSalaryForGivePartlySalaryMethod(double partlySalary, Salary salary) {
+    private void toDoGivePartlySalary(double partlySalary, Salary salary, PaymentType paymentType) {
 
         salary.setPartlySalary(salary.getPartlySalary() + partlySalary);
 
@@ -166,11 +141,14 @@ public class SalaryService implements BaseService<SalaryRequest, String> {
         }
 
         salary.setActive(false);
+        transaction(salary.getUser().getPhoneNumber(), partlySalary, paymentType, salary, "Hodimga qisman oylik berildi");
     }
 
+
+    @Transactional(rollbackFor = {Exception.class, RecordNotFoundException.class})
     public ApiResponse giveSalary(String phoneNumber, boolean debtCollection, PaymentType paymentType) {
 
-        Salary salary = findByUserPhoneNumberAndActiveTrue(phoneNumber);
+        Salary salary = getByUserPhoneNumberAndActiveTrue(phoneNumber);
 
         if (salary.getDate().getMonth() != LocalDate.now().getMonth()) {
 
@@ -181,15 +159,15 @@ public class SalaryService implements BaseService<SalaryRequest, String> {
 
         if (salaryWithoutDebt > 0) {
 
-            ApiResponse response = getTransactionResponse(phoneNumber, salaryWithoutDebt, paymentType, salary, "Hodimga oylik berildi");
-
-            if (response != null) return response;
+            transaction(phoneNumber, salaryWithoutDebt, paymentType, salary, "Hodimga oylik berildi");
 
         }
 
         repaymentOfDebtIfAny(debtCollection, salary);
 
-        setSalaryForGiveSalaryMethod(salary);
+        salary.setGivenSalary(salary.getGivenSalary() + salary.getSalary());
+        salary.setSalary(0);
+        salary.setActive(false);
 
         createNewSalary(salary);
 
@@ -197,25 +175,20 @@ public class SalaryService implements BaseService<SalaryRequest, String> {
 
         String message = getMessage(debtCollection, salary, salaryWithoutDebt > 0 ? salaryWithoutDebt : 0);
 
-        return new ApiResponse(message, true, SalaryResponse.toResponse(salary));
+        return new ApiResponse(message, true, getResponse(salary));
     }
 
-    private void setSalaryForGiveSalaryMethod(Salary salary) {
-        salary.setGivenSalary(salary.getGivenSalary() + salary.getSalary());
-        salary.setSalary(0);
-        salary.setActive(false);
-    }
 
-    public ApiResponse giveDebtToEmployee(String phoneNumber, double debtAmount, PaymentType paymentType) {
-        Salary salary = findByUserPhoneNumberAndActiveTrue(phoneNumber);
-        ApiResponse response = getTransactionResponse(phoneNumber, debtAmount, paymentType, salary, "Hodim pul oldi");
-        if (response != null) return response;
-        setSalaryForGiveDebtToEmployeeMethod(debtAmount, salary);
+    @Transactional(rollbackFor = {Exception.class, RecordNotFoundException.class})
+    public ApiResponse giveDebt(String phoneNumber, double debtAmount, PaymentType paymentType) {
+        Salary salary = getByUserPhoneNumberAndActiveTrue(phoneNumber);
+        transaction(phoneNumber, debtAmount, paymentType, salary, "Hodim pul oldi");
+        toDoGiveDebt(debtAmount, salary);
         salaryRepository.save(salary);
-        return new ApiResponse(Constants.SUCCESSFULLY, true, SalaryResponse.toResponse(salary));
+        return new ApiResponse(Constants.SUCCESSFULLY, true, getResponse(salary));
     }
 
-    private void setSalaryForGiveDebtToEmployeeMethod(double debtAmount, Salary salary) {
+    private void toDoGiveDebt(double debtAmount, Salary salary) {
 
         double money = salary.getSalary() - debtAmount;
 
@@ -235,24 +208,26 @@ public class SalaryService implements BaseService<SalaryRequest, String> {
 
     }
 
+    @Transactional(rollbackFor = {Exception.class, RecordNotFoundException.class})
     public ApiResponse debtRepayment(String phoneNumber) {
-        Salary salary = findByUserPhoneNumberAndActiveTrue(phoneNumber);
+        Salary salary = getByUserPhoneNumberAndActiveTrue(phoneNumber);
         boolean isDebtAvailable = salary.getAmountDebt() > 0;
         repaymentOfDebtIfAny(true, salary);
         salaryRepository.save(salary);
         String message = !isDebtAvailable ? Constants.NO_DEBT_EXISTS
                 : salary.getSalary() - salary.getAmountDebt() >= 0 ? Constants.DEBT_WAS_COLLECTED
                 : Constants.SALARY_NOT_ENOUGH_REMAINING_DEBT + salary.getAmountDebt();
-        return new ApiResponse(message, true, SalaryResponse.toResponse(salary));
+        return new ApiResponse(message, true, getResponse(salary));
     }
 
-    private ApiResponse getTransactionResponse(String phoneNumber, double cashSalary, PaymentType paymentType, Salary salary, String message) {
-        try {
-            transactionHistoryService.create(TransactionHistoryRequest.toTransactionHistoryRequest(phoneNumber, cashSalary, paymentType, ExpenseType.ADDITIONAL_EXPENSE, salary, message));
-        } catch (Exception e) {
-            return new ApiResponse(e.getMessage(), false);
-        }
-        return null;
+    private void transaction(String phoneNumber, double cashSalary, PaymentType paymentType, Salary salary, String message) {
+        transactionHistoryService.create(modelMapper.map(
+                new Transaction(phoneNumber,
+                        cashSalary,
+                        paymentType,
+                        ExpenseType.ADDITIONAL_EXPENSE,
+                        salary,
+                        message), TransactionHistoryRequest.class));
     }
 
     private String getMessage(boolean debtCollection, Salary salary, double givingSalary) {
@@ -297,21 +272,37 @@ public class SalaryService implements BaseService<SalaryRequest, String> {
     }
 
     private void setSalary(SalaryRequest salaryRequest, Salary salary) {
-        salary.setUser(userRepository.findByPhoneNumberAndBlockedFalse(salaryRequest.getPhoneNumber()).orElseThrow(() -> new RecordNotFoundException(Constants.USER_NOT_FOUND)));
-        salary.setMainBalance(mainBalanceRepository.findByIdAndActiveTrue(salaryRequest.getMainBalanceId()).orElseThrow(() -> new RecordNotFoundException(Constants.MAIN_BALANCE_NOT_FOUND)));
-        salary.setBranch(branchRepository.findByIdAndDeleteFalse(salaryRequest.getBranchId()).orElseThrow(() -> new RecordNotFoundException(Constants.BRANCH_NOT_FOUND)));
-    }
+        User user = userRepository.findByPhoneNumberAndBlockedFalse(salaryRequest.getPhoneNumber())
+                .orElseThrow(() -> new RecordNotFoundException(Constants.USER_NOT_FOUND));
+        MainBalance mainBalance = mainBalanceRepository.findByIdAndActiveTrue(salaryRequest.getMainBalanceId())
+                .orElseThrow(() -> new RecordNotFoundException(Constants.MAIN_BALANCE_NOT_FOUND));
+        Branch branch = branchRepository.findByIdAndDeleteFalse(salaryRequest.getBranchId())
+                .orElseThrow(() -> new RecordNotFoundException(Constants.BRANCH_NOT_FOUND));
 
-    private Salary findByUserPhoneNumberAndActiveTrue(String phoneNumber) {
-        return salaryRepository.findByUserPhoneNumberAndActiveTrue(phoneNumber).orElseThrow(() -> new RecordNotFoundException(Constants.SALARY_NOT_FOUND));
+        salary.setUser(user);
+        salary.setMainBalance(mainBalance);
+        salary.setBranch(branch);
     }
 
     public ApiResponse getAllByBranchId(Integer branchId) {
         List<SalaryResponse> salaryResponses = new ArrayList<>();
         List<Salary> all = salaryRepository.findAllByBranch_IdAndActiveTrue(branchId);
         all.forEach(salary -> {
-            salaryResponses.add(SalaryResponse.toResponse(salary));
+            SalaryResponse response = getResponse(salary);
+            salaryResponses.add(response);
         });
         return new ApiResponse(Constants.SUCCESSFULLY, true, salaryResponses);
+    }
+
+    public SalaryResponse getResponse(Salary salary) {
+        SalaryResponse salaryResponse = modelMapper.map(salary, SalaryResponse.class);
+        salaryResponse.setDate(salary.getDate().toString());
+        salaryResponse.setUser(modelMapper.map(salary.getUser(), UserResponse.class));
+        return salaryResponse;
+    }
+
+    private Salary getByUserPhoneNumberAndActiveTrue(String phoneNumber) {
+        return salaryRepository.findByUserPhoneNumberAndActiveTrue(phoneNumber)
+                .orElseThrow(() -> new RecordNotFoundException(Constants.SALARY_NOT_FOUND));
     }
 }

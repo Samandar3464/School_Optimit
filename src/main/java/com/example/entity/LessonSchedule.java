@@ -1,16 +1,9 @@
 package com.example.entity;
 
-import com.example.model.request.LessonScheduleDto;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
-import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Getter
 @Setter
@@ -24,47 +17,27 @@ public class LessonSchedule {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @ManyToOne
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    private Subject subject;
-
-    @ManyToOne
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    private User teacher;
-
-    @ManyToOne
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    private Branch branch;
-
-    @ManyToOne
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    private StudentClass studentClass;
-
-    private int durationLesson;
+    private int lessonHour;
 
     private boolean active;
 
+    private LocalDate date;
+
     @ManyToOne
-    @OnDelete(action = OnDeleteAction.CASCADE)
+    private Subject subject;
+
+    @ManyToOne
+    private User teacher;
+
+    @ManyToOne
+    private Branch branch;
+
+    @ManyToOne
+    private StudentClass studentClass;
+
+    @ManyToOne
     private Room room;
-
-    @JsonSerialize(using = LocalDateTimeSerializer.class)
-    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
-    private LocalDateTime startTime;
-
-    @JsonSerialize(using = LocalDateTimeSerializer.class)
-    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
-    private LocalDateTime endTime;
 
     @ManyToOne
     private TypeOfWork typeOfWork;
-
-    public static LessonSchedule from(LessonScheduleDto scheduleDto){
-        return LessonSchedule.builder()
-                .durationLesson(scheduleDto.getDurationLesson())
-                .startTime(scheduleDto.getStartTime())
-                .endTime(scheduleDto.getEndTime())
-                .active(true)
-                .build();
-    }
 }

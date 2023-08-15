@@ -2,7 +2,7 @@ package com.example.controller;
 
 import com.example.model.common.ApiResponse;
 import com.example.model.request.ScoreDto;
-import com.example.model.request.ScoreRequestDto;
+import com.example.model.request.ScoreRequest;
 import com.example.service.ScoreService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
@@ -18,8 +18,8 @@ public class ScoreController {
     private final ScoreService scoreService;
 
     @PostMapping("/create")
-    public ApiResponse create(@RequestBody ScoreRequestDto scoreRequestDto) {
-        return scoreService.create(scoreRequestDto);
+    public ApiResponse create(@RequestBody ScoreRequest scoreRequest) {
+        return scoreService.create(scoreRequest);
     }
 
 //    @GetMapping("/findByIdAndDeleteFalse/{id}")
@@ -28,22 +28,13 @@ public class ScoreController {
 //    }
 
     @PutMapping("/update")
-    public ApiResponse update(@RequestBody @Validated ScoreRequestDto scoreRequestDto) {
-        return scoreService.update(scoreRequestDto);
+    public ApiResponse update(@RequestBody @Validated ScoreRequest scoreRequest) {
+        return scoreService.update(scoreRequest);
     }
 
     @DeleteMapping("/delete/{id}")
-    public ApiResponse delete(@PathVariable UUID id) {
+    public ApiResponse delete(@PathVariable Integer id) {
         return scoreService.delete(id);
-    }
-    @PostMapping("/getAll")
-    public ApiResponse getAllScores(@RequestBody ScoreDto scoreDto) {
-        return scoreService.getAll(scoreDto);
-    }
-
-    @PostMapping("/getAllForStudentAndFamily")
-    public ApiResponse getAllForStudentAndFamily(@RequestBody ScoreDto scoreDto) {
-        return scoreService.getForStudentAndFamily(scoreDto);
     }
 
 }

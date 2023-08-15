@@ -7,10 +7,11 @@ import com.example.kitchen.entity.DailyConsumedDrinks;
 import com.example.kitchen.entity.DrinksInWareHouse;
 import com.example.kitchen.entity.PurchasedDrinks;
 import com.example.kitchen.entity.Warehouse;
-import com.example.kitchen.model.Response.DrinksInWareHouseResponse;
+import com.example.kitchen.model.response.DrinksInWareHouseResponse;
 import com.example.kitchen.model.request.DailyConsumedDrinksRequest;
 import com.example.kitchen.model.request.DrinksInWareHouseRequest;
 import com.example.kitchen.model.request.PurchasedDrinksRequest;
+import com.example.kitchen.model.response.DrinksInWareHouseResponsePage;
 import com.example.kitchen.repository.DrinksInWareHouseRepository;
 import com.example.kitchen.repository.WareHouseRepository;
 import com.example.model.common.ApiResponse;
@@ -98,14 +99,14 @@ public class DrinksInWareHouseService {
     public ApiResponse getAllByWarehouseId(Integer warehouseId, int page, int size) {
         Page<DrinksInWareHouse> all = drinksInWareHouseRepository
                 .findAllByWarehouseIdAndActiveTrue(warehouseId, PageRequest.of(page, size));
-        List<DrinksInWareHouseResponse> responses = getDrinksInWareHouseResponses(all);
+        DrinksInWareHouseResponsePage responses = getDrinksInWareHouseResponses(all);
         return new ApiResponse(Constants.SUCCESSFULLY, true, responses);
     }
 
     public ApiResponse getAllByBranchId(Integer branchId, int page, int size) {
         Page<DrinksInWareHouse> all = drinksInWareHouseRepository
                 .findAllByBranchIdAndActiveTrue(branchId, PageRequest.of(page, size));
-        List<DrinksInWareHouseResponse> response = getDrinksInWareHouseResponses(all);
+        DrinksInWareHouseResponsePage response = getDrinksInWareHouseResponses(all);
         return new ApiResponse(Constants.SUCCESSFULLY, true, response);
     }
 
@@ -142,14 +143,18 @@ public class DrinksInWareHouseService {
                 .orElseThrow(() -> new RecordNotFoundException(Constants.DRINKS_IN_WAREHOUSE_NOT_FOUND));
     }
 
-    private List<DrinksInWareHouseResponse> getDrinksInWareHouseResponses(Page<DrinksInWareHouse> all) {
+    private DrinksInWareHouseResponsePage getDrinksInWareHouseResponses(Page<DrinksInWareHouse> all) {
+        DrinksInWareHouseResponsePage page = new DrinksInWareHouseResponsePage();
         List<DrinksInWareHouseResponse> response = new ArrayList<>();
         all.forEach(drinksInWareHouse -> {
             DrinksInWareHouseResponse houseResponse =
                     modelMapper.map(drinksInWareHouse, DrinksInWareHouseResponse.class);
             response.add(houseResponse);
         });
-        return response;
+        page.setDrinksInWareHouseResponses(response);
+        page.setTotalPage(all.getTotalPages());
+        page.setTotalElement(all.getTotalElements());
+        return page;
     }
 
     private void setDrinksWarehouse(DrinksInWareHouseRequest request, DrinksInWareHouse drinksInWareHouse) {

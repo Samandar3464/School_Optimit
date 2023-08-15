@@ -1,22 +1,29 @@
 package com.example.service;
 
+import com.example.entity.Branch;
 import com.example.entity.Salary;
 import com.example.entity.StaffAttendance;
+import com.example.entity.User;
 import com.example.enums.Constants;
 import com.example.exception.RecordAlreadyExistException;
 import com.example.exception.RecordNotFoundException;
 import com.example.model.common.ApiResponse;
 import com.example.model.request.StaffAttendanceRequest;
 import com.example.model.response.StaffAttendanceResponse;
+import com.example.model.response.StaffAttendanceResponsePage;
 import com.example.repository.BranchRepository;
 import com.example.repository.SalaryRepository;
 import com.example.repository.StaffAttendanceRepository;
 import com.example.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -27,55 +34,64 @@ public class StaffAttendanceService implements BaseService<StaffAttendanceReques
     private final UserRepository userRepository;
     private final SalaryRepository salaryRepository;
     private final BranchRepository branchRepository;
+    private final ModelMapper modelMapper;
 
 
     @Override
     public ApiResponse create(StaffAttendanceRequest staffAttendanceRequest) {
-        StaffAttendance staffAttendance = StaffAttendance.toStaffAttendance(staffAttendanceRequest);
-        if (attendanceRepository.findByUserIdAndDate(staffAttendanceRequest.getUserId(), staffAttendanceRequest.getDate()).isPresent()) {
+        StaffAttendance staffAttendance = modelMapper.map(staffAttendanceRequest, StaffAttendance.class);
+        if (attendanceRepository.findByUserIdAndDate(staffAttendanceRequest.getUserId(), LocalDate.now()).isPresent()) {
             throw new RecordAlreadyExistException(Constants.STAFF_ATTENDANCE_ALREADY_EXISTS_FOR_THIS_DATE);
         }
         set(staffAttendanceRequest, staffAttendance);
         dailyWageSetting(staffAttendance);
         attendanceRepository.save(staffAttendance);
-        return new ApiResponse(Constants.SUCCESSFULLY, true);
+        StaffAttendanceResponse response = getStaffAttendanceResponse(staffAttendance);
+        return new ApiResponse(Constants.SUCCESSFULLY, true, response);
     }
 
     @Override
     public ApiResponse getById(Integer integer) {
-        StaffAttendance staffAttendance = attendanceRepository.findById(integer).orElseThrow(() -> new RecordNotFoundException(Constants.STAFF_ATTENDANCE_NOT_FOUND));
-        return new ApiResponse(Constants.SUCCESSFULLY, true, StaffAttendanceResponse.toResponse(staffAttendance));
+        StaffAttendance staffAttendance = attendanceRepository.findById(integer)
+                .orElseThrow(() -> new RecordNotFoundException(Constants.STAFF_ATTENDANCE_NOT_FOUND));
+        StaffAttendanceResponse staffAttendanceResponse = getStaffAttendanceResponse(staffAttendance);
+        return new ApiResponse(Constants.SUCCESSFULLY, true, staffAttendanceResponse);
     }
 
-    public ApiResponse getAllByUserId(Integer id) {
-        List<StaffAttendanceResponse> all = StaffAttendanceResponse.toAllResponse(attendanceRepository.findAllByUserId(id, Sort.by(Sort.Direction.DESC,"id")));
-        return new ApiResponse(Constants.SUCCESSFULLY, true, all);
+    public ApiResponse getAllByUserId(Integer id, int page, int size) {
+        Page<StaffAttendance> all = attendanceRepository
+                .findAllByUserId(id, PageRequest.of(page, size, Sort.Direction.DESC, "id"));
+
+        StaffAttendanceResponsePage staffAttendanceResponsePage = getStaffAttendanceResponsePage(all);
+        return new ApiResponse(Constants.SUCCESSFULLY, true, staffAttendanceResponsePage);
     }
 
-    public ApiResponse getAllByBranchId(Integer id) {
-        List<StaffAttendanceResponse> all = StaffAttendanceResponse.toAllResponse(attendanceRepository.findAllByBranchId(id, Sort.by(Sort.Direction.DESC,"id")));
-        return new ApiResponse(Constants.SUCCESSFULLY, true, all);
+    public ApiResponse getAllByBranchId(Integer id, int page, int size) {
+        Page<StaffAttendance> all = attendanceRepository
+                .findAllByBranchId(id, PageRequest.of(page, size, Sort.Direction.DESC, "id"));
+        StaffAttendanceResponsePage staffAttendanceResponsePage = getStaffAttendanceResponsePage(all);
+        return new ApiResponse(Constants.SUCCESSFULLY, true, staffAttendanceResponsePage);
     }
 
     @Override
     public ApiResponse update(StaffAttendanceRequest staffAttendanceRequest) {
-        attendanceRepository.findByUserIdAndDate(staffAttendanceRequest.getUserId(), staffAttendanceRequest.getOldDate()).orElseThrow(() -> new RecordNotFoundException(Constants.STAFF_ATTENDANCE_NOT_FOUND));
-        if (attendanceRepository.findByUserIdAndDate(staffAttendanceRequest.getUserId(), staffAttendanceRequest.getDate()).isPresent()) {
-            throw new RecordAlreadyExistException(Constants.STAFF_ATTENDANCE_ALREADY_EXISTS_FOR_THIS_DATE);
-        }
-        StaffAttendance staffAttendance = StaffAttendance.toStaffAttendance(staffAttendanceRequest);
+        checkingUpdate(staffAttendanceRequest);
+        StaffAttendance staffAttendance = modelMapper.map(staffAttendanceRequest, StaffAttendance.class);
         staffAttendance.setId(staffAttendanceRequest.getId());
         set(staffAttendanceRequest, staffAttendance);
         attendanceRepository.save(staffAttendance);
-        return new ApiResponse(Constants.SUCCESSFULLY, true, StaffAttendanceResponse.toResponse(staffAttendance));
+        StaffAttendanceResponse staffAttendanceResponse = getStaffAttendanceResponse(staffAttendance);
+        return new ApiResponse(Constants.SUCCESSFULLY, true, staffAttendanceResponse);
     }
 
     @Override
     public ApiResponse delete(Integer integer) {
-        StaffAttendance staffAttendance = attendanceRepository.findById(integer).orElseThrow(() -> new RecordNotFoundException(Constants.STAFF_ATTENDANCE_NOT_FOUND));
+        StaffAttendance staffAttendance = attendanceRepository
+                .findById(integer).orElseThrow(() -> new RecordNotFoundException(Constants.STAFF_ATTENDANCE_NOT_FOUND));
         attendanceRepository.deleteById(integer);
         checkAndDeleteDailyWage(staffAttendance);
-        return new ApiResponse(Constants.DELETED, true, staffAttendance);
+        StaffAttendanceResponse staffAttendanceResponse = getStaffAttendanceResponse(staffAttendance);
+        return new ApiResponse(Constants.DELETED, true, staffAttendanceResponse);
     }
 
     private void dailyWageSetting(StaffAttendance staffAttendance) {
@@ -101,8 +117,40 @@ public class StaffAttendanceService implements BaseService<StaffAttendanceReques
         }
     }
 
+    private void checkingUpdate(StaffAttendanceRequest staffAttendanceRequest) {
+        attendanceRepository.findById(staffAttendanceRequest.getId())
+                .orElseThrow(() -> new RecordNotFoundException(Constants.STAFF_ATTENDANCE_NOT_FOUND));
+        if (attendanceRepository.findByUserIdAndDate(staffAttendanceRequest.getUserId(), LocalDate.now()).isPresent()) {
+            throw new RecordAlreadyExistException(Constants.STAFF_ATTENDANCE_ALREADY_EXISTS_FOR_THIS_DATE);
+        }
+    }
+
     private void set(StaffAttendanceRequest staffAttendanceRequest, StaffAttendance staffAttendance) {
-        staffAttendance.setUser(userRepository.findById(staffAttendanceRequest.getUserId()).orElseThrow(() -> new RecordNotFoundException(Constants.USER_NOT_FOUND)));
-        staffAttendance.setBranch(branchRepository.findById(staffAttendanceRequest.getBranchId()).orElseThrow(() -> new RecordNotFoundException(Constants.BRANCH_NOT_FOUND)));
+        User user = userRepository.findById(staffAttendanceRequest.getUserId())
+                .orElseThrow(() -> new RecordNotFoundException(Constants.USER_NOT_FOUND));
+        Branch branch = branchRepository.findById(staffAttendanceRequest.getBranchId())
+                .orElseThrow(() -> new RecordNotFoundException(Constants.BRANCH_NOT_FOUND));
+
+        staffAttendance.setDate(LocalDate.now());
+        staffAttendance.setUser(user);
+        staffAttendance.setBranch(branch);
+    }
+
+    private StaffAttendanceResponsePage getStaffAttendanceResponsePage(Page<StaffAttendance> all) {
+        StaffAttendanceResponsePage staffAttendanceResponsePage = new StaffAttendanceResponsePage();
+        List<StaffAttendanceResponse> staffAttendanceResponses = new ArrayList<>();
+        all.forEach(staffAttendance -> {
+            staffAttendanceResponses.add(getStaffAttendanceResponse(staffAttendance));
+        });
+        staffAttendanceResponsePage.setStaffAttendanceResponses(staffAttendanceResponses);
+        staffAttendanceResponsePage.setTotalPage(all.getTotalPages());
+        staffAttendanceResponsePage.setTotalElement(all.getTotalElements());
+        return staffAttendanceResponsePage;
+    }
+
+    private StaffAttendanceResponse getStaffAttendanceResponse(StaffAttendance staffAttendance) {
+        StaffAttendanceResponse response = modelMapper.map(staffAttendance, StaffAttendanceResponse.class);
+        response.setDate(staffAttendance.getDate().toString());
+        return response;
     }
 }
