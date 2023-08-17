@@ -1,10 +1,13 @@
 package com.example.model.response;
 
-import com.example.entity.Student;
 import com.example.entity.Subject;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class ScoreResponse {
 
     private Integer id;
