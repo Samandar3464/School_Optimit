@@ -54,8 +54,12 @@ public class StudentHomeworkService implements BaseService<StudentHomeworkReques
 
     @Override
     public ApiResponse update(StudentHomeworkRequest request) {
-        checkingStudentHomeworkForExists(request);
-        getStudentHomework(request.getId());
+        StudentHomework homework = getStudentHomework(request.getId());
+        if (!request.getDate().equals(homework.getDate())
+                || request.getLessonHour() != homework.getLessonHour()
+                || !request.getStudentClassId().equals(homework.getStudentClass().getId())) {
+            checkingStudentHomeworkForExists(request);
+        }
         StudentHomework studentHomework = modelMapper.map(request, StudentHomework.class);
         studentHomework.setId(request.getId());
         setStudentHomework(request, studentHomework);
