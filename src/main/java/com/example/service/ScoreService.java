@@ -90,6 +90,8 @@ public class ScoreService implements BaseService<ScoreRequest, Integer> {
 
     private ScoreResponse getScoreResponse(Score score) {
         ScoreResponse response = modelMapper.map(score, ScoreResponse.class);
+        response.setStudent(modelMapper.map(score.getStudent(),StudentResponse.class));
+        response.setJournal(modelMapper.map(score.getJournal(),JournalResponse.class));
         response.setTeacher(modelMapper.map(score.getTeacher(), UserResponse.class));
         response.setCreatedDate(score.getCreatedDate().toString());
         return response;

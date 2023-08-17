@@ -15,7 +15,7 @@ public class ScoreResponse {
 
     private String createdDate;
 
-    private Student student;
+    private StudentResponse student;
 
     private UserResponse teacher;
 

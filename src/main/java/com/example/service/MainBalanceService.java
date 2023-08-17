@@ -81,6 +81,7 @@ public class MainBalanceService implements BaseService<MainBalanceRequest, Integ
 
     private MainBalanceResponse getMainBalanceResponse(MainBalance mainBalance) {
         MainBalanceResponse response = modelMapper.map(mainBalance, MainBalanceResponse.class);
+//        MainBalanceResponse response = modelMapper.map(mainBalance, MainBalanceResponse.class);
         response.setDate(mainBalance.getDate().toString());
         return response;
     }
