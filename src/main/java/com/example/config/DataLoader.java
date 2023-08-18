@@ -25,7 +25,6 @@ public class DataLoader implements CommandLineRunner {
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
     private final LevelRepository levelRepository;
-    private final JournalService journalService;
 
 
     @Value("${spring.sql.init.mode}")
@@ -37,7 +36,6 @@ public class DataLoader implements CommandLineRunner {
 
         if (initMode.equals("always")) {
 
-            journalService.create(new JournalRequest(1,1,1));
 
             Level level1 = new Level(1, 1);
             Level level2 = new Level(2, 2);

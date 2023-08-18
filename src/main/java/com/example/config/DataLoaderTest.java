@@ -5,7 +5,9 @@ import com.example.entity.*;
 import com.example.enums.Gender;
 import com.example.kitchen.entity.Warehouse;
 import com.example.kitchen.repository.WareHouseRepository;
+import com.example.model.request.JournalRequest;
 import com.example.repository.*;
+import com.example.service.JournalService;
 import com.example.service.MainBalanceService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,6 +23,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class DataLoaderTest implements CommandLineRunner {
 
+    private final JournalService journalService;
     private final PermissionRepository permissionRepository;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
@@ -143,6 +146,8 @@ public class DataLoaderTest implements CommandLineRunner {
                     .active(true)
                     .build();
             subjectRepository.save(matemetika);
+
+            journalService.create(new JournalRequest(1,1,1));
         }
     }
 }
