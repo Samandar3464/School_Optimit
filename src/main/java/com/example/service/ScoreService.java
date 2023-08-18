@@ -99,14 +99,16 @@ public class ScoreService implements BaseService<ScoreRequest, Integer> {
 
     private void setScore(ScoreRequest scoreRequest, Score score) {
         Student student = studentRepository.findByIdAndActiveTrue(scoreRequest.getStudentId())
-                .orElseThrow(() -> new UserNotFoundException(STUDENT_NOT_FOUND));
+                .orElseThrow(() -> new RecordNotFoundException(STUDENT_NOT_FOUND));
         Subject subject = subjectRepository.findByIdAndActiveTrue(scoreRequest.getSubjectId())
                 .orElseThrow(() -> new RecordNotFoundException(SUBJECT_NOT_FOUND));
         User teacher = userRepository.findByIdAndBlockedFalse(scoreRequest.getTeacherId())
-                .orElseThrow(() -> new UserNotFoundException(TEACHER_NOT_FOUND));
+                .orElseThrow(() -> new RecordNotFoundException(TEACHER_NOT_FOUND));
         Journal journal = journalRepository.findByIdAndActiveTrue(scoreRequest.getJournalId())
-                .orElseThrow(() -> new UserNotFoundException(JOURNAL_NOT_FOUND));
+                .orElseThrow(() -> new RecordNotFoundException(JOURNAL_NOT_FOUND));
 
+        score.setScore(scoreRequest.getScore());
+        score.setDescription(scoreRequest.getDescription());
         score.setTeacher(teacher);
         score.setJournal(journal);
         score.setSubject(subject);
