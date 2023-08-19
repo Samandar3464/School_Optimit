@@ -120,7 +120,7 @@ public class DailyConsumedDrinksService implements BaseService<DailyConsumedDrin
                 .orElseThrow(() -> new RecordNotFoundException(Constants.USER_NOT_FOUND));
 
         dailyConsumedDrinks.setLocalDateTime(LocalDateTime.now());
-        dailyConsumedDrinks.setDelete(true);
+        dailyConsumedDrinks.setDelete(false);
         dailyConsumedDrinks.setBranch(branch);
         dailyConsumedDrinks.setWarehouse(warehouse);
         dailyConsumedDrinks.setEmployee(user);

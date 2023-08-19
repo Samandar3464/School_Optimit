@@ -44,7 +44,7 @@ public class ScoreService implements BaseService<ScoreRequest, Integer> {
     public ApiResponse getById(Integer id) {
         Score score = scoreRepository.findById(id)
                 .orElseThrow(() -> new RecordNotFoundException(SCORE_NOT_FOUND));
-        ScoreResponse response = modelMapper.map(score, ScoreResponse.class);
+        ScoreResponse response = getScoreResponse(score);
         return new ApiResponse(SUCCESSFULLY, true, response);
     }
 
@@ -90,21 +90,25 @@ public class ScoreService implements BaseService<ScoreRequest, Integer> {
 
     private ScoreResponse getScoreResponse(Score score) {
         ScoreResponse response = modelMapper.map(score, ScoreResponse.class);
+        response.setStudent(modelMapper.map(score.getStudent(),StudentResponse.class));
+        response.setJournal(modelMapper.map(score.getJournal(),JournalResponse.class));
         response.setTeacher(modelMapper.map(score.getTeacher(), UserResponse.class));
         response.setCreatedDate(score.getCreatedDate().toString());
         return response;
     }
 
     private void setScore(ScoreRequest scoreRequest, Score score) {
-        Student student = studentRepository.findById(scoreRequest.getStudentId())
-                .orElseThrow(() -> new UserNotFoundException(STUDENT_NOT_FOUND));
-        Subject subject = subjectRepository.findById(scoreRequest.getSubjectId())
+        Student student = studentRepository.findByIdAndActiveTrue(scoreRequest.getStudentId())
+                .orElseThrow(() -> new RecordNotFoundException(STUDENT_NOT_FOUND));
+        Subject subject = subjectRepository.findByIdAndActiveTrue(scoreRequest.getSubjectId())
                 .orElseThrow(() -> new RecordNotFoundException(SUBJECT_NOT_FOUND));
-        User teacher = userRepository.findById(scoreRequest.getTeacherId())
-                .orElseThrow(() -> new UserNotFoundException(TEACHER_NOT_FOUND));
-        Journal journal = journalRepository.findById(scoreRequest.getJournalId())
-                .orElseThrow(() -> new UserNotFoundException(JOURNAL_NOT_FOUND));
+        User teacher = userRepository.findByIdAndBlockedFalse(scoreRequest.getTeacherId())
+                .orElseThrow(() -> new RecordNotFoundException(TEACHER_NOT_FOUND));
+        Journal journal = journalRepository.findByIdAndActiveTrue(scoreRequest.getJournalId())
+                .orElseThrow(() -> new RecordNotFoundException(JOURNAL_NOT_FOUND));
 
+        score.setScore(scoreRequest.getScore());
+        score.setDescription(scoreRequest.getDescription());
         score.setTeacher(teacher);
         score.setJournal(journal);
         score.setSubject(subject);

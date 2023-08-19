@@ -11,6 +11,7 @@ import com.example.model.common.ApiResponse;
 import com.example.model.request.StaffAttendanceRequest;
 import com.example.model.response.StaffAttendanceResponse;
 import com.example.model.response.StaffAttendanceResponsePage;
+import com.example.model.response.UserResponse;
 import com.example.repository.BranchRepository;
 import com.example.repository.SalaryRepository;
 import com.example.repository.StaffAttendanceRepository;
@@ -105,7 +106,7 @@ public class StaffAttendanceService implements BaseService<StaffAttendanceReques
         if (staffAttendance.getDate().equals(LocalDate.now())) {
 
             Salary salary = salaryRepository.findByUserPhoneNumberAndActiveTrue(
-                    staffAttendance.getUser().getPhoneNumber())
+                            staffAttendance.getUser().getPhoneNumber())
                     .orElseThrow(() -> new RecordNotFoundException(Constants.SALARY_NOT_FOUND));
 
             double dailyWage = (salary.getFix() + salary.getClassLeaderSalary()) / salary.getUser().getWorkDays();
@@ -155,6 +156,7 @@ public class StaffAttendanceService implements BaseService<StaffAttendanceReques
 
     private StaffAttendanceResponse getStaffAttendanceResponse(StaffAttendance staffAttendance) {
         StaffAttendanceResponse response = modelMapper.map(staffAttendance, StaffAttendanceResponse.class);
+        response.setUserResponse(modelMapper.map(staffAttendance.getUser(), UserResponse.class));
         response.setDate(staffAttendance.getDate().toString());
         return response;
     }

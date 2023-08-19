@@ -3,7 +3,9 @@ package com.example.config;
 
 import com.example.entity.*;
 import com.example.enums.Gender;
+import com.example.model.request.JournalRequest;
 import com.example.repository.*;
+import com.example.service.JournalService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;

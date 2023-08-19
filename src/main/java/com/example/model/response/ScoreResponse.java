@@ -1,10 +1,13 @@
 package com.example.model.response;
 
-import com.example.entity.Student;
 import com.example.entity.Subject;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class ScoreResponse {
 
     private Integer id;
@@ -15,7 +18,7 @@ public class ScoreResponse {
 
     private String createdDate;
 
-    private Student student;
+    private StudentResponse student;
 
     private UserResponse teacher;
 

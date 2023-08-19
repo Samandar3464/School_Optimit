@@ -17,7 +17,8 @@ public interface StudentRepository extends JpaRepository<Student, Integer> {
 
     Page<Student> findAllByBranchIdAndActiveTrue(Pageable pageable, Integer id);
 
-    List<Student> findAllByBranchIdAndActiveFalseOrderByAddedTimeAsc(Integer branchId,Sort sort);
+    List<Student> findAllByBranchIdAndActiveFalseOrderByAddedTimeAsc(Integer branchId,Sort pageable);
+    List<Student> findAllByBranchIdAndActiveTrue(Integer branchId,Pageable pageable);
 
 
     List<Student> findByFamiliesIn(Collection<List<Family>> families, Sort sort);

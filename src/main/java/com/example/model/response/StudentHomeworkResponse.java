@@ -1,5 +1,6 @@
 package com.example.model.response;
 
+import com.example.entity.Branch;
 import com.example.entity.Subject;
 import lombok.Data;
 
@@ -21,6 +22,10 @@ public class StudentHomeworkResponse {
     private Subject subject;
 
     private Integer teacherId;
+
+    private Integer studentClassId;
+
+    private Branch branch;
 
     private boolean active;
 }
