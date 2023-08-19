@@ -1,5 +1,6 @@
 package com.example.model.response;
 
+import com.example.entity.Branch;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -19,7 +20,7 @@ public class StaffAttendanceResponse {
 
     private String description;
 
-    private Integer userId;
+    private UserResponse userResponse;
 
-    private Integer branchId;
+    private Branch branch;
 }
