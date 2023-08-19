@@ -4,6 +4,7 @@ import com.example.entity.Branch;
 import com.example.entity.Room;
 import com.example.entity.Subject;
 import com.example.entity.TypeOfWork;
+import com.example.enums.WeekDays;
 import lombok.Data;
 
 @Data
@@ -21,7 +22,7 @@ public class LessonScheduleResponse {
 
     private boolean active;
 
-    private String date;
+    private WeekDays date;
 
     private Branch branch;
 

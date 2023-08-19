@@ -1,5 +1,6 @@
 package com.example.entity;
 
+import com.example.enums.WeekDays;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -21,7 +22,7 @@ public class LessonSchedule {
 
     private boolean active;
 
-    private LocalDate date;
+    private WeekDays date;
 
     @ManyToOne
     private Subject subject;
