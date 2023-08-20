@@ -19,4 +19,10 @@ public class OverallReportRequest {
     private Integer userId;
 
     private Integer branchId;
+
+    public OverallReportRequest(LocalDate date, Integer userId, Integer branchId) {
+        this.date = date;
+        this.userId = userId;
+        this.branchId = branchId;
+    }
 }

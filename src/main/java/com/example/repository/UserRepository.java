@@ -16,7 +16,10 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     Optional<User> findByPhoneNumberAndBlockedFalse(String phoneNumber);
 
     Page<User> findAllByBranch_IdAndBlockedFalse(Integer branch_id, Pageable pageable);
-    List<User> findAllByBranch_IdAndBlockedFalse(Integer branch_id,Sort sort);
+
+    Page<User> findAllByBlockedFalse(Pageable pageable);
+
+    List<User> findAllByBranch_IdAndBlockedFalse(Integer branch_id, Sort sort);
 
     Optional<User> findByPhoneNumberAndVerificationCode(String phoneNumber, Integer verificationCode);
 
