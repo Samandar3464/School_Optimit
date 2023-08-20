@@ -17,9 +17,9 @@ public class TeachingHoursResponse {
 
     private String date;
 
-    private Integer subjectId;
+    private SubjectResponse subject;
 
-    private Integer teacherId;
+    private UserResponse teacher;
 
-    private Integer studentClassId;
+    private StudentClassResponse studentClass;
 }
