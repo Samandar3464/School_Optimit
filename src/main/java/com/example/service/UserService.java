@@ -216,6 +216,7 @@ public class UserService implements BaseService<UserRegisterDto, Integer> {
         response.setRegisteredDate(user.getRegisteredDate().toString());
         response.setProfilePhotoUrl(attachmentService.getUrl(user.getProfilePhoto()));
         response.setProfilePhotoUrl(getPhotoLink(user.getProfilePhoto()));
+        response.setBusinessId(user.getBranch().getBusiness().getId());
         return response;
     }
 
