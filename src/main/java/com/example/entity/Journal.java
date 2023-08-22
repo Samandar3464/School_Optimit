@@ -1,13 +1,9 @@
 package com.example.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
-
-import java.time.LocalDate;
-import java.util.List;
 
 
 @Getter
@@ -24,7 +20,7 @@ public class Journal {
 
     private boolean active;
 
-    private int startDate;
+    private int  startDate;
 
     private int endDate;
 
@@ -35,4 +31,8 @@ public class Journal {
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Branch branch;
+
+    @ManyToOne
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    private Level level;
 }

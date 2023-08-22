@@ -137,4 +137,5 @@ public class Constants {
     public static final String STUDENT_CLASS_BUSY = "STUDENT_CLASS_BUSY";
     public static final String ROOM_BUSY = "ROOM_BUSY";
     public static final String DAILY_MEAL = "DAILY_MEAL";
+    public static final String SUBJECT_LEVEL_ALREADY_EXISTS = "SUBJECT_LEVEL_ALREADY_EXISTS";
 }

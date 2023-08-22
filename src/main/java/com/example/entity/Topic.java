@@ -30,10 +30,5 @@ public class Topic {
     private LocalDateTime creationDate;
 
     @ManyToOne
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    private Subject subject;
-
-    @OneToOne
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    private Level level;
+    private SubjectLevel subjectLevel;
 }

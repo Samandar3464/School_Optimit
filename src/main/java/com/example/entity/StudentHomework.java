@@ -32,8 +32,7 @@ public class StudentHomework {
     private boolean active;
 
     @ManyToOne
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    private Subject subject;
+    private SubjectLevel subjectLevel;
 
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)

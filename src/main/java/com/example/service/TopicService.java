@@ -1,15 +1,13 @@
 package com.example.service;
 
-import com.example.entity.Attachment;
-import com.example.entity.Level;
-import com.example.entity.Subject;
-import com.example.entity.Topic;
+import com.example.entity.*;
 import com.example.exception.RecordAlreadyExistException;
 import com.example.exception.RecordNotFoundException;
 import com.example.model.common.ApiResponse;
 import com.example.model.request.TopicRequest;
 import com.example.model.response.TopicResponse;
 import com.example.repository.LevelRepository;
+import com.example.repository.SubjectLevelRepository;
 import com.example.repository.SubjectRepository;
 import com.example.repository.TopicRepository;
 import lombok.RequiredArgsConstructor;
@@ -28,14 +26,13 @@ import static com.example.enums.Constants.*;
 public class TopicService implements BaseService<TopicRequest, Integer> {
 
     private final TopicRepository topicRepository;
-    private final SubjectRepository subjectRepository;
+    private final SubjectLevelRepository subjectLevelRepository;
     private final AttachmentService attachmentService;
-    private final LevelRepository levelRepository;
     private final ModelMapper modelMapper;
 
     @Override
     public ApiResponse create(TopicRequest dto) {
-        if (topicRepository.existsByNameAndSubjectIdAndLevelId(dto.getName(), dto.getSubjectId(), dto.getLevelId())) {
+        if (topicRepository.existsByNameAndSubjectLevelId(dto.getName(), dto.getSubjectLevelId())) {
             throw new RecordAlreadyExistException(TOPIC_ALREADY_EXIST);
         }
         Topic topic = modelMapper.map(dto,Topic.class);
@@ -73,9 +70,8 @@ public class TopicService implements BaseService<TopicRequest, Integer> {
         return new ApiResponse(DELETED, true, getTopicResponse(oldTopic));
     }
 
-    public List<TopicResponse> findAllBySubjectId(Integer subjectId, Integer levelId) {
-        List<Topic> all = topicRepository.findAllBySubjectIdAndLevelId(
-                subjectId,levelId,
+    public List<TopicResponse> findAllBySubjectId(Integer subjectLevelId) {
+        List<Topic> all = topicRepository.findAllBySubjectLevelId(subjectLevelId,
                 Sort.by(Sort.Direction.DESC, "id"));
         List<TopicResponse> responses = new ArrayList<>();
         all.forEach(topic -> {
@@ -85,23 +81,20 @@ public class TopicService implements BaseService<TopicRequest, Integer> {
     }
 
     private void setTopic(TopicRequest dto, Topic topic) {
-        Level level = levelRepository.findById(dto.getLevelId())
-                .orElseThrow(() -> new RecordNotFoundException(LEVEL_NOT_FOUND));
-        Subject subject = subjectRepository.findById(dto.getSubjectId())
-                .orElseThrow(() -> new RecordNotFoundException(SUBJECT_NOT_FOUND));
+        SubjectLevel subjectLevel = subjectLevelRepository.findById(dto.getSubjectLevelId())
+                .orElseThrow(() -> new RecordNotFoundException(SUBJECT_LEVEL_NOT_FOUND));
         List<Attachment> attachments =
                 attachmentService.saveToSystemListFile(dto.getLessonFiles());
 
         topic.setCreationDate(LocalDateTime.now());
-        topic.setLevel(level);
-        topic.setSubject(subject);
+        topic.setSubjectLevel(subjectLevel);
         topic.setLessonFiles(attachments);
     }
 
     private void checkingTopicByExists(TopicRequest dto) {
         Topic old = topicRepository.findById(dto.getId()).orElseThrow(() -> new RecordNotFoundException(TOPIC_NOT_FOUND));
-        if (!dto.getName().equals(old.getName()) || !dto.getSubjectId().equals(old.getSubject().getId()) || !dto.getLevelId().equals(old.getLevel().getId())
-                && topicRepository.existsByNameAndSubjectIdAndLevelId(dto.getName(), dto.getSubjectId(), dto.getLevelId())) {
+        if (!dto.getName().equals(old.getName()) || !dto.getSubjectLevelId().equals(old.getSubjectLevel().getId())
+                && topicRepository.existsByNameAndSubjectLevelId(dto.getName(), dto.getSubjectLevelId())) {
             throw new RecordNotFoundException(TOPIC_ALREADY_EXIST);
         }
     }

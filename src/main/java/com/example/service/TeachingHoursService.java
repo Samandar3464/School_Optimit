@@ -27,7 +27,7 @@ public class TeachingHoursService implements BaseService<TeachingHoursRequest, I
     private final StudentClassRepository studentClassRepository;
     private final TypeOfWorkRepository typeOfWorkRepository;
     private final UserRepository userRepository;
-    private final SubjectRepository subjectRepository;
+    private final SubjectLevelRepository subjectLevelRepository;
     private final SalaryRepository salaryRepository;
     private final ModelMapper modelMapper;
 
@@ -153,14 +153,14 @@ public class TeachingHoursService implements BaseService<TeachingHoursRequest, I
                 .orElseThrow(() -> new RecordNotFoundException(Constants.USER_NOT_FOUND));
         TypeOfWork typeOfWork = typeOfWorkRepository.findById(teachingHoursRequest.getTypeOfWorkId())
                 .orElseThrow(() -> new RecordNotFoundException(Constants.TYPE_OF_WORK_NOT_FOUND));
-        Subject subject = subjectRepository.findById(teachingHoursRequest.getSubjectId())
+        SubjectLevel subject = subjectLevelRepository.findById(teachingHoursRequest.getSubjectLevelId())
                 .orElseThrow(() -> new RecordNotFoundException(Constants.SUBJECT_NOT_FOUND));
 
         teachingHours.setActive(true);
         teachingHours.setStudentClass(studentClass);
         teachingHours.setTeacher(user);
         teachingHours.setTypeOfWork(typeOfWork);
-        teachingHours.setSubject(subject);
+        teachingHours.setSubjectLevel(subject);
     }
 
     private TeachingHoursResponseForPage getTeachingHoursResponses(Page<TeachingHours> all) {
@@ -178,7 +178,7 @@ public class TeachingHoursService implements BaseService<TeachingHoursRequest, I
     private TeachingHoursResponse getTeachingHoursResponse(TeachingHours teachingHours) {
         TeachingHoursResponse response = modelMapper.map(teachingHours, TeachingHoursResponse.class);
         response.setDate(teachingHours.getDate().toString());
-        response.setSubject(modelMapper.map(teachingHours.getSubject(), SubjectResponse.class));
+        response.setSubjectLevelResponse(modelMapper.map(teachingHours.getSubjectLevel(), SubjectLevelResponse.class));
         response.setTeacher(modelMapper.map(teachingHours.getTeacher(), UserResponse.class));
         response.setStudentClass(modelMapper.map(teachingHours.getStudentClass(), StudentClassResponse.class));
         return response;

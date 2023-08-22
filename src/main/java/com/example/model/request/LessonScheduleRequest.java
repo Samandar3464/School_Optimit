@@ -14,7 +14,7 @@ public class LessonScheduleRequest {
 
     private Integer id;
 
-    private Integer subjectId;
+    private Integer subjectLevelId;
 
     private Integer teacherId;
 

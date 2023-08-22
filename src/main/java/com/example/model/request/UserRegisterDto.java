@@ -63,7 +63,7 @@ public class UserRegisterDto {
 
     private Integer roleId;
 
-    private List<Integer> subjectsIds;
+    private List<Integer> subjectLevelIdList;
 
     private boolean married;
 

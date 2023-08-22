@@ -11,6 +11,8 @@ public class TopicResponse {
 
     private String name;
 
+    private Integer subjectLevelId;
+
     private List<String> lessonFiles;
 
     private  List<String> useFullLinks;

@@ -2,7 +2,6 @@ package com.example.service;
 
 import com.example.entity.*;
 import com.example.exception.RecordNotFoundException;
-import com.example.exception.UserNotFoundException;
 import com.example.model.common.ApiResponse;
 import com.example.model.request.ScoreRequest;
 import com.example.model.response.*;
@@ -28,7 +27,7 @@ public class ScoreService implements BaseService<ScoreRequest, Integer> {
     private final StudentRepository studentRepository;
     private final UserRepository userRepository;
     private final ModelMapper modelMapper;
-    private final SubjectRepository subjectRepository;
+    private final SubjectLevelRepository subjectLevelRepository;
     private final JournalRepository journalRepository;
 
     @Override
@@ -83,7 +82,7 @@ public class ScoreService implements BaseService<ScoreRequest, Integer> {
 
     public ApiResponse getAllByStudentIdAndSubjectId(Integer studentId, Integer subjectId, int page, int size) {
         Page<Score> all = scoreRepository.
-                findAllByStudentIdAndSubjectId(studentId, subjectId, PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "id")));
+                findAllByStudentIdAndSubjectLevelId(studentId, subjectId, PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "id")));
         ScoreResponsePage scoreResponsePage = getScoreResponsePage(all);
         return new ApiResponse(SUCCESSFULLY, true, scoreResponsePage);
     }
@@ -100,7 +99,7 @@ public class ScoreService implements BaseService<ScoreRequest, Integer> {
     private void setScore(ScoreRequest scoreRequest, Score score) {
         Student student = studentRepository.findByIdAndActiveTrue(scoreRequest.getStudentId())
                 .orElseThrow(() -> new RecordNotFoundException(STUDENT_NOT_FOUND));
-        Subject subject = subjectRepository.findByIdAndActiveTrue(scoreRequest.getSubjectId())
+        SubjectLevel subject = subjectLevelRepository.findByIdAndActiveTrue(scoreRequest.getSubjectLevelId())
                 .orElseThrow(() -> new RecordNotFoundException(SUBJECT_NOT_FOUND));
         User teacher = userRepository.findByIdAndBlockedFalse(scoreRequest.getTeacherId())
                 .orElseThrow(() -> new RecordNotFoundException(TEACHER_NOT_FOUND));
@@ -111,7 +110,7 @@ public class ScoreService implements BaseService<ScoreRequest, Integer> {
         score.setDescription(scoreRequest.getDescription());
         score.setTeacher(teacher);
         score.setJournal(journal);
-        score.setSubject(subject);
+        score.setSubjectLevel(subject);
         score.setStudent(student);
         score.setCreatedDate(LocalDateTime.now());
     }

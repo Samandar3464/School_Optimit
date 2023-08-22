@@ -31,7 +31,7 @@ public class LessonScheduleService implements BaseService<LessonScheduleRequest,
 
     private final BranchRepository branchRepository;
     private final UserRepository userRepository;
-    private final SubjectRepository subjectRepository;
+    private final SubjectLevelRepository subjectLevelRepository;
     private final RoomRepository roomRepository;
     private final StudentClassRepository studentClassRepository;
     private final LessonScheduleRepository lessonScheduleRepository;
@@ -165,14 +165,14 @@ public class LessonScheduleService implements BaseService<LessonScheduleRequest,
                 .orElseThrow(() -> new RecordNotFoundException(TYPE_OF_WORK_NOT_FOUND));
         Room room = roomRepository.findByIdAndActiveTrue(scheduleRequest.getRoomId())
                 .orElseThrow(() -> new RecordNotFoundException(ROOM_NOT_FOUND));
-        Subject subject = subjectRepository.findByIdAndActiveTrue(scheduleRequest.getSubjectId())
+        SubjectLevel subject = subjectLevelRepository.findByIdAndActiveTrue(scheduleRequest.getSubjectLevelId())
                 .orElseThrow(() -> new RecordNotFoundException(SUBJECT_NOT_FOUND));
 
         lessonSchedule.setActive(true);
         lessonSchedule.setRoom(room);
         lessonSchedule.setTeacher(user);
         lessonSchedule.setBranch(branch);
-        lessonSchedule.setSubject(subject);
+        lessonSchedule.setSubjectLevel(subject);
         lessonSchedule.setTypeOfWork(typeOfWork);
         lessonSchedule.setStudentClass(studentClass);
     }

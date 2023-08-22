@@ -8,7 +8,6 @@ import lombok.NoArgsConstructor;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
-import java.util.UUID;
 
 @Data
 @Builder
@@ -24,9 +23,5 @@ public class TopicRequest {
 
     private List<String> useFullLinks;
 
-    private Integer subjectId;
-
-    private Integer levelId;
-
-
+    private Integer subjectLevelId;
 }

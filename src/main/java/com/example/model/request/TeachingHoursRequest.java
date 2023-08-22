@@ -33,7 +33,7 @@ public class TeachingHoursRequest {
     private Integer teacherId;
 
     @Min(value = 1)
-    private Integer subjectId;
+    private Integer subjectLevelId;
 
     @Min(value = 1)
     private Integer typeOfWorkId;
