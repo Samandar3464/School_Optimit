@@ -55,7 +55,7 @@ public class SubjectLevelService implements BaseService<SubjectLevelRequest, Int
 
     @Override
     public ApiResponse update(SubjectLevelRequest subjectLevelRequest) {
-        SubjectLevel subjectLevel = subjectLevelRepository.findByIdAndActiveTrue(subjectLevelRequest.getSubjectId())
+        SubjectLevel subjectLevel = subjectLevelRepository.findByIdAndActiveTrue(subjectLevelRequest.getId())
                 .orElseThrow(() -> new RecordNotFoundException(Constants.SUBJECT_LEVEL_NOT_FOUND));
         if (!subjectLevel.getSubject().getId().equals(subjectLevelRequest.getSubjectId())
                 || !subjectLevel.getLevel().getId().equals(subjectLevelRequest.getLevelId())
