@@ -56,6 +56,11 @@ public class DailyMealService implements BaseService<DailyMealRequest, Integer> 
         return new ApiResponse(Constants.SUCCESSFULLY, true, dailyMealResponsePage);
     }
 
+    public ApiResponse getByAll() {
+        List<DailyMeal> all = dailyMealRepository.findAll();
+        return new ApiResponse(Constants.SUCCESSFULLY, true, all);
+    }
+
 
     private DailyMealResponsePage getDailyMealResponsePage(Page<DailyMeal> all) {
         List<DailyMealResponse> responses = new ArrayList<>();

@@ -9,7 +9,6 @@ import com.example.exception.RecordAlreadyExistException;
 import com.example.exception.RecordNotFoundException;
 import com.example.model.common.ApiResponse;
 import com.example.model.request.SubjectLevelRequest;
-import com.example.model.response.SubjectLevelResponse;
 import com.example.model.response.SubjectLevelResponsePage;
 import com.example.repository.BranchRepository;
 import com.example.repository.LevelRepository;
@@ -93,12 +92,20 @@ public class SubjectLevelService implements BaseService<SubjectLevelRequest, Int
         subjectLevel.setActive(true);
     }
 
-    public ApiResponse getAllSubjectByBranchId(Integer id, int page, int size) {
-        Page<SubjectLevel> all = subjectLevelRepository.findAllByBranch_IdAndActiveTrue(id, PageRequest.of(page, size));
+    public ApiResponse getAllSubjectByBranchIdByPage(Integer id, int page, int size) {
+        Page<SubjectLevel> all = subjectLevelRepository
+                .findAllByBranch_IdAndActiveTrue(id, PageRequest.of(page, size));
         SubjectLevelResponsePage subjectLevelResponsePage = new SubjectLevelResponsePage();
         subjectLevelResponsePage.setSubjectLevels(all.getContent());
         subjectLevelResponsePage.setTotalPage(all.getTotalPages());
         subjectLevelResponsePage.setTotalElement(all.getTotalElements());
         return new ApiResponse(Constants.SUCCESSFULLY, true, subjectLevelResponsePage);
     }
+
+    public ApiResponse getAllSubjectByBranchId(Integer id) {
+        List<SubjectLevel> all = subjectLevelRepository
+                .findAllByBranchIdAndActiveTrue(id);
+        return new ApiResponse(Constants.SUCCESSFULLY, true, all);
+    }
+
 }

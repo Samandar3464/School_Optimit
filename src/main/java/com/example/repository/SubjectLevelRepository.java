@@ -14,4 +14,6 @@ public interface SubjectLevelRepository extends JpaRepository<SubjectLevel, Inte
     Optional<SubjectLevel> findByBranchIdAndSubjectIdAndLevelIdAndActiveTrue(Integer branch_id, Integer subject_id, Integer level_id);
 
     Page<SubjectLevel> findAllByBranch_IdAndActiveTrue(Integer id, Pageable pageable);
+
+    List<SubjectLevel> findAllByBranchIdAndActiveTrue(Integer id);
 }

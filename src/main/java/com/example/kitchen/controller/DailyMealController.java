@@ -15,7 +15,7 @@ public class DailyMealController {
 
 
     @PostMapping
-    public ApiResponse save(@RequestBody DailyMealRequest dailyMealRequest) {
+    public ApiResponse save(@ModelAttribute DailyMealRequest dailyMealRequest) {
         return dailyMealService.create(dailyMealRequest);
     }
 
@@ -29,6 +29,11 @@ public class DailyMealController {
                                         @RequestParam(name = "page", defaultValue = "0") int page,
                                         @RequestParam(name = "size", defaultValue = "5") int size) {
         return dailyMealService.getByAllBranchId(branchId, page, size);
+    }
+
+    @GetMapping("getAll")
+    public ApiResponse getByAll() {
+        return dailyMealService.getByAll();
     }
 
     @PutMapping

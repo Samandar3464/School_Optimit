@@ -24,11 +24,16 @@ public class SubjectLevelController {
     }
 
 
-    @GetMapping("getAllByBranchId/{id}")
+    @GetMapping("getAllSubjectByBranchIdByPage/{id}")
     public ApiResponse getAllByBranchId(@PathVariable Integer id,
                                         @RequestParam(name = "page", defaultValue = "0") int page,
                                         @RequestParam(name = "size", defaultValue = "5") int size) {
-        return subjectLevelService.getAllSubjectByBranchId(id, page, size);
+        return subjectLevelService.getAllSubjectByBranchIdByPage(id, page, size);
+    }
+
+    @GetMapping("getAllSubjectByBranchId/{id}")
+    public ApiResponse getAllByBranchId(@PathVariable Integer id){
+        return subjectLevelService.getAllSubjectByBranchId(id);
     }
 
     @PutMapping
