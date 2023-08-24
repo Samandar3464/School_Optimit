@@ -1,13 +1,11 @@
 package com.example.controller;
 
-import com.example.entity.Family;
 import com.example.model.common.ApiResponse;
-import com.example.model.request.FamilyAddStudentDto;
 import com.example.model.request.FamilyLoginDto;
 import com.example.model.request.FamilyRequest;
 import com.example.service.FamilyService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RequiredArgsConstructor
@@ -18,7 +16,7 @@ public class FamilyController {
     private final FamilyService familyService;
 
     @PostMapping("/create")
-    public ApiResponse create(@RequestBody FamilyRequest family) {
+    public ApiResponse create(@RequestBody  FamilyRequest family) {
         return familyService.create(family);
     }
 
@@ -48,7 +46,7 @@ public class FamilyController {
     }
 
     @PostMapping("/loginFamily")
-    public ApiResponse loginFamily(@RequestBody FamilyLoginDto familyLoginDto){
+    public ApiResponse loginFamily(@RequestBody @Valid FamilyLoginDto familyLoginDto){
        return familyService.familyLogIn(familyLoginDto);
     }
 }

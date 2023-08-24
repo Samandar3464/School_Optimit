@@ -1,5 +1,6 @@
 package com.example.model.request;
 
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -9,6 +10,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class FamilyLoginDto {
 
+    @Size(min = 9, max = 9)
     private String phoneNumber;
+
+    @Size(min = 6)
     private String password;
 }
