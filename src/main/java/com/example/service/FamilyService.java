@@ -114,10 +114,11 @@ public class FamilyService implements BaseService<FamilyRequest, Integer> {
     }
 
     public ApiResponse familyLogIn(String phoneNumber, String password) {
-        List<Student> students = familyRepository.findByPhoneNumberAndPassword(phoneNumber, password)
-                .orElseThrow(() -> new UserNotFoundException(FAMILY_NOT_FOUND)).getStudents();
-        List<Integer> responses = getStudentResponses(students);
-        return new ApiResponse(SUCCESSFULLY, true, responses);
+        Family family = familyRepository.findByPhoneNumberAndPassword(phoneNumber, password)
+                .orElseThrow(() -> new UserNotFoundException(FAMILY_NOT_FOUND));
+        FamilyResponse response = getFamilyResponse(family);
+        return new ApiResponse(SUCCESSFULLY, true, response
+        );
     }
 
     private List<Integer> getStudentResponses(List<Student> students) {
