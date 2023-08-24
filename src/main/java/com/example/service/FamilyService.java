@@ -6,7 +6,6 @@ import com.example.entity.Student;
 import com.example.exception.RecordNotFoundException;
 import com.example.exception.UserNotFoundException;
 import com.example.model.common.ApiResponse;
-import com.example.model.request.FamilyLoginDto;
 import com.example.model.request.FamilyRequest;
 import com.example.model.response.FamilyResponse;
 import com.example.model.response.FamilyResponsePage;
@@ -46,6 +45,7 @@ public class FamilyService implements BaseService<FamilyRequest, Integer> {
 
     private FamilyResponse getFamilyResponse(Family family) {
         FamilyResponse response = modelMapper.map(family, FamilyResponse.class);
+        response.setStudentResponses(getStudentResponses(family.getStudents()));
         response.setCreatedDate(family.getRegisteredDate().toString());
         return response;
     }
@@ -116,14 +116,14 @@ public class FamilyService implements BaseService<FamilyRequest, Integer> {
     public ApiResponse familyLogIn(String phoneNumber, String password) {
         List<Student> students = familyRepository.findByPhoneNumberAndPassword(phoneNumber, password)
                 .orElseThrow(() -> new UserNotFoundException(FAMILY_NOT_FOUND)).getStudents();
-        List<StudentResponse> responses = getStudentResponses(students);
+        List<Integer> responses = getStudentResponses(students);
         return new ApiResponse(SUCCESSFULLY, true, responses);
     }
 
-    private List<StudentResponse> getStudentResponses(List<Student> students) {
-        List<StudentResponse> responses = new ArrayList<>();
+    private List<Integer> getStudentResponses(List<Student> students) {
+        List<Integer> responses = new ArrayList<>();
         students.forEach(student -> {
-            responses.add(modelMapper.map(student, StudentResponse.class));
+            responses.add(student.getId());
         });
         return responses;
     }
