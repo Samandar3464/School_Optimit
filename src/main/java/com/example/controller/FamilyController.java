@@ -45,8 +45,9 @@ public class FamilyController {
         return familyService.getList(page, size,branchId);
     }
 
-    @PostMapping("/loginFamily")
-    public ApiResponse loginFamily(@RequestBody @Valid FamilyLoginDto familyLoginDto){
-       return familyService.familyLogIn(familyLoginDto);
+    @GetMapping("/loginFamily")
+    public ApiResponse loginFamily(@RequestParam String phoneNumber,
+                                   @RequestParam String password){
+       return familyService.familyLogIn(phoneNumber, password);
     }
 }

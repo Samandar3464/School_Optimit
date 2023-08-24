@@ -1,7 +1,10 @@
 package com.example.model.response;
 
+import com.example.entity.Branch;
 import com.example.enums.Gender;
 import lombok.*;
+
+import java.util.List;
 
 @Getter
 @Setter
@@ -19,7 +22,13 @@ public class FamilyResponse {
 
     private String fireBaseToken;
 
+    private String createdDate;
+
     private Gender gender;
 
     private boolean active;
+
+    private Branch branch;
+
+    private List<StudentResponse> studentResponses;
 }

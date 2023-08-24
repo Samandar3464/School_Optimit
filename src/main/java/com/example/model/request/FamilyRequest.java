@@ -18,15 +18,10 @@ public class FamilyRequest {
 
     private Integer id;
 
-//    @NotBlank
     private String fullName;
 
-//    @NotBlank
-//    @Size(min = 9,max = 9)
     private String phoneNumber;
 
-//    @NotBlank
-//    @Size(min = 6)
     private String password;
 
     @Enumerated(EnumType.STRING)

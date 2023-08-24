@@ -2,10 +2,8 @@ package com.example.entity;
 
 import com.example.enums.Gender;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.*;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -26,9 +24,11 @@ public class Family {
     private String fullName;
 
     @Column(nullable = false)
+    @Size(min = 9,max = 9)
     private String phoneNumber;
 
     @Column(nullable = false)
+    @Size(min = 6)
     private String password;
 
     private LocalDateTime registeredDate;

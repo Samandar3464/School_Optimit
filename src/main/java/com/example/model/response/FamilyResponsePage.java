@@ -9,11 +9,9 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class FamilyResponseList {
+public class FamilyResponsePage {
 
     private List<FamilyResponse> familyResponseDtoList;
-    private long allSize;
-    private int allPage;
-    private int currentPage;
-
+    private long totalElement;
+    private int totalPage;
 }
