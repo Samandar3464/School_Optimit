@@ -99,7 +99,7 @@ public class FamilyService implements BaseService<FamilyRequest, Integer> {
         Pageable pageable = PageRequest.of(page, size);
         Page<Family> familyList = familyRepository.findAllByBranchIdAndActiveTrue(branchId, pageable);
         List<FamilyResponse> familyResponses = new ArrayList<>();
-//        familyList.getContent().forEach(obj -> familyResponses.add(FamilyResponse.from(obj)));
+        familyList.getContent().forEach(obj -> familyResponses.add(modelMapper.map(obj,FamilyResponse.class)));
         return new ApiResponse(new FamilyResponseList(familyResponses, familyList.getTotalElements(), familyList.getTotalPages(), familyList.getNumber()), true);
     }
 
