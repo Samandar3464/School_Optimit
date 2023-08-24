@@ -2,6 +2,8 @@ package com.example.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import java.time.LocalDate;
 
@@ -27,7 +29,7 @@ public class TeachingHours {
     private TypeOfWork typeOfWork;
 
     @ManyToOne
-    private Subject subject;
+    private SubjectLevel subjectLevel;
 
     @ManyToOne
     private User teacher;

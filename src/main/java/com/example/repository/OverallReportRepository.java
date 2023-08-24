@@ -8,8 +8,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.time.LocalDate;
 import java.util.List;
 
-public interface OverallReportRepository extends JpaRepository<OverallReport,Integer> {
+public interface OverallReportRepository extends JpaRepository<OverallReport, Integer> {
 
-    Page<OverallReport> findAllByDate(LocalDate date, Pageable pageable);
+    Page<OverallReport> findAllByDateBetween(LocalDate date, LocalDate dateEnd, Pageable pageable);
+
     Page<OverallReport> findAllByBranch_Id(Integer branchId, Pageable pageable);
 }

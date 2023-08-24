@@ -19,26 +19,21 @@ public class OverallReportController {
 
     private final OverallReportService overallReportService;
 
-    @PostMapping("/save")
-    public ApiResponse save(@RequestBody OverallReportRequest overallReportRequest) {
-        return overallReportService.create(overallReportRequest);
-    }
-
-    @GetMapping("/getById/{id}")
-    public ApiResponse getById(@PathVariable Integer id) {
-        return overallReportService.getById(id);
-    }
-
-
     @GetMapping("/getAllByDate")
     public ApiResponse getAllByDate(@RequestParam
                                     @JsonSerialize(using = LocalDateSerializer.class)
                                     @JsonDeserialize(using = LocalDateDeserializer.class)
-                                    LocalDate localDate,
+                                    LocalDate startDate,
+
+                                    @RequestParam
+                                    @JsonSerialize(using = LocalDateSerializer.class)
+                                    @JsonDeserialize(using = LocalDateDeserializer.class)
+                                    LocalDate endDate,
+
                                     @RequestParam(name = "page", defaultValue = "0") int page,
                                     @RequestParam(name = "size", defaultValue = "5") int size
     ) {
-        return overallReportService.getAllByDate(localDate, page, size);
+        return overallReportService.getAllByDate(startDate, endDate, page, size);
     }
 
     @GetMapping("/getAllByBranchId/{branchId}")
@@ -48,16 +43,5 @@ public class OverallReportController {
             @RequestParam(name = "size", defaultValue = "5") int size
     ) {
         return overallReportService.getAllByBranchId(branchId, page, size);
-    }
-
-
-    @GetMapping("/update")
-    public ApiResponse update(@RequestBody OverallReportRequest overallReportRequest) {
-        return overallReportService.update(overallReportRequest);
-    }
-
-    @GetMapping("/delete/{id}")
-    public ApiResponse delete(@PathVariable Integer id) {
-        return overallReportService.delete(id);
     }
 }

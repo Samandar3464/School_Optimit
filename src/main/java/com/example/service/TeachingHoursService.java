@@ -6,8 +6,7 @@ import com.example.exception.RecordAlreadyExistException;
 import com.example.exception.RecordNotFoundException;
 import com.example.model.common.ApiResponse;
 import com.example.model.request.TeachingHoursRequest;
-import com.example.model.response.TeachingHoursResponse;
-import com.example.model.response.TeachingHoursResponseForPage;
+import com.example.model.response.*;
 import com.example.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -28,7 +27,7 @@ public class TeachingHoursService implements BaseService<TeachingHoursRequest, I
     private final StudentClassRepository studentClassRepository;
     private final TypeOfWorkRepository typeOfWorkRepository;
     private final UserRepository userRepository;
-    private final SubjectRepository subjectRepository;
+    private final SubjectLevelRepository subjectLevelRepository;
     private final SalaryRepository salaryRepository;
     private final ModelMapper modelMapper;
 
@@ -72,7 +71,7 @@ public class TeachingHoursService implements BaseService<TeachingHoursRequest, I
     @Override
     public ApiResponse update(TeachingHoursRequest teachingHoursRequest) {
         TeachingHours oldTransaction = teachingHoursRepository.findByIdAndActiveTrue(teachingHoursRequest.getId()).orElseThrow(() -> new RecordNotFoundException(Constants.TEACHING_HOURS_NOT_FOUND));
-        TeachingHours teachingHours = modelMapper.map(teachingHoursRequest,TeachingHours.class);
+        TeachingHours teachingHours = modelMapper.map(teachingHoursRequest, TeachingHours.class);
         teachingHours.setId(teachingHoursRequest.getId());
         setTeachingHours(teachingHoursRequest, teachingHours);
         hourlyWageSetting(teachingHours, oldTransaction.getTypeOfWork().getPrice());
@@ -154,14 +153,14 @@ public class TeachingHoursService implements BaseService<TeachingHoursRequest, I
                 .orElseThrow(() -> new RecordNotFoundException(Constants.USER_NOT_FOUND));
         TypeOfWork typeOfWork = typeOfWorkRepository.findById(teachingHoursRequest.getTypeOfWorkId())
                 .orElseThrow(() -> new RecordNotFoundException(Constants.TYPE_OF_WORK_NOT_FOUND));
-        Subject subject = subjectRepository.findById(teachingHoursRequest.getSubjectId())
+        SubjectLevel subject = subjectLevelRepository.findById(teachingHoursRequest.getSubjectLevelId())
                 .orElseThrow(() -> new RecordNotFoundException(Constants.SUBJECT_NOT_FOUND));
 
         teachingHours.setActive(true);
         teachingHours.setStudentClass(studentClass);
         teachingHours.setTeacher(user);
         teachingHours.setTypeOfWork(typeOfWork);
-        teachingHours.setSubject(subject);
+        teachingHours.setSubjectLevel(subject);
     }
 
     private TeachingHoursResponseForPage getTeachingHoursResponses(Page<TeachingHours> all) {
@@ -179,6 +178,9 @@ public class TeachingHoursService implements BaseService<TeachingHoursRequest, I
     private TeachingHoursResponse getTeachingHoursResponse(TeachingHours teachingHours) {
         TeachingHoursResponse response = modelMapper.map(teachingHours, TeachingHoursResponse.class);
         response.setDate(teachingHours.getDate().toString());
+        response.setSubjectLevelResponse(modelMapper.map(teachingHours.getSubjectLevel(), SubjectLevelResponse.class));
+        response.setTeacher(modelMapper.map(teachingHours.getTeacher(), UserResponse.class));
+        response.setStudentClass(modelMapper.map(teachingHours.getStudentClass(), StudentClassResponse.class));
         return response;
     }
 

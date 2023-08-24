@@ -73,8 +73,8 @@ public class User implements UserDetails {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Branch branch;
 
-    @ManyToMany(fetch = FetchType.EAGER)
-    private List<Subject> subjects;
+    @ManyToMany
+    private List<SubjectLevel> subjectLevels;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

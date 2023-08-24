@@ -1,6 +1,5 @@
 package com.example.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
@@ -71,10 +70,6 @@ public class Student {
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
     private StudentClass studentClass;
-
-    @JsonIgnore
-    @ManyToMany(cascade = CascadeType.ALL)
-    private List<Family> families;
 
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)

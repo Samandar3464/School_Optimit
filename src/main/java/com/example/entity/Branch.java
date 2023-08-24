@@ -22,7 +22,6 @@ public class Branch {
 
     private String address;
 
-    @JsonIgnore
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Business business;

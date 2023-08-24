@@ -9,6 +9,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -16,21 +18,16 @@ public class FamilyRequest {
 
     private Integer id;
 
-    @NotBlank
     private String fullName;
 
-    @NotBlank
-    @Size(min = 9,max = 9)
     private String phoneNumber;
 
-    @NotBlank
-    @Size(min = 6)
     private String password;
 
     @Enumerated(EnumType.STRING)
     private Gender gender;
 
-    private Integer studentId;
+    private List<Integer> studentIdList;
 
     private Integer branchId;
 }

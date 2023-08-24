@@ -23,7 +23,7 @@ public class ScoreRequest {
 
     private Integer teacherId;
 
-    private Integer subjectId;
+    private Integer subjectLevelId;
 
     private Integer journalId;
 }

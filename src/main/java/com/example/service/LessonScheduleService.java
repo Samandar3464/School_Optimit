@@ -31,7 +31,7 @@ public class LessonScheduleService implements BaseService<LessonScheduleRequest,
 
     private final BranchRepository branchRepository;
     private final UserRepository userRepository;
-    private final SubjectRepository subjectRepository;
+    private final SubjectLevelRepository subjectLevelRepository;
     private final RoomRepository roomRepository;
     private final StudentClassRepository studentClassRepository;
     private final LessonScheduleRepository lessonScheduleRepository;
@@ -113,7 +113,6 @@ public class LessonScheduleService implements BaseService<LessonScheduleRequest,
 
     private LessonScheduleResponse getLessonScheduleResponse(LessonSchedule lessonSchedule) {
         LessonScheduleResponse response = modelMapper.map(lessonSchedule, LessonScheduleResponse.class);
-        response.setDate(lessonSchedule.getDate().toString());
         response.setTeacher(modelMapper.map(lessonSchedule.getTeacher(), UserResponse.class));
         response.setStudentClass(modelMapper.map(lessonSchedule.getStudentClass(), StudentClassResponse.class));
         return response;
@@ -126,7 +125,7 @@ public class LessonScheduleService implements BaseService<LessonScheduleRequest,
                         lessonScheduleRequest.getStudentClassId(),
                         lessonScheduleRequest.getLessonHour(),
                         lessonScheduleRequest.getBranchId(),
-                        lessonScheduleRequest.getLocalDate());
+                        lessonScheduleRequest.getWeekDays());
 
         if (studentClassOptional.isPresent()) {
             throw new RecordAlreadyExistException(Constants.STUDENT_CLASS_BUSY);
@@ -137,7 +136,7 @@ public class LessonScheduleService implements BaseService<LessonScheduleRequest,
                         lessonScheduleRequest.getTeacherId(),
                         lessonScheduleRequest.getLessonHour(),
                         lessonScheduleRequest.getBranchId(),
-                        lessonScheduleRequest.getLocalDate());
+                        lessonScheduleRequest.getWeekDays());
 
         if (teacherOptional.isPresent()) {
             throw new RecordAlreadyExistException(TEACHER_ALREADY_BUSY);
@@ -148,7 +147,7 @@ public class LessonScheduleService implements BaseService<LessonScheduleRequest,
                         lessonScheduleRequest.getRoomId(),
                         lessonScheduleRequest.getLessonHour(),
                         lessonScheduleRequest.getBranchId(),
-                        lessonScheduleRequest.getLocalDate());
+                        lessonScheduleRequest.getWeekDays());
 
         if (roomOptional.isPresent()) {
             throw new RecordAlreadyExistException(Constants.ROOM_BUSY);
@@ -166,14 +165,14 @@ public class LessonScheduleService implements BaseService<LessonScheduleRequest,
                 .orElseThrow(() -> new RecordNotFoundException(TYPE_OF_WORK_NOT_FOUND));
         Room room = roomRepository.findByIdAndActiveTrue(scheduleRequest.getRoomId())
                 .orElseThrow(() -> new RecordNotFoundException(ROOM_NOT_FOUND));
-        Subject subject = subjectRepository.findByIdAndActiveTrue(scheduleRequest.getSubjectId())
+        SubjectLevel subject = subjectLevelRepository.findByIdAndActiveTrue(scheduleRequest.getSubjectLevelId())
                 .orElseThrow(() -> new RecordNotFoundException(SUBJECT_NOT_FOUND));
 
         lessonSchedule.setActive(true);
         lessonSchedule.setRoom(room);
         lessonSchedule.setTeacher(user);
         lessonSchedule.setBranch(branch);
-        lessonSchedule.setSubject(subject);
+        lessonSchedule.setSubjectLevel(subject);
         lessonSchedule.setTypeOfWork(typeOfWork);
         lessonSchedule.setStudentClass(studentClass);
     }

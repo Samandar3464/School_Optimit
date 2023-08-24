@@ -16,7 +16,5 @@ public class WorkExperienceResponse {
 
     private String endDate;
 
-    private Integer employeeId;
-
-    private String employeeFullName;
+    private UserResponse userResponse;
 }

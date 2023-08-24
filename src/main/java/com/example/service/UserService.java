@@ -11,10 +11,7 @@ import com.example.model.response.NotificationMessageResponse;
 import com.example.model.response.TokenResponse;
 import com.example.model.response.UserResponse;
 import com.example.model.response.UserResponsePage;
-import com.example.repository.BranchRepository;
-import com.example.repository.RoleRepository;
-import com.example.repository.SubjectRepository;
-import com.example.repository.UserRepository;
+import com.example.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
@@ -49,7 +46,7 @@ public class UserService implements BaseService<UserRegisterDto, Integer> {
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
     private final BranchRepository branchRepository;
-    private final SubjectRepository subjectRepository;
+    private final SubjectLevelRepository subjectLevelRepository;
     private final AttachmentService attachmentService;
     private final AuthenticationManager authenticationManager;
     private final FireBaseMessagingService fireBaseMessagingService;
@@ -203,9 +200,9 @@ public class UserService implements BaseService<UserRegisterDto, Integer> {
         return (User) authentication.getPrincipal();
     }
 
-    public ApiResponse addSubjectToUser(Integer userId, List<Integer> subjectIds) {
+    public ApiResponse addSubjectLevel(Integer userId, List<Integer> subjectIds) {
         User user = getUserById(userId);
-        user.setSubjects(subjectRepository.findAllById(subjectIds));
+        user.setSubjectLevels(subjectLevelRepository.findAllById(subjectIds));
         userRepository.save(user);
         return new ApiResponse(SUCCESSFULLY, true, toUserResponse(user));
     }
@@ -216,6 +213,8 @@ public class UserService implements BaseService<UserRegisterDto, Integer> {
         response.setRegisteredDate(user.getRegisteredDate().toString());
         response.setProfilePhotoUrl(attachmentService.getUrl(user.getProfilePhoto()));
         response.setProfilePhotoUrl(getPhotoLink(user.getProfilePhoto()));
+        
+        response.setBusinessId(user.getBranch() == null ? null : user.getBranch().getBusiness().getId());
         return response;
     }
 
@@ -279,15 +278,15 @@ public class UserService implements BaseService<UserRegisterDto, Integer> {
                 .orElseThrow(() -> new RecordNotFoundException(BRANCH_NOT_FOUND));
         Role role = roleRepository.findById(userRegisterDto.getRoleId())
                 .orElseThrow(() -> new RecordNotFoundException(ROLE_NOT_FOUND));
-        List<Subject> subjects = userRegisterDto.getSubjectsIds() == null
-                ? null : subjectRepository.findAllById(userRegisterDto.getSubjectsIds());
+        List<SubjectLevel> subjects = userRegisterDto.getSubjectLevelIdList() == null
+                ? null : subjectLevelRepository.findAllById(userRegisterDto.getSubjectLevelIdList());
 
         user.setBlocked(false);
         user.setRegisteredDate(LocalDateTime.now());
         user.setBranch(branch);
         user.setRole(role);
         user.setPassword(encode);
-        user.setSubjects(subjects);
+        user.setSubjectLevels(subjects);
         return user;
     }
 }

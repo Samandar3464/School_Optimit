@@ -16,6 +16,7 @@ public interface StaffAttendanceRepository extends JpaRepository<StaffAttendance
     Page<StaffAttendance> findAllByUserId(Integer id, Pageable pageable);
 
     Optional<StaffAttendance> findByUserIdAndDate(Integer user_id, LocalDate date);
+    Optional<StaffAttendance> findByUserId(Integer user_id);
 
     Page<StaffAttendance> findAllByBranchId(Integer id,Pageable pageable);
 }

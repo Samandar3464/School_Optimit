@@ -9,7 +9,7 @@ import com.example.model.common.ApiResponse;
 import com.example.model.request.FamilyLoginDto;
 import com.example.model.request.FamilyRequest;
 import com.example.model.response.FamilyResponse;
-import com.example.model.response.FamilyResponseList;
+import com.example.model.response.FamilyResponsePage;
 import com.example.model.response.StudentResponse;
 import com.example.repository.BranchRepository;
 import com.example.repository.FamilyRepository;
@@ -18,13 +18,10 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import static com.example.enums.Constants.*;
@@ -43,27 +40,33 @@ public class FamilyService implements BaseService<FamilyRequest, Integer> {
         Family family = modelMapper.map(familyRequest, Family.class);
         setFamily(familyRequest, family);
         familyRepository.save(family);
-        return new ApiResponse(SUCCESSFULLY, true);
+        FamilyResponse response = getFamilyResponse(family);
+        return new ApiResponse(SUCCESSFULLY, true, response);
+    }
+
+    private FamilyResponse getFamilyResponse(Family family) {
+        FamilyResponse response = modelMapper.map(family, FamilyResponse.class);
+        response.setCreatedDate(family.getRegisteredDate().toString());
+        return response;
     }
 
     private void setFamily(FamilyRequest familyRequest, Family family) {
         Branch branch = branchRepository.findByIdAndDeleteFalse(familyRequest.getBranchId())
                 .orElseThrow(() -> new RecordNotFoundException(BRANCH_NOT_FOUND));
-        Student student = studentRepository.findByIdAndActiveTrue(familyRequest.getStudentId())
-                .orElseThrow(() -> new UserNotFoundException(STUDENT_NOT_FOUND));
+        List<Student> students = studentRepository
+                .findAllByIdInAndActiveTrue(familyRequest.getStudentIdList());
 
-        student.getFamilies().add(family);
-        family.setBranch(branch);
-        family.setRegisteredDate(LocalDateTime.now());
         family.setActive(true);
-        studentRepository.save(student);
+        family.setBranch(branch);
+        family.setStudents(students);
+        family.setRegisteredDate(LocalDateTime.now());
     }
 
     @Override
     public ApiResponse getById(Integer integer) {
         Family family = familyRepository.findByIdAndActiveTrue(integer)
                 .orElseThrow(() -> new UserNotFoundException(FAMILY_NOT_FOUND));
-        FamilyResponse response = modelMapper.map(family, FamilyResponse.class);
+        FamilyResponse response = getFamilyResponse(family);
         return new ApiResponse(SUCCESSFULLY, true, response);
     }
 
@@ -76,7 +79,7 @@ public class FamilyService implements BaseService<FamilyRequest, Integer> {
         family.setId(familyRequest.getId());
         family.setFireBaseToken(old.getFireBaseToken());
         familyRepository.save(family);
-        FamilyResponse response = modelMapper.map(family, FamilyResponse.class);
+        FamilyResponse response = getFamilyResponse(family);
         return new ApiResponse(SUCCESSFULLY, true, response);
     }
 
@@ -84,32 +87,44 @@ public class FamilyService implements BaseService<FamilyRequest, Integer> {
     public ApiResponse delete(Integer integer) {
         Family family = familyRepository.findByIdAndActiveTrue(integer)
                 .orElseThrow(() -> new UserNotFoundException(FAMILY_NOT_FOUND));
-        Student student = studentRepository.findByIdAndActiveTrue(family.getStudent().getId())
-                .orElseThrow(() -> new RecordNotFoundException(STUDENT_NOT_FOUND));
-
-        student.getFamilies().remove(family);
         familyRepository.delete(family);
-        studentRepository.save(student);
-        FamilyResponse response = modelMapper.map(family, FamilyResponse.class);
+        FamilyResponse response = getFamilyResponse(family);
         return new ApiResponse(DELETED, true, response);
     }
 
 
     public ApiResponse getList(int page, int size, int branchId) {
-        Pageable pageable = PageRequest.of(page, size);
-        Page<Family> familyList = familyRepository.findAllByBranchIdAndActiveTrue(branchId, pageable);
-        List<FamilyResponse> familyResponses = new ArrayList<>();
-//        familyList.getContent().forEach(obj -> familyResponses.add(FamilyResponse.from(obj)));
-        return new ApiResponse(new FamilyResponseList(familyResponses, familyList.getTotalElements(), familyList.getTotalPages(), familyList.getNumber()), true);
+        Page<Family> all = familyRepository
+                .findAllByBranchIdAndActiveTrue(branchId, PageRequest.of(page, size));
+        FamilyResponsePage response = getFamilyResponsePage(all);
+        return new ApiResponse(SUCCESSFULLY, true, response);
     }
 
-    public ApiResponse familyLogIn(FamilyLoginDto dto) {
-        Family family = familyRepository.findByPhoneNumberAndPassword(dto.getPhoneNumber(), dto.getPassword())
-                .orElseThrow(() -> new UserNotFoundException(FAMILY_NOT_FOUND));
-        List<Student> allByFamily = studentRepository.findByFamiliesIn(List.of(Collections.singletonList(family)), Sort.by(Sort.Direction.DESC, "id"));
-        List<StudentResponse> studentResponseDtoList = new ArrayList<>();
-        allByFamily.forEach(student ->
-                studentResponseDtoList.add(modelMapper.map(student, StudentResponse.class)));
-        return new ApiResponse(studentResponseDtoList, true);
+    private FamilyResponsePage getFamilyResponsePage(Page<Family> all) {
+        List<FamilyResponse> familyResponses = new ArrayList<>();
+        all.forEach(family -> {
+            familyResponses.add(getFamilyResponse(family));
+        });
+        FamilyResponsePage familyResponsePage = new FamilyResponsePage();
+        familyResponsePage.setFamilyResponseDtoList(familyResponses);
+        familyResponsePage.setTotalPage(all.getTotalPages());
+        familyResponsePage.setTotalElement(all.getTotalElements());
+
+        return familyResponsePage;
+    }
+
+    public ApiResponse familyLogIn(String phoneNumber, String password) {
+        List<Student> students = familyRepository.findByPhoneNumberAndPassword(phoneNumber, password)
+                .orElseThrow(() -> new UserNotFoundException(FAMILY_NOT_FOUND)).getStudents();
+        List<StudentResponse> responses = getStudentResponses(students);
+        return new ApiResponse(SUCCESSFULLY, true, responses);
+    }
+
+    private List<StudentResponse> getStudentResponses(List<Student> students) {
+        List<StudentResponse> responses = new ArrayList<>();
+        students.forEach(student -> {
+            responses.add(modelMapper.map(student, StudentResponse.class));
+        });
+        return responses;
     }
 }

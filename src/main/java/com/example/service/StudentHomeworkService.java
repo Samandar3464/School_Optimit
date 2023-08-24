@@ -25,7 +25,7 @@ public class StudentHomeworkService implements BaseService<StudentHomeworkReques
     private final ModelMapper modelMapper;
     private final UserRepository userRepository;
     private final BranchRepository branchRepository;
-    private final SubjectRepository subjectRepository;
+    private final SubjectLevelRepository subjectLevelRepository;
     private final StudentClassRepository studentClassRepository;
 
 
@@ -103,7 +103,7 @@ public class StudentHomeworkService implements BaseService<StudentHomeworkReques
                 .orElseThrow(() -> new RecordNotFoundException(Constants.USER_NOT_FOUND));
         StudentClass studentClass = studentClassRepository.findByIdAndActiveTrue(request.getStudentClassId())
                 .orElseThrow(() -> new RecordNotFoundException(Constants.STUDENT_CLASS_NOT_FOUND));
-        Subject subject = subjectRepository.findByIdAndActiveTrue(request.getSubjectId())
+        SubjectLevel subject = subjectLevelRepository.findByIdAndActiveTrue(request.getSubjectLevelId())
                 .orElseThrow(() -> new RecordNotFoundException(Constants.SUBJECT_NOT_FOUND));
         Branch branch = branchRepository.findByIdAndDeleteFalse(request.getBranchId())
                 .orElseThrow(() -> new RecordNotFoundException(Constants.BRANCH_NOT_FOUND));
@@ -112,7 +112,7 @@ public class StudentHomeworkService implements BaseService<StudentHomeworkReques
         studentHomework.setDate(LocalDate.now());
         studentHomework.setTeacher(user);
         studentHomework.setStudentClass(studentClass);
-        studentHomework.setSubject(subject);
+        studentHomework.setSubjectLevel(subject);
         studentHomework.setBranch(branch);
     }
 

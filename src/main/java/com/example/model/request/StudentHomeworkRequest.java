@@ -33,8 +33,8 @@ public class StudentHomeworkRequest {
     @JsonDeserialize(using = LocalDateDeserializer.class)
     private LocalDate date;
 
-    @Min(value = 1,message = "must be subjectId")
-    private Integer subjectId;
+    @Min(value = 1,message = "must be subjectLevelId")
+    private Integer subjectLevelId;
 
     @Min(value = 1,message = "must be teacherId")
     private Integer teacherId;

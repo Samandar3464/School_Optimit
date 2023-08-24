@@ -7,6 +7,7 @@ import com.example.exception.RecordNotFoundException;
 import com.example.exception.UserNotFoundException;
 import com.example.model.common.ApiResponse;
 import com.example.model.request.WorkExperienceRequest;
+import com.example.model.response.UserResponse;
 import com.example.model.response.WorkExperienceResponse;
 import com.example.model.response.WorkExperienceResponsePage;
 import com.example.repository.UserRepository;
@@ -112,6 +113,7 @@ public class WorkExperienceService implements BaseService<WorkExperienceRequest,
         WorkExperienceResponse response = modelMapper.map(workExperience, WorkExperienceResponse.class);
         response.setStartDate(workExperience.getStartDate().toString());
         response.setEndDate(workExperience.getEndDate().toString());
+        response.setUserResponse(modelMapper.map(workExperience.getEmployee(), UserResponse.class));
         return response;
     }
 }

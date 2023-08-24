@@ -27,10 +27,10 @@ public class UserController {
         return userService.create(userRegisterDto);
     }
 
-    @PostMapping("/addSubjectToUser")
+    @PostMapping("/addSubjectLevel")
     public ApiResponse addSubjectToUser(@RequestParam Integer userId,
-                                        @RequestParam List<Integer> subjectIds) {
-        return userService.addSubjectToUser(userId, subjectIds);
+                                        @RequestParam List<Integer> subjectLevelIds) {
+        return userService.addSubjectLevel(userId, subjectLevelIds);
     }
 
 

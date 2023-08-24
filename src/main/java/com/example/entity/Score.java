@@ -30,7 +30,7 @@ public class Score {
     private User teacher;
 
     @ManyToOne
-    private Subject subject;
+    private SubjectLevel subjectLevel;
 
     @ManyToOne
     private Journal journal;

@@ -26,6 +26,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -45,6 +46,7 @@ public class StaffAttendanceService implements BaseService<StaffAttendanceReques
             throw new RecordAlreadyExistException(Constants.STAFF_ATTENDANCE_ALREADY_EXISTS_FOR_THIS_DATE);
         }
         set(staffAttendanceRequest, staffAttendance);
+        staffAttendance.setDate(LocalDate.now());
         dailyWageSetting(staffAttendance);
         attendanceRepository.save(staffAttendance);
         StaffAttendanceResponse response = getStaffAttendanceResponse(staffAttendance);
@@ -75,9 +77,9 @@ public class StaffAttendanceService implements BaseService<StaffAttendanceReques
 
     @Override
     public ApiResponse update(StaffAttendanceRequest staffAttendanceRequest) {
-        checkingUpdate(staffAttendanceRequest);
-        StaffAttendance staffAttendance = modelMapper.map(staffAttendanceRequest, StaffAttendance.class);
-        staffAttendance.setId(staffAttendanceRequest.getId());
+        StaffAttendance staffAttendance = attendanceRepository.findById(staffAttendanceRequest.getId())
+                .orElseThrow(() -> new RecordNotFoundException(Constants.STAFF_ATTENDANCE_NOT_FOUND));
+        checkingUpdate(staffAttendanceRequest, staffAttendance);
         set(staffAttendanceRequest, staffAttendance);
         attendanceRepository.save(staffAttendance);
         StaffAttendanceResponse staffAttendanceResponse = getStaffAttendanceResponse(staffAttendance);
@@ -123,11 +125,12 @@ public class StaffAttendanceService implements BaseService<StaffAttendanceReques
         }
     }
 
-    private void checkingUpdate(StaffAttendanceRequest staffAttendanceRequest) {
-        attendanceRepository.findById(staffAttendanceRequest.getId())
-                .orElseThrow(() -> new RecordNotFoundException(Constants.STAFF_ATTENDANCE_NOT_FOUND));
-        if (attendanceRepository.findByUserIdAndDate(staffAttendanceRequest.getUserId(), LocalDate.now()).isPresent()) {
-            throw new RecordAlreadyExistException(Constants.STAFF_ATTENDANCE_ALREADY_EXISTS_FOR_THIS_DATE);
+    private void checkingUpdate(StaffAttendanceRequest staffAttendanceRequest, StaffAttendance staffAttendance) {
+        Optional<StaffAttendance> newAttendance = attendanceRepository
+                .findByUserIdAndDate(staffAttendanceRequest.getUserId(), staffAttendance.getDate());
+
+        if (newAttendance.isPresent() && !staffAttendance.getUser().getId().equals(staffAttendanceRequest.getUserId())) {
+            throw new RecordNotFoundException(Constants.STAFF_ATTENDANCE_ALREADY_EXISTS_FOR_THIS_DATE);
         }
     }
 
@@ -137,7 +140,8 @@ public class StaffAttendanceService implements BaseService<StaffAttendanceReques
         Branch branch = branchRepository.findById(staffAttendanceRequest.getBranchId())
                 .orElseThrow(() -> new RecordNotFoundException(Constants.BRANCH_NOT_FOUND));
 
-        staffAttendance.setDate(LocalDate.now());
+        staffAttendance.setCameToWork(staffAttendanceRequest.isCameToWork());
+        staffAttendance.setDescription(staffAttendanceRequest.getDescription());
         staffAttendance.setUser(user);
         staffAttendance.setBranch(branch);
     }

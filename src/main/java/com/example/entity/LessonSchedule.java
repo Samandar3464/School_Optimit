@@ -1,9 +1,9 @@
 package com.example.entity;
 
+import com.example.enums.WeekDays;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.LocalDate;
 
 @Getter
 @Setter
@@ -21,10 +21,10 @@ public class LessonSchedule {
 
     private boolean active;
 
-    private LocalDate date;
+    private WeekDays date;
 
     @ManyToOne
-    private Subject subject;
+    private SubjectLevel subjectLevel;
 
     @ManyToOne
     private User teacher;

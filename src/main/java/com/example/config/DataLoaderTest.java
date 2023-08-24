@@ -130,7 +130,7 @@ public class DataLoaderTest implements CommandLineRunner {
 
             StudentClass savedStudentClass = studentClassRepository.save(studentClass);
 
-            studentRepository.save(new Student(1, "aaa", "a", "a", "907403767", "111111", LocalDate.now(), "wefs", true, 3_000_000, "1", LocalDateTime.now(), null, null, null, savedStudentClass, null, saveBranch, null));
+            studentRepository.save(new Student(1, "aaa", "a", "a", "907403767", "111111", LocalDate.now(), "wefs", true, 3_000_000, "1", LocalDateTime.now(), null, null, null, savedStudentClass,  saveBranch, null));
 
             TypeOfWork typeOfWork = TypeOfWork.builder()
                     .branch(saveBranch)
