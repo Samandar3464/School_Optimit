@@ -27,6 +27,7 @@ public class Topic {
     @ElementCollection
     private List<String> useFullLinks;
 
+    
     private LocalDateTime creationDate;
 
     @ManyToOne
