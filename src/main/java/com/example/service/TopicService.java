@@ -35,11 +35,11 @@ public class TopicService implements BaseService<TopicRequest, Integer> {
         if (topicRepository.existsByNameAndSubjectLevelId(dto.getName(), dto.getSubjectLevelId())) {
             throw new RecordAlreadyExistException(TOPIC_ALREADY_EXIST);
         }
-        Topic topic = modelMapper.map(dto,Topic.class);
+        Topic topic = modelMapper.map(dto, Topic.class);
         setTopic(dto, topic);
         topicRepository.save(topic);
         TopicResponse response = getTopicResponse(topic);
-        return new ApiResponse(SUCCESSFULLY, true,response);
+        return new ApiResponse(SUCCESSFULLY, true, response);
     }
 
     @Override
@@ -53,7 +53,7 @@ public class TopicService implements BaseService<TopicRequest, Integer> {
     @Override
     public ApiResponse update(TopicRequest dto) {
         checkingTopicByExists(dto);
-        Topic topic = modelMapper.map(dto,Topic.class);
+        Topic topic = modelMapper.map(dto, Topic.class);
         topic.setId(dto.getId());
         setTopic(dto, topic);
         topicRepository.save(topic);
@@ -83,12 +83,14 @@ public class TopicService implements BaseService<TopicRequest, Integer> {
     private void setTopic(TopicRequest dto, Topic topic) {
         SubjectLevel subjectLevel = subjectLevelRepository.findById(dto.getSubjectLevelId())
                 .orElseThrow(() -> new RecordNotFoundException(SUBJECT_LEVEL_NOT_FOUND));
-        List<Attachment> attachments =
-                attachmentService.saveToSystemListFile(dto.getLessonFiles());
+        if (dto.getLessonFiles() != null) {
+            List<Attachment> attachments =
+                    attachmentService.saveToSystemListFile(dto.getLessonFiles());
+            topic.setLessonFiles(attachments);
+        }
 
         topic.setCreationDate(LocalDateTime.now());
         topic.setSubjectLevel(subjectLevel);
-        topic.setLessonFiles(attachments);
     }
 
     private void checkingTopicByExists(TopicRequest dto) {
@@ -101,8 +103,10 @@ public class TopicService implements BaseService<TopicRequest, Integer> {
 
     private TopicResponse getTopicResponse(Topic topic) {
         TopicResponse response = modelMapper.map(topic, TopicResponse.class);
-        List<String> urlList = attachmentService.getUrlList(topic.getLessonFiles());
-        response.setLessonFiles(urlList);
+        if (response.getLessonFiles()!=null){
+            List<String> urlList = attachmentService.getUrlList(topic.getLessonFiles());
+            response.setLessonFiles(urlList);
+        }
         return response;
     }
 }
