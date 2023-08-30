@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -35,11 +36,11 @@ public class TopicService implements BaseService<TopicRequest, Integer> {
         if (topicRepository.existsByNameAndSubjectLevelId(dto.getName(), dto.getSubjectLevelId())) {
             throw new RecordAlreadyExistException(TOPIC_ALREADY_EXIST);
         }
-        Topic topic = modelMapper.map(dto,Topic.class);
+        Topic topic = modelMapper.map(dto, Topic.class);
         setTopic(dto, topic);
         topicRepository.save(topic);
         TopicResponse response = getTopicResponse(topic);
-        return new ApiResponse(SUCCESSFULLY, true,response);
+        return new ApiResponse(SUCCESSFULLY, true, response);
     }
 
     @Override
@@ -53,7 +54,7 @@ public class TopicService implements BaseService<TopicRequest, Integer> {
     @Override
     public ApiResponse update(TopicRequest dto) {
         checkingTopicByExists(dto);
-        Topic topic = modelMapper.map(dto,Topic.class);
+        Topic topic = modelMapper.map(dto, Topic.class);
         topic.setId(dto.getId());
         setTopic(dto, topic);
         topicRepository.save(topic);
@@ -62,47 +63,67 @@ public class TopicService implements BaseService<TopicRequest, Integer> {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public ApiResponse delete(Integer id) {
         Topic oldTopic = topicRepository.findById(id)
                 .orElseThrow(() -> new RecordNotFoundException(TOPIC_NOT_FOUND));
-        oldTopic.getLessonFiles().forEach(attachmentService::deleteNewName);
         topicRepository.deleteById(id);
-        return new ApiResponse(DELETED, true, getTopicResponse(oldTopic));
+        oldTopic.getLessonFiles().forEach(attachmentService::deleteNewName);
+        return new ApiResponse(DELETED, true);
     }
 
-    public List<TopicResponse> findAllBySubjectId(Integer subjectLevelId) {
-        List<Topic> all = topicRepository.findAllBySubjectLevelId(subjectLevelId,
+    public ApiResponse findAllByBranchId(Integer branchId) {
+        List<Topic> all = topicRepository.findAllBySubjectLevelBranchId(branchId,
                 Sort.by(Sort.Direction.DESC, "id"));
         List<TopicResponse> responses = new ArrayList<>();
         all.forEach(topic -> {
             responses.add(getTopicResponse(topic));
         });
-        return responses;
+        return new ApiResponse(SUCCESSFULLY, true, responses);
+    }
+
+    public ApiResponse findAllBySubjectIdBranchId(Integer subjectLevelId, Integer branchId) {
+        List<Topic> all = topicRepository.findAllBySubjectLevelIdAndSubjectLevelBranchId(
+                subjectLevelId, branchId, Sort.by(Sort.Direction.DESC, "id"));
+        List<TopicResponse> responses = new ArrayList<>();
+        all.forEach(topic -> {
+            responses.add(getTopicResponse(topic));
+        });
+        return new ApiResponse(SUCCESSFULLY, true, responses);
     }
 
     private void setTopic(TopicRequest dto, Topic topic) {
         SubjectLevel subjectLevel = subjectLevelRepository.findById(dto.getSubjectLevelId())
                 .orElseThrow(() -> new RecordNotFoundException(SUBJECT_LEVEL_NOT_FOUND));
-        List<Attachment> attachments =
-                attachmentService.saveToSystemListFile(dto.getLessonFiles());
+        if (dto.getLessonFiles() != null) {
+            List<Attachment> attachments =
+                    attachmentService.saveToSystemListFile(dto.getLessonFiles());
+            topic.setLessonFiles(attachments);
+        }
 
         topic.setCreationDate(LocalDateTime.now());
         topic.setSubjectLevel(subjectLevel);
-        topic.setLessonFiles(attachments);
     }
 
     private void checkingTopicByExists(TopicRequest dto) {
         Topic old = topicRepository.findById(dto.getId()).orElseThrow(() -> new RecordNotFoundException(TOPIC_NOT_FOUND));
-        if (!dto.getName().equals(old.getName()) || !dto.getSubjectLevelId().equals(old.getSubjectLevel().getId())
-                && topicRepository.existsByNameAndSubjectLevelId(dto.getName(), dto.getSubjectLevelId())) {
-            throw new RecordNotFoundException(TOPIC_ALREADY_EXIST);
+        if (!dto.getName().equals(old.getName()) || !dto.getSubjectLevelId().equals(old.getSubjectLevel().getId())) {
+            if (topicRepository.existsByNameAndSubjectLevelId(dto.getName(), dto.getSubjectLevelId())) {
+                throw new RecordNotFoundException(TOPIC_ALREADY_EXIST);
+            }
         }
     }
 
     private TopicResponse getTopicResponse(Topic topic) {
-        TopicResponse response = modelMapper.map(topic, TopicResponse.class);
-        List<String> urlList = attachmentService.getUrlList(topic.getLessonFiles());
-        response.setLessonFiles(urlList);
+        TopicResponse response = new TopicResponse();
+        response.setName(topic.getName());
+        response.setId(topic.getId());
+        response.setSubjectLevel(topic.getSubjectLevel());
+        response.setUseFullLinks(topic.getUseFullLinks() == null ? null : topic.getUseFullLinks());
+        if (response.getLessonFiles() != null) {
+            List<String> urlList = attachmentService.getUrlList(topic.getLessonFiles());
+            response.setLessonFiles(urlList);
+        }
         return response;
     }
 }

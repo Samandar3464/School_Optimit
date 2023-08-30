@@ -30,5 +30,5 @@ public class FamilyResponse {
 
     private Branch branch;
 
-    private List<StudentResponse> studentResponses;
+    private List<Integer> studentResponses;
 }

@@ -9,5 +9,7 @@ import java.util.List;
 public interface TopicRepository extends JpaRepository<Topic, Integer> {
     Boolean existsByNameAndSubjectLevelId(String name, Integer subjectLevelId);
 
-    List<Topic> findAllBySubjectLevelId(Integer subjectLevelId, Sort sort);
+    List<Topic> findAllBySubjectLevelBranchId(Integer branchId, Sort sort);
+
+    List<Topic> findAllBySubjectLevelIdAndSubjectLevelBranchId(Integer subjectLevelId, Integer branchId, Sort sort);
 }

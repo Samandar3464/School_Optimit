@@ -38,8 +38,9 @@ public class DataLoaderTest implements CommandLineRunner {
     private final TypeOfWorkRepository typeOfWorkRepository;
     private final SubjectRepository subjectRepository;
     private final LevelRepository levelRepository;
-    private final MainBalanceService mainBalanceService;
+    private final TopicRepository topicRepository;
     private final WareHouseRepository wareHouseRepository;
+    private final SubjectLevelRepository subjectLevelRepository;
 
 
     @Value("${spring.sql.init.mode}")
@@ -130,7 +131,7 @@ public class DataLoaderTest implements CommandLineRunner {
 
             StudentClass savedStudentClass = studentClassRepository.save(studentClass);
 
-            studentRepository.save(new Student(1, "aaa", "a", "a", "907403767", "111111", LocalDate.now(), "wefs", true, 3_000_000, "1", LocalDateTime.now(), null, null, null, savedStudentClass,  saveBranch, null));
+            studentRepository.save(new Student(1, "aaa", "a", "a", "907403767", "111111", LocalDate.now(), "wefs", true, 3_000_000, "1", LocalDateTime.now(), null, null, null, savedStudentClass, saveBranch, null));
 
             TypeOfWork typeOfWork = TypeOfWork.builder()
                     .branch(saveBranch)
@@ -147,7 +148,10 @@ public class DataLoaderTest implements CommandLineRunner {
                     .build();
             subjectRepository.save(matemetika);
 
-            journalService.create(new JournalRequest(1,1,1));
+            SubjectLevel subjectLevel = subjectLevelRepository.save(new SubjectLevel(1, true, matemetika, savedLavel, saveBranch));
+            SubjectLevel subject = subjectLevelRepository.save(new SubjectLevel(2, true, matemetika, savedLavel, saveBranch));
+            topicRepository.save(new Topic(1, "aaa", null, null, LocalDateTime.now(), subject));
+            journalService.create(new JournalRequest(1, 1, 1));
         }
     }
 }
