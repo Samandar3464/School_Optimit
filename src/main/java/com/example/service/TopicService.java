@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -62,22 +63,33 @@ public class TopicService implements BaseService<TopicRequest, Integer> {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public ApiResponse delete(Integer id) {
         Topic oldTopic = topicRepository.findById(id)
                 .orElseThrow(() -> new RecordNotFoundException(TOPIC_NOT_FOUND));
-        oldTopic.getLessonFiles().forEach(attachmentService::deleteNewName);
         topicRepository.deleteById(id);
-        return new ApiResponse(DELETED, true, getTopicResponse(oldTopic));
+        oldTopic.getLessonFiles().forEach(attachmentService::deleteNewName);
+        return new ApiResponse(DELETED, true);
     }
 
-    public List<TopicResponse> findAllBySubjectId(Integer subjectLevelId) {
-        List<Topic> all = topicRepository.findAllBySubjectLevelId(subjectLevelId,
+    public ApiResponse findAllByBranchId(Integer branchId) {
+        List<Topic> all = topicRepository.findAllBySubjectLevelBranchId(branchId,
                 Sort.by(Sort.Direction.DESC, "id"));
         List<TopicResponse> responses = new ArrayList<>();
         all.forEach(topic -> {
             responses.add(getTopicResponse(topic));
         });
-        return responses;
+        return new ApiResponse(SUCCESSFULLY, true, responses);
+    }
+
+    public ApiResponse findAllBySubjectIdBranchId(Integer subjectLevelId, Integer branchId) {
+        List<Topic> all = topicRepository.findAllBySubjectLevelIdAndSubjectLevelBranchId(
+                subjectLevelId, branchId, Sort.by(Sort.Direction.DESC, "id"));
+        List<TopicResponse> responses = new ArrayList<>();
+        all.forEach(topic -> {
+            responses.add(getTopicResponse(topic));
+        });
+        return new ApiResponse(SUCCESSFULLY, true, responses);
     }
 
     private void setTopic(TopicRequest dto, Topic topic) {
@@ -95,15 +107,20 @@ public class TopicService implements BaseService<TopicRequest, Integer> {
 
     private void checkingTopicByExists(TopicRequest dto) {
         Topic old = topicRepository.findById(dto.getId()).orElseThrow(() -> new RecordNotFoundException(TOPIC_NOT_FOUND));
-        if (!dto.getName().equals(old.getName()) || !dto.getSubjectLevelId().equals(old.getSubjectLevel().getId())
-                && topicRepository.existsByNameAndSubjectLevelId(dto.getName(), dto.getSubjectLevelId())) {
-            throw new RecordNotFoundException(TOPIC_ALREADY_EXIST);
+        if (!dto.getName().equals(old.getName()) || !dto.getSubjectLevelId().equals(old.getSubjectLevel().getId())) {
+            if (topicRepository.existsByNameAndSubjectLevelId(dto.getName(), dto.getSubjectLevelId())) {
+                throw new RecordNotFoundException(TOPIC_ALREADY_EXIST);
+            }
         }
     }
 
     private TopicResponse getTopicResponse(Topic topic) {
-        TopicResponse response = modelMapper.map(topic, TopicResponse.class);
-        if (response.getLessonFiles()!=null){
+        TopicResponse response = new TopicResponse();
+        response.setName(topic.getName());
+        response.setId(topic.getId());
+        response.setSubjectLevel(topic.getSubjectLevel());
+        response.setUseFullLinks(topic.getUseFullLinks() == null ? null : topic.getUseFullLinks());
+        if (response.getLessonFiles() != null) {
             List<String> urlList = attachmentService.getUrlList(topic.getLessonFiles());
             response.setLessonFiles(urlList);
         }

@@ -25,6 +25,18 @@ public class TopicController {
         return topicService.getById(id);
     }
 
+    @GetMapping("findAllByBranchId/{branchId}")
+    public ApiResponse findAllByBranchId(@PathVariable Integer branchId){
+        return topicService.findAllByBranchId(branchId);
+    }
+
+    @GetMapping("findAllBySubjectIdAndBranchId")
+    public ApiResponse findAllBySubjectIdBranchId(@RequestParam Integer branchId,
+                                         @RequestParam Integer subjectId){
+        return topicService.findAllBySubjectIdBranchId(subjectId,branchId);
+    }
+
+
     @PutMapping("update")
     public ApiResponse update(@ModelAttribute TopicRequest topicRequest){
         return topicService.update(topicRequest);

@@ -38,6 +38,7 @@ public class DataLoaderTest implements CommandLineRunner {
     private final TypeOfWorkRepository typeOfWorkRepository;
     private final SubjectRepository subjectRepository;
     private final LevelRepository levelRepository;
+    private final TopicRepository topicRepository;
     private final WareHouseRepository wareHouseRepository;
     private final SubjectLevelRepository subjectLevelRepository;
 
@@ -147,7 +148,9 @@ public class DataLoaderTest implements CommandLineRunner {
                     .build();
             subjectRepository.save(matemetika);
 
-            subjectLevelRepository.save(new SubjectLevel(1, true, matemetika, savedLavel, saveBranch));
+            SubjectLevel subjectLevel = subjectLevelRepository.save(new SubjectLevel(1, true, matemetika, savedLavel, saveBranch));
+            SubjectLevel subject = subjectLevelRepository.save(new SubjectLevel(2, true, matemetika, savedLavel, saveBranch));
+            topicRepository.save(new Topic(1, "aaa", null, null, LocalDateTime.now(), subject));
             journalService.create(new JournalRequest(1, 1, 1));
         }
     }
