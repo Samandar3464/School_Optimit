@@ -15,7 +15,7 @@ public class StudentController {
     private final StudentService service;
 
     @PostMapping("/create")
-    public ApiResponse create(@ModelAttribute StudentRequest studentRequest) {
+    public ApiResponse create(@ModelAttribute  StudentRequest studentRequest) {
         return service.create(studentRequest);
     }
 
@@ -41,9 +41,9 @@ public class StudentController {
         return service.getList(page, size, branchId);
     }
 
-    @GetMapping("/getAllByClassId/{id}/{branchId}")
-    public ApiResponse getAllByClassName(@PathVariable Integer id, @PathVariable Integer branchId) {
-        return service.getListByClassNumber(id, branchId);
+    @GetMapping("/getAllByClassId/{classId}/{branchId}")
+    public ApiResponse getAllByClassName(@PathVariable Integer classId, @PathVariable Integer branchId) {
+        return service.getListByClassNumber(classId, branchId);
     }
 
     @GetMapping("/getAllNeActiveStudents/{branchId}")

@@ -19,7 +19,6 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-
 public class StudentRequest {
 
     private Integer id;
@@ -46,15 +45,14 @@ public class StudentRequest {
 
     private Integer branchId;
 
-    private boolean active;
-
     private Integer paymentAmount;
 
     private MultipartFile medDocPhoto;
 
-    @Size(min = 9,max = 9)
+    @Size(min = 9, max = 9)
     private String phoneNumber;  // phoneNumber
 
+    @Size(min = 6)
     private String password;
 
 }

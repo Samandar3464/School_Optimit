@@ -1,7 +1,9 @@
 package com.example.service;
 
 import com.example.entity.*;
+import com.example.enums.Constants;
 import com.example.exception.*;
+import com.example.mappers.StudentMapper;
 import com.example.model.common.ApiResponse;
 import com.example.model.request.FamilyLoginDto;
 import com.example.model.request.StudentRequest;
@@ -25,6 +27,7 @@ import java.io.FileNotFoundException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static com.example.enums.Constants.*;
 
@@ -40,13 +43,18 @@ public class StudentService implements BaseService<StudentRequest, Integer> {
     private final ModelMapper modelMapper;
 
     @Override
-    @Transactional(rollbackFor = {FileNotFoundException.class, UserNotFoundException.class, FileInputException.class, OriginalFileNameNullException.class, InputException.class, RecordNotFoundException.class})
     public ApiResponse create(StudentRequest studentRequest) {
-        if (studentRepository.findByPhoneNumberAndPassword(studentRequest.getPhoneNumber(), studentRequest.getPassword()).isPresent()) {
-            throw new RecordNotFoundException(PHONE_NUMBER_ALREADY_REGISTERED);
+        Optional<Student> byPhoneNumberAndPassword = studentRepository.findByPhoneNumberAndPassword(studentRequest.getPhoneNumber(), studentRequest.getPassword());
+        if (byPhoneNumberAndPassword.isPresent()) {
+            throw new RecordAlreadyExistException(PHONE_NUMBER_ALREADY_REGISTERED);
         }
-        Student student = modelMapper.map(studentRequest, Student.class);
-        setStudent(studentRequest, student);
+        Branch branch = branchRepository.findByIdAndDeleteFalse(studentRequest.getBranchId())
+                .orElseThrow(() -> new RecordNotFoundException(Constants.BRANCH_NOT_FOUND));
+        StudentClass studentClass = studentClassRepository.findByIdAndActiveTrue(studentRequest.getStudentClassId())
+                .orElseThrow(() -> new RecordNotFoundException(Constants.STUDENT_CLASS_NOT_FOUND));
+
+        Student student = StudentMapper.toEntity(studentRequest, studentClass, branch);
+        savePhotosIfExists(studentRequest,student);
         studentRepository.save(student);
         StudentResponse studentResponse = getStudentResponse(student);
         return new ApiResponse(SUCCESSFULLY, true, studentResponse);
@@ -64,26 +72,22 @@ public class StudentService implements BaseService<StudentRequest, Integer> {
     @Transactional(rollbackFor = {FileNotFoundException.class, UserNotFoundException.class, FileInputException.class, OriginalFileNameNullException.class, InputException.class, RecordNotFoundException.class})
     public ApiResponse update(StudentRequest studentRequest) {
 
-        Student student = modelMapper.map(studentRequest, Student.class);
-
-        Student old = studentRepository.findByIdAndActiveTrue(studentRequest.getId())
-                .orElseThrow(() -> new UserNotFoundException(STUDENT_NOT_FOUND));
-
         Branch branch = branchRepository.findById(studentRequest.getBranchId())
                 .orElseThrow(() -> new RecordNotFoundException(BRANCH_NOT_FOUND));
 
         StudentClass studentClass = studentClassRepository.findById(studentRequest.getStudentClassId())
                 .orElseThrow(() -> new RecordNotFoundException(CLASS_NOT_FOUND));
 
+        Student student = StudentMapper.toEntity(studentRequest,studentClass,branch);
+
+        Student old = studentRepository.findByIdAndActiveTrue(studentRequest.getId())
+                .orElseThrow(() -> new UserNotFoundException(STUDENT_NOT_FOUND));
+
+        student.setAccountNumber(old.getAccountNumber());
+        student.setId(old.getId());
         deletePhotosIfExists(old);
         savePhotosIfExists(studentRequest, student);
-
-        student.setActive(true);
-        student.setAddedTime(LocalDateTime.now());
-        student.setBranch(branch);
-        student.setStudentClass(studentClass);
         studentRepository.save(student);
-
         StudentResponse response = getStudentResponse(student);
         return new ApiResponse(SUCCESSFULLY, true, response);
     }
@@ -192,19 +196,5 @@ public class StudentService implements BaseService<StudentRequest, Integer> {
         Student student = studentRepository.findByPhoneNumberAndPassword(dto.getPhoneNumber(), dto.getPassword()).orElseThrow(() -> new RecordNotFoundException(STUDENT_NOT_FOUND));
         Journal journal = journalRepository.findByStudentClassIdAndActiveTrue(student.getStudentClass().getId()).orElseThrow(() -> new RecordNotFoundException(JOURNAL_NOT_FOUND));
         return new ApiResponse(SUCCESSFULLY, true, getStudentResponse(student));
-    }
-
-
-    private void setStudent(StudentRequest studentRequest, Student student) {
-        Branch branch = branchRepository.findById(studentRequest.getBranchId())
-                .orElseThrow(() -> new RecordNotFoundException(BRANCH_NOT_FOUND));
-        StudentClass studentClass = studentClassRepository.findById(studentRequest.getStudentClassId())
-                .orElseThrow(() -> new RecordNotFoundException(CLASS_NOT_FOUND));
-
-        savePhotosIfExists(studentRequest,student);
-        student.setActive(true);
-        student.setAddedTime(LocalDateTime.now());
-        student.setBranch(branch);
-        student.setStudentClass(studentClass);
     }
 }
