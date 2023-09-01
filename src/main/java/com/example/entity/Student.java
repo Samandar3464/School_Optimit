@@ -57,7 +57,6 @@ public class Student {
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     private LocalDateTime addedTime;
 
-    @Column(nullable = false)
     @OneToMany(cascade = CascadeType.ALL)
     private List<Attachment> docPhoto; // guvohnoma yoki pasport rasmi
 
