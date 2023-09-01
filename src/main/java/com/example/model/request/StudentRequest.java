@@ -24,28 +24,22 @@ public class StudentRequest {
 
     private Integer id;
 
-    @Column(nullable = false)
     private String firstName;
 
-    @Column(nullable = false)
     private String lastName;
 
-    @Column(nullable = false)
     private String fatherName;
 
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     @JsonDeserialize(using = LocalDateDeserializer.class)
     private LocalDate birthDate;
 
-    @Column(nullable = false)
     private String docNumber;
 
-    @Column(nullable = false)
     private List<MultipartFile> docPhoto;
 
     private MultipartFile reference;
 
-    @Column(nullable = false)
     private MultipartFile photo;
 
     private Integer studentClassId;
