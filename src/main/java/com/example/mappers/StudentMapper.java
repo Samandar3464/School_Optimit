@@ -36,10 +36,9 @@ public class StudentMapper {
         student.setBirthDate(studentRequest.getBirthDate());
         student.setFirstName(studentRequest.getFirstName());
         student.setFatherName(studentRequest.getFatherName());
-        if (studentRequest.getPassword() != null) {
-            student.setPassword(studentRequest.getPassword());
-        }
+
         student.setPhoneNumber(studentRequest.getPhoneNumber());
+        student.setPassword(studentRequest.getPassword());
         student.setPaymentAmount(studentRequest.getPaymentAmount());
     }
 }

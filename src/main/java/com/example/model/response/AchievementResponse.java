@@ -19,7 +19,11 @@ public class AchievementResponse {
 
     private String aboutAchievement;
 
+<<<<<<< HEAD
     private Integer photoCertificateId;
+=======
+    private String photoCertificate;
+>>>>>>> 67ccb880a99b336fb6ab7fc42bff89f882b33348
 
     private Integer userId;
 }

@@ -10,7 +10,14 @@ import com.example.model.request.StudentRequest;
 import com.example.model.response.StudentClassResponse;
 import com.example.model.response.StudentResponse;
 import com.example.model.response.StudentResponseListForAdmin;
+<<<<<<< HEAD
 import com.example.repository.*;
+=======
+import com.example.repository.BranchRepository;
+import com.example.repository.JournalRepository;
+import com.example.repository.StudentClassRepository;
+import com.example.repository.StudentRepository;
+>>>>>>> 67ccb880a99b336fb6ab7fc42bff89f882b33348
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
@@ -22,7 +29,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.FileNotFoundException;
 import java.time.LocalDateTime;
+<<<<<<< HEAD
 import java.util.*;
+=======
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+>>>>>>> 67ccb880a99b336fb6ab7fc42bff89f882b33348
 
 import static com.example.enums.Constants.*;
 
@@ -31,7 +44,11 @@ import static com.example.enums.Constants.*;
 public class StudentService implements BaseService<StudentRequest, Integer> {
 
     private final StudentRepository studentRepository;
+<<<<<<< HEAD
     private final AttachmentRepository attachmentRepository;
+=======
+    private final AttachmentService attachmentService;
+>>>>>>> 67ccb880a99b336fb6ab7fc42bff89f882b33348
     private final StudentClassRepository studentClassRepository;
     private final BranchRepository branchRepository;
     private final JournalRepository journalRepository;
@@ -49,7 +66,11 @@ public class StudentService implements BaseService<StudentRequest, Integer> {
                 .orElseThrow(() -> new RecordNotFoundException(Constants.STUDENT_CLASS_NOT_FOUND));
 
         Student student = StudentMapper.toEntity(studentRequest, studentClass, branch);
+<<<<<<< HEAD
         savePhotosIfExists(studentRequest, student, false);
+=======
+        savePhotosIfExists(studentRequest,student);
+>>>>>>> 67ccb880a99b336fb6ab7fc42bff89f882b33348
         studentRepository.save(student);
         StudentResponse studentResponse = getStudentResponse(student);
         return new ApiResponse(SUCCESSFULLY, true, studentResponse);
@@ -73,19 +94,31 @@ public class StudentService implements BaseService<StudentRequest, Integer> {
         StudentClass studentClass = studentClassRepository.findById(studentRequest.getStudentClassId())
                 .orElseThrow(() -> new RecordNotFoundException(CLASS_NOT_FOUND));
 
+<<<<<<< HEAD
+=======
+        Student student = StudentMapper.toEntity(studentRequest,studentClass,branch);
+>>>>>>> 67ccb880a99b336fb6ab7fc42bff89f882b33348
 
         Student old = studentRepository.findByIdAndActiveTrue(studentRequest.getId())
                 .orElseThrow(() -> new UserNotFoundException(STUDENT_NOT_FOUND));
 
+<<<<<<< HEAD
         Student student = StudentMapper.update(studentRequest, studentClass, branch, old);
         student.setAccountNumber(old.getAccountNumber());
         student.setId(old.getId());
         savePhotosIfExists(studentRequest, student, true);
+=======
+        student.setAccountNumber(old.getAccountNumber());
+        student.setId(old.getId());
+        deletePhotosIfExists(old);
+        savePhotosIfExists(studentRequest, student);
+>>>>>>> 67ccb880a99b336fb6ab7fc42bff89f882b33348
         studentRepository.save(student);
         StudentResponse response = getStudentResponse(student);
         return new ApiResponse(SUCCESSFULLY, true, response);
     }
 
+<<<<<<< HEAD
     private void savePhotosIfExists(StudentRequest studentRequest, Student student, boolean isUpdate) {
         if (studentRequest.getPhotoId() != null) {
             if (student.getPhoto() != null && isUpdate)
@@ -123,6 +156,46 @@ public class StudentService implements BaseService<StudentRequest, Integer> {
         }
     }
 
+=======
+    private void savePhotosIfExists(StudentRequest studentRequest, Student student) {
+        if (studentRequest.getPhoto() != null) {
+            Attachment photo = attachmentService.saveToSystem(studentRequest.getPhoto());
+            student.setPhoto(photo);
+        }
+
+        if (studentRequest.getReference() != null) {
+            Attachment photo = attachmentService.saveToSystem(studentRequest.getReference());
+            student.setReference(photo);
+        }
+
+        if (studentRequest.getMedDocPhoto() != null) {
+            Attachment photo = attachmentService.saveToSystem(studentRequest.getMedDocPhoto());
+            student.setMedDocPhoto(photo);
+        }
+
+        if (studentRequest.getDocPhoto() != null) {
+            List<Attachment> attachments = attachmentService.saveToSystemListFile(studentRequest.getDocPhoto());
+            student.setDocPhoto(attachments);
+        }
+    }
+
+    private void deletePhotosIfExists(Student old) {
+        if (old.getPhoto() != null) {
+            attachmentService.deleteNewName(old.getPhoto());
+        }
+        if (old.getReference() != null) {
+            attachmentService.deleteNewName(old.getReference());
+        }
+        if (old.getDocPhoto() != null) {
+            old.getDocPhoto().forEach(attachmentService::deleteNewName);
+        }
+        if (old.getMedDocPhoto() != null) {
+            attachmentService.deleteNewName(old.getMedDocPhoto());
+        }
+    }
+
+
+>>>>>>> 67ccb880a99b336fb6ab7fc42bff89f882b33348
     @Override
     public ApiResponse delete(Integer integer) {
         Student student = studentRepository.findByIdAndActiveTrue(integer)
@@ -138,7 +211,11 @@ public class StudentService implements BaseService<StudentRequest, Integer> {
         Page<Student> students = studentRepository.findAllByBranchIdAndActiveTrue(pageable, branchId);
         List<StudentResponse> studentResponseList = new ArrayList<>();
         students.forEach(student -> studentResponseList.add(getStudentResponse(student)));
+<<<<<<< HEAD
         studentResponseList.sort(Comparator.comparing(StudentResponse::getLastName).reversed());
+=======
+
+>>>>>>> 67ccb880a99b336fb6ab7fc42bff89f882b33348
         StudentResponseListForAdmin admin = new StudentResponseListForAdmin(
                 studentResponseList,
                 students.getTotalElements(),
@@ -152,6 +229,7 @@ public class StudentService implements BaseService<StudentRequest, Integer> {
 
         StudentClassResponse classResponse = modelMapper.map(student.getStudentClass(), StudentClassResponse.class);
 
+<<<<<<< HEAD
         studentResponse.setPhotoId(student.getPhoto() == null ? null
                 : student.getPhoto().getId());
 
@@ -168,11 +246,27 @@ public class StudentService implements BaseService<StudentRequest, Integer> {
 
 //        studentResponse.setReferenceId(student.getReference() == null ? null
 //                : student.getReference().getId());
+=======
+        studentResponse.setPhoto(student.getPhoto() == null ? null
+                : attachmentService.getUrl(student.getPhoto()));
+
+        studentResponse.setDocPhoto(student.getDocPhoto() == null ? null
+                : attachmentService.getUrlList(student.getDocPhoto()));
+
+        studentResponse.setMedDocPhoto(student.getMedDocPhoto() == null ? null
+                : attachmentService.getUrl(student.getMedDocPhoto()));
+
+        studentResponse.setReference(student.getReference() == null ? null
+                : attachmentService.getUrl(student.getReference()));
+>>>>>>> 67ccb880a99b336fb6ab7fc42bff89f882b33348
 
         studentResponse.setAddedTime(student.getAddedTime().toString());
         studentResponse.setBirthDate(student.getBirthDate().toString());
         studentResponse.setStudentClass(classResponse);
+<<<<<<< HEAD
         studentResponse.setBranch(student.getBranch());
+=======
+>>>>>>> 67ccb880a99b336fb6ab7fc42bff89f882b33348
 
         return studentResponse;
     }
@@ -196,6 +290,7 @@ public class StudentService implements BaseService<StudentRequest, Integer> {
         Journal journal = journalRepository.findByStudentClassIdAndActiveTrue(student.getStudentClass().getId()).orElseThrow(() -> new RecordNotFoundException(JOURNAL_NOT_FOUND));
         return new ApiResponse(SUCCESSFULLY, true, getStudentResponse(student));
     }
+<<<<<<< HEAD
 
     public ApiResponse search(String name) {
         List<Student> search = studentRepository.findAllByFirstNameContainingIgnoreCaseAndActiveTrue(name);
@@ -211,4 +306,6 @@ public class StudentService implements BaseService<StudentRequest, Integer> {
         }
         return new ApiResponse("all", true, arrayList);
     }
+=======
+>>>>>>> 67ccb880a99b336fb6ab7fc42bff89f882b33348
 }

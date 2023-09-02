@@ -15,4 +15,8 @@ public class StudentResponseListForAdmin {
     private long allSize;
     private int allPage;
     private int currentPage;
+<<<<<<< HEAD
+=======
+
+>>>>>>> 67ccb880a99b336fb6ab7fc42bff89f882b33348
 }

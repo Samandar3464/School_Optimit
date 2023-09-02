@@ -19,7 +19,11 @@ public class TopicRequest {
 
     private String name;
 
+<<<<<<< HEAD
     private List<Integer> lessonFilesIds;
+=======
+    private List<MultipartFile> lessonFiles;
+>>>>>>> 67ccb880a99b336fb6ab7fc42bff89f882b33348
 
     private List<String> useFullLinks;
 

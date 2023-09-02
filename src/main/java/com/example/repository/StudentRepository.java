@@ -26,8 +26,11 @@ public interface StudentRepository extends JpaRepository<Student, Integer> {
     Optional<Student> findByAccountNumberAndActiveTrue(String accountNumber);
 
     Optional<Student> findByPhoneNumberAndPassword(String phoneNumber, String password);
+<<<<<<< HEAD
 
     List<Student> findAllByFirstNameContainingIgnoreCaseAndActiveTrue(String firstName);
     List<Student> findAllByLastNameContainingIgnoreCaseAndActiveTrue(String lastname);
     List<Student> findAllByDocNumberContainingIgnoreCaseAndActiveTrue(String docNumber);
+=======
+>>>>>>> 67ccb880a99b336fb6ab7fc42bff89f882b33348
 }

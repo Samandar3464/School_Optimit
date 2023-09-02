@@ -59,7 +59,11 @@ public class UserRegisterDto {
     @JsonDeserialize(using = LocalDateDeserializer.class)
     private LocalDate birthDate;
 
+<<<<<<< HEAD
     private Integer profilePhotoId;
+=======
+    private MultipartFile profilePhoto;
+>>>>>>> 67ccb880a99b336fb6ab7fc42bff89f882b33348
 
     private Integer roleId;
 

@@ -18,7 +18,11 @@ public class TopicResponse {
 
     private SubjectLevel subjectLevel;
 
+<<<<<<< HEAD
     private List<Integer> lessonFilesId;
+=======
+    private List<String> lessonFiles;
+>>>>>>> 67ccb880a99b336fb6ab7fc42bff89f882b33348
 
     private  List<String> useFullLinks;
 }

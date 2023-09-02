@@ -10,8 +10,13 @@ import com.example.kitchen.model.response.DailyMealResponse;
 import com.example.kitchen.model.response.DailyMealResponsePage;
 import com.example.kitchen.repository.DailyMealRepository;
 import com.example.model.common.ApiResponse;
+<<<<<<< HEAD
 import com.example.repository.AttachmentRepository;
 import com.example.repository.BranchRepository;
+=======
+import com.example.repository.BranchRepository;
+import com.example.service.AttachmentService;
+>>>>>>> 67ccb880a99b336fb6ab7fc42bff89f882b33348
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
@@ -26,9 +31,15 @@ import java.util.List;
 public class DailyMealService implements BaseService<DailyMealRequest, Integer> {
 
     private final DailyMealRepository dailyMealRepository;
+<<<<<<< HEAD
     private final BranchRepository branchRepository;
     private final ModelMapper modelMapper;
     private final AttachmentRepository attachmentRepository;
+=======
+    private final AttachmentService attachmentService;
+    private final BranchRepository branchRepository;
+    private final ModelMapper modelMapper;
+>>>>>>> 67ccb880a99b336fb6ab7fc42bff89f882b33348
 
 
     @Override
@@ -101,14 +112,25 @@ public class DailyMealService implements BaseService<DailyMealRequest, Integer> 
 
     private DailyMealResponse getDailyMealResponse(DailyMeal dailyMeal) {
         DailyMealResponse response = modelMapper.map(dailyMeal, DailyMealResponse.class);
+<<<<<<< HEAD
         response.setPhotoId(dailyMeal.getPhoto().getId());
+=======
+        String url = attachmentService.getUrl(dailyMeal.getPhoto());
+        response.setPhoto(url);
+>>>>>>> 67ccb880a99b336fb6ab7fc42bff89f882b33348
         return response;
     }
 
     private void setDailyMeal(DailyMealRequest dailyMealRequest, DailyMeal dailyMeal) {
         Branch branch = branchRepository.findByIdAndDeleteFalse(dailyMealRequest.getBranchId())
                 .orElseThrow(() -> new RecordNotFoundException(Constants.DAILY_MEAL));
+<<<<<<< HEAD
         attachmentRepository.findAllById(dailyMealRequest.getPhotoId()).ifPresent(dailyMeal::setPhoto);
+=======
+        Attachment attachment = attachmentService.saveToSystem(dailyMealRequest.getPhoto());
+
+        dailyMeal.setPhoto(attachment);
+>>>>>>> 67ccb880a99b336fb6ab7fc42bff89f882b33348
         dailyMeal.setBranch(branch);
     }
 }

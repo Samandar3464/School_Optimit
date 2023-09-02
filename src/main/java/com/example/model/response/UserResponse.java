@@ -31,7 +31,11 @@ public class UserResponse {
 
     private String phoneNumber;
 
+<<<<<<< HEAD
     private Integer profilePhotoId;
+=======
+    private String profilePhotoUrl;
+>>>>>>> 67ccb880a99b336fb6ab7fc42bff89f882b33348
 
     private String birthDate;
 
