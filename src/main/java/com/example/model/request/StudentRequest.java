@@ -35,11 +35,17 @@ public class StudentRequest {
 
     private String docNumber;
 
+<<<<<<< HEAD
+    private List<Integer> docPhotoIds;
+
+    private Integer photoId;
+=======
     private List<MultipartFile> docPhoto;
 
     private MultipartFile reference;
 
     private MultipartFile photo;
+>>>>>>> 67ccb880a99b336fb6ab7fc42bff89f882b33348
 
     private Integer studentClassId;
 
@@ -47,7 +53,11 @@ public class StudentRequest {
 
     private Integer paymentAmount;
 
+<<<<<<< HEAD
+    private Integer medDocPhotoId;
+=======
     private MultipartFile medDocPhoto;
+>>>>>>> 67ccb880a99b336fb6ab7fc42bff89f882b33348
 
     @Size(min = 9, max = 9)
     private String phoneNumber;  // phoneNumber

@@ -6,10 +6,15 @@ import com.example.exception.RecordNotFoundException;
 import com.example.model.common.ApiResponse;
 import com.example.model.request.TopicRequest;
 import com.example.model.response.TopicResponse;
+<<<<<<< HEAD
+import com.example.repository.*;
+import jakarta.persistence.Id;
+=======
 import com.example.repository.LevelRepository;
 import com.example.repository.SubjectLevelRepository;
 import com.example.repository.SubjectRepository;
 import com.example.repository.TopicRepository;
+>>>>>>> 67ccb880a99b336fb6ab7fc42bff89f882b33348
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Sort;
@@ -28,8 +33,13 @@ public class TopicService implements BaseService<TopicRequest, Integer> {
 
     private final TopicRepository topicRepository;
     private final SubjectLevelRepository subjectLevelRepository;
+<<<<<<< HEAD
+    private final ModelMapper modelMapper;
+    private final AttachmentRepository attachmentRepository;
+=======
     private final AttachmentService attachmentService;
     private final ModelMapper modelMapper;
+>>>>>>> 67ccb880a99b336fb6ab7fc42bff89f882b33348
 
     @Override
     public ApiResponse create(TopicRequest dto) {
@@ -68,7 +78,11 @@ public class TopicService implements BaseService<TopicRequest, Integer> {
         Topic oldTopic = topicRepository.findById(id)
                 .orElseThrow(() -> new RecordNotFoundException(TOPIC_NOT_FOUND));
         topicRepository.deleteById(id);
+<<<<<<< HEAD
+        attachmentRepository.deleteAll(oldTopic.getLessonFiles());
+=======
         oldTopic.getLessonFiles().forEach(attachmentService::deleteNewName);
+>>>>>>> 67ccb880a99b336fb6ab7fc42bff89f882b33348
         return new ApiResponse(DELETED, true);
     }
 
@@ -95,10 +109,16 @@ public class TopicService implements BaseService<TopicRequest, Integer> {
     private void setTopic(TopicRequest dto, Topic topic) {
         SubjectLevel subjectLevel = subjectLevelRepository.findById(dto.getSubjectLevelId())
                 .orElseThrow(() -> new RecordNotFoundException(SUBJECT_LEVEL_NOT_FOUND));
+<<<<<<< HEAD
+        if (dto.getLessonFilesIds() != null) {
+            List<Attachment> attachmentList = attachmentRepository.findAllById(dto.getLessonFilesIds());
+            topic.setLessonFiles(attachmentList);
+=======
         if (dto.getLessonFiles() != null) {
             List<Attachment> attachments =
                     attachmentService.saveToSystemListFile(dto.getLessonFiles());
             topic.setLessonFiles(attachments);
+>>>>>>> 67ccb880a99b336fb6ab7fc42bff89f882b33348
         }
 
         topic.setCreationDate(LocalDateTime.now());
@@ -120,9 +140,19 @@ public class TopicService implements BaseService<TopicRequest, Integer> {
         response.setId(topic.getId());
         response.setSubjectLevel(topic.getSubjectLevel());
         response.setUseFullLinks(topic.getUseFullLinks() == null ? null : topic.getUseFullLinks());
+<<<<<<< HEAD
+        if (response.getLessonFilesId() != null) {
+           List<Integer> integerList = new ArrayList<>();
+            List<Attachment> lessonFiles = topic.getLessonFiles();
+            for (Attachment lessonFile : lessonFiles) {
+                integerList.add(lessonFile.getId());
+            }
+            response.setLessonFilesId(integerList);
+=======
         if (response.getLessonFiles() != null) {
             List<String> urlList = attachmentService.getUrlList(topic.getLessonFiles());
             response.setLessonFiles(urlList);
+>>>>>>> 67ccb880a99b336fb6ab7fc42bff89f882b33348
         }
         return response;
     }

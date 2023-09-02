@@ -15,7 +15,11 @@ public class DailyMealRequest {
 
     private String name;
 
+<<<<<<< HEAD
+    private Integer photoId;
+=======
     private MultipartFile photo;
+>>>>>>> 67ccb880a99b336fb6ab7fc42bff89f882b33348
 
     private WeekDays day;
 

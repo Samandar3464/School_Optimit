@@ -5,6 +5,11 @@ import com.example.model.request.FamilyLoginDto;
 import com.example.model.request.StudentRequest;
 import com.example.service.StudentService;
 import lombok.RequiredArgsConstructor;
+<<<<<<< HEAD
+import org.springframework.http.HttpEntity;
+import org.springframework.http.ResponseEntity;
+=======
+>>>>>>> 67ccb880a99b336fb6ab7fc42bff89f882b33348
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -15,7 +20,11 @@ public class StudentController {
     private final StudentService service;
 
     @PostMapping("/create")
+<<<<<<< HEAD
+    public ApiResponse create(@RequestBody StudentRequest studentRequest) {
+=======
     public ApiResponse create(@ModelAttribute  StudentRequest studentRequest) {
+>>>>>>> 67ccb880a99b336fb6ab7fc42bff89f882b33348
         return service.create(studentRequest);
     }
 
@@ -25,7 +34,11 @@ public class StudentController {
     }
 
     @PutMapping("/update")
+<<<<<<< HEAD
+    public ApiResponse update(@RequestBody StudentRequest studentRequest) {
+=======
     public ApiResponse update(@ModelAttribute StudentRequest studentRequest) {
+>>>>>>> 67ccb880a99b336fb6ab7fc42bff89f882b33348
         return service.update(studentRequest);
     }
 
@@ -56,4 +69,13 @@ public class StudentController {
         return service.studentLogIn(studentLogin);
     }
 
+<<<<<<< HEAD
+    @GetMapping("/search")
+    public HttpEntity<?> search(@RequestParam String name) {
+        ApiResponse apiResponse = service.search(name);
+        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
+    }
+
+=======
+>>>>>>> 67ccb880a99b336fb6ab7fc42bff89f882b33348
 }
