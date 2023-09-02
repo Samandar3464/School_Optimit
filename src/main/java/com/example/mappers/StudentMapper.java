@@ -3,11 +3,7 @@ package com.example.mappers;
 import com.example.entity.Branch;
 import com.example.entity.Student;
 import com.example.entity.StudentClass;
-import com.example.enums.Constants;
-import com.example.exception.RecordNotFoundException;
 import com.example.model.request.StudentRequest;
-import com.example.repository.BranchRepository;
-import com.example.repository.StudentClassRepository;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 
