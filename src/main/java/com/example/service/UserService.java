@@ -47,7 +47,8 @@ public class UserService implements BaseService<UserRegisterDto, Integer> {
     private final PasswordEncoder passwordEncoder;
     private final BranchRepository branchRepository;
     private final SubjectLevelRepository subjectLevelRepository;
-    private final AttachmentService attachmentService;
+    //    private final AttachmentService attachmentService;
+    private final AttachmentRepository attachmentRepository;
     private final AuthenticationManager authenticationManager;
     private final FireBaseMessagingService fireBaseMessagingService;
 
@@ -56,7 +57,9 @@ public class UserService implements BaseService<UserRegisterDto, Integer> {
     @Override
     public ApiResponse create(UserRegisterDto userRegisterDto) {
         User user = setAndCheckUser(userRegisterDto);
-        user.setProfilePhoto(userRegisterDto.getProfilePhoto() == null ? null : attachmentService.saveToSystem(userRegisterDto.getProfilePhoto()));
+        if (userRegisterDto.getProfilePhotoId() != null) {
+            attachmentRepository.findAllById(userRegisterDto.getId()).ifPresent(user::setProfilePhoto);
+        }
         userRepository.save(user);
         UserResponse response = toUserResponse(user);
         return new ApiResponse(SUCCESSFULLY, true, response);
@@ -211,9 +214,8 @@ public class UserService implements BaseService<UserRegisterDto, Integer> {
         UserResponse response = modelMapper.map(user, UserResponse.class);
         response.setBirthDate(user.getBirthDate().toString());
         response.setRegisteredDate(user.getRegisteredDate().toString());
-        response.setProfilePhotoUrl(attachmentService.getUrl(user.getProfilePhoto()));
-        response.setProfilePhotoUrl(getPhotoLink(user.getProfilePhoto()));
-        
+        response.setProfilePhotoId(user.getProfilePhoto() == null ? null : user.getProfilePhoto().getId());
+
         response.setBusinessId(user.getBranch() == null ? null : user.getBranch().getBusiness().getId());
         return response;
     }
@@ -239,18 +241,17 @@ public class UserService implements BaseService<UserRegisterDto, Integer> {
     public String getPhotoLink(Attachment attachment) {
         String photoLink = "https://sb.kaleidousercontent.com/67418/992x558/7632960ff9/people.png";
         if (attachment != null) {
-            photoLink = attachmentService.attachUploadFolder + attachment.getPath() + "/" + attachment.getNewName() + "." + attachment.getType();
+//            photoLink = attachmentService.attachUploadFolder + attachment.getPath() + "/" + attachment.getNewName() + "." + attachment.getType();
         }
         return photoLink;
     }
 
     private void setPhotoIfIsExist(UserRegisterDto userRegisterDto, User user) {
-        if (userRegisterDto.getProfilePhoto() != null) {
-            Attachment attachment = attachmentService.saveToSystem(userRegisterDto.getProfilePhoto());
+        if (userRegisterDto.getProfilePhotoId() != null) {
             if (user.getProfilePhoto() != null) {
-                attachmentService.deleteNewName(user.getProfilePhoto());
+                attachmentRepository.delete(user.getProfilePhoto());
             }
-            user.setProfilePhoto(attachment);
+            attachmentRepository.findAllById(userRegisterDto.getProfilePhotoId()).ifPresent(user::setProfilePhoto);
         }
     }
 

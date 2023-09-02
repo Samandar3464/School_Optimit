@@ -6,10 +6,8 @@ import com.example.exception.RecordNotFoundException;
 import com.example.model.common.ApiResponse;
 import com.example.model.request.TopicRequest;
 import com.example.model.response.TopicResponse;
-import com.example.repository.LevelRepository;
-import com.example.repository.SubjectLevelRepository;
-import com.example.repository.SubjectRepository;
-import com.example.repository.TopicRepository;
+import com.example.repository.*;
+import jakarta.persistence.Id;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Sort;
@@ -28,8 +26,8 @@ public class TopicService implements BaseService<TopicRequest, Integer> {
 
     private final TopicRepository topicRepository;
     private final SubjectLevelRepository subjectLevelRepository;
-    private final AttachmentService attachmentService;
     private final ModelMapper modelMapper;
+    private final AttachmentRepository attachmentRepository;
 
     @Override
     public ApiResponse create(TopicRequest dto) {
@@ -68,7 +66,7 @@ public class TopicService implements BaseService<TopicRequest, Integer> {
         Topic oldTopic = topicRepository.findById(id)
                 .orElseThrow(() -> new RecordNotFoundException(TOPIC_NOT_FOUND));
         topicRepository.deleteById(id);
-        oldTopic.getLessonFiles().forEach(attachmentService::deleteNewName);
+        attachmentRepository.deleteAll(oldTopic.getLessonFiles());
         return new ApiResponse(DELETED, true);
     }
 
@@ -95,10 +93,9 @@ public class TopicService implements BaseService<TopicRequest, Integer> {
     private void setTopic(TopicRequest dto, Topic topic) {
         SubjectLevel subjectLevel = subjectLevelRepository.findById(dto.getSubjectLevelId())
                 .orElseThrow(() -> new RecordNotFoundException(SUBJECT_LEVEL_NOT_FOUND));
-        if (dto.getLessonFiles() != null) {
-            List<Attachment> attachments =
-                    attachmentService.saveToSystemListFile(dto.getLessonFiles());
-            topic.setLessonFiles(attachments);
+        if (dto.getLessonFilesIds() != null) {
+            List<Attachment> attachmentList = attachmentRepository.findAllById(dto.getLessonFilesIds());
+            topic.setLessonFiles(attachmentList);
         }
 
         topic.setCreationDate(LocalDateTime.now());
@@ -120,9 +117,13 @@ public class TopicService implements BaseService<TopicRequest, Integer> {
         response.setId(topic.getId());
         response.setSubjectLevel(topic.getSubjectLevel());
         response.setUseFullLinks(topic.getUseFullLinks() == null ? null : topic.getUseFullLinks());
-        if (response.getLessonFiles() != null) {
-            List<String> urlList = attachmentService.getUrlList(topic.getLessonFiles());
-            response.setLessonFiles(urlList);
+        if (response.getLessonFilesId() != null) {
+           List<Integer> integerList = new ArrayList<>();
+            List<Attachment> lessonFiles = topic.getLessonFiles();
+            for (Attachment lessonFile : lessonFiles) {
+                integerList.add(lessonFile.getId());
+            }
+            response.setLessonFilesId(integerList);
         }
         return response;
     }

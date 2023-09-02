@@ -19,7 +19,7 @@ public class TopicRequest {
 
     private String name;
 
-    private List<MultipartFile> lessonFiles;
+    private List<Integer> lessonFilesIds;
 
     private List<String> useFullLinks;
 

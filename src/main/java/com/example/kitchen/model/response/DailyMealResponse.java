@@ -15,7 +15,7 @@ public class DailyMealResponse {
 
     private String name;
 
-    private String photo;
+    private Integer photoId;
 
     private WeekDays day;
 

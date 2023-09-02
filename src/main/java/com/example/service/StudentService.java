@@ -10,10 +10,7 @@ import com.example.model.request.StudentRequest;
 import com.example.model.response.StudentClassResponse;
 import com.example.model.response.StudentResponse;
 import com.example.model.response.StudentResponseListForAdmin;
-import com.example.repository.BranchRepository;
-import com.example.repository.JournalRepository;
-import com.example.repository.StudentClassRepository;
-import com.example.repository.StudentRepository;
+import com.example.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
@@ -25,9 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.FileNotFoundException;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static com.example.enums.Constants.*;
 
@@ -36,7 +31,7 @@ import static com.example.enums.Constants.*;
 public class StudentService implements BaseService<StudentRequest, Integer> {
 
     private final StudentRepository studentRepository;
-    private final AttachmentService attachmentService;
+    private final AttachmentRepository attachmentRepository;
     private final StudentClassRepository studentClassRepository;
     private final BranchRepository branchRepository;
     private final JournalRepository journalRepository;
@@ -54,7 +49,7 @@ public class StudentService implements BaseService<StudentRequest, Integer> {
                 .orElseThrow(() -> new RecordNotFoundException(Constants.STUDENT_CLASS_NOT_FOUND));
 
         Student student = StudentMapper.toEntity(studentRequest, studentClass, branch);
-        savePhotosIfExists(studentRequest,student);
+        savePhotosIfExists(studentRequest, student, false);
         studentRepository.save(student);
         StudentResponse studentResponse = getStudentResponse(student);
         return new ApiResponse(SUCCESSFULLY, true, studentResponse);
@@ -78,57 +73,55 @@ public class StudentService implements BaseService<StudentRequest, Integer> {
         StudentClass studentClass = studentClassRepository.findById(studentRequest.getStudentClassId())
                 .orElseThrow(() -> new RecordNotFoundException(CLASS_NOT_FOUND));
 
-        Student student = StudentMapper.toEntity(studentRequest,studentClass,branch);
 
         Student old = studentRepository.findByIdAndActiveTrue(studentRequest.getId())
                 .orElseThrow(() -> new UserNotFoundException(STUDENT_NOT_FOUND));
 
+        Student student = StudentMapper.update(studentRequest, studentClass, branch, old);
         student.setAccountNumber(old.getAccountNumber());
         student.setId(old.getId());
-        deletePhotosIfExists(old);
-        savePhotosIfExists(studentRequest, student);
+        savePhotosIfExists(studentRequest, student, true);
         studentRepository.save(student);
         StudentResponse response = getStudentResponse(student);
         return new ApiResponse(SUCCESSFULLY, true, response);
     }
 
-    private void savePhotosIfExists(StudentRequest studentRequest, Student student) {
-        if (studentRequest.getPhoto() != null) {
-            Attachment photo = attachmentService.saveToSystem(studentRequest.getPhoto());
-            student.setPhoto(photo);
+    private void savePhotosIfExists(StudentRequest studentRequest, Student student, boolean isUpdate) {
+        if (studentRequest.getPhotoId() != null) {
+            if (student.getPhoto() != null && isUpdate)
+                attachmentRepository.delete(student.getPhoto());
+//                attachmentService.deleteNewName(student.getPhoto());
+//            Attachment photo = attachmentService.saveToSystem(studentRequest.getPhoto());
+            attachmentRepository.findAllById(studentRequest.getPhotoId()).ifPresent(student::setPhoto);
         }
 
-        if (studentRequest.getReference() != null) {
-            Attachment photo = attachmentService.saveToSystem(studentRequest.getReference());
-            student.setReference(photo);
-        }
+//        if (studentRequest.getReferenceId() != null) {
+//            if (student.getReference() != null && isUpdate)
+//                attachmentRepository.delete(student.getReference());
+////                attachmentService.deleteNewName(student.getReference());
+////            Attachment photo = attachmentService.saveToSystem(studentRequest.getReference());
+////            student.setReference(photo);
+//            attachmentRepository.findById(studentRequest.getReferenceId()).ifPresent(student::setReference);
+//        }
 
-        if (studentRequest.getMedDocPhoto() != null) {
+        if (studentRequest.getMedDocPhotoId() != null) {
+            if (student.getMedDocPhoto() != null && isUpdate)
+                attachmentRepository.delete(student.getMedDocPhoto());
+               /* student.getDocPhoto().forEach(attachmentService::deleteNewName);
             Attachment photo = attachmentService.saveToSystem(studentRequest.getMedDocPhoto());
-            student.setMedDocPhoto(photo);
+            student.setMedDocPhoto(photo);*/
+            attachmentRepository.findById(studentRequest.getMedDocPhotoId()).ifPresent(student::setMedDocPhoto);
         }
 
-        if (studentRequest.getDocPhoto() != null) {
+        if (studentRequest.getDocPhotoIds() != null) {
+            if (student.getMedDocPhoto() != null && isUpdate)
+                attachmentRepository.deleteAll(student.getDocPhoto());
+              /*  attachmentService.deleteNewName(student.getMedDocPhoto());
             List<Attachment> attachments = attachmentService.saveToSystemListFile(studentRequest.getDocPhoto());
-            student.setDocPhoto(attachments);
+            student.setDocPhoto(attachments);*/
+            student.setDocPhoto(attachmentRepository.findAllById(studentRequest.getDocPhotoIds()));
         }
     }
-
-    private void deletePhotosIfExists(Student old) {
-        if (old.getPhoto() != null) {
-            attachmentService.deleteNewName(old.getPhoto());
-        }
-        if (old.getReference() != null) {
-            attachmentService.deleteNewName(old.getReference());
-        }
-        if (old.getDocPhoto() != null) {
-            old.getDocPhoto().forEach(attachmentService::deleteNewName);
-        }
-        if (old.getMedDocPhoto() != null) {
-            attachmentService.deleteNewName(old.getMedDocPhoto());
-        }
-    }
-
 
     @Override
     public ApiResponse delete(Integer integer) {
@@ -145,7 +138,7 @@ public class StudentService implements BaseService<StudentRequest, Integer> {
         Page<Student> students = studentRepository.findAllByBranchIdAndActiveTrue(pageable, branchId);
         List<StudentResponse> studentResponseList = new ArrayList<>();
         students.forEach(student -> studentResponseList.add(getStudentResponse(student)));
-
+        studentResponseList.sort(Comparator.comparing(StudentResponse::getLastName).reversed());
         StudentResponseListForAdmin admin = new StudentResponseListForAdmin(
                 studentResponseList,
                 students.getTotalElements(),
@@ -159,21 +152,27 @@ public class StudentService implements BaseService<StudentRequest, Integer> {
 
         StudentClassResponse classResponse = modelMapper.map(student.getStudentClass(), StudentClassResponse.class);
 
-        studentResponse.setPhoto(student.getPhoto() == null ? null
-                : attachmentService.getUrl(student.getPhoto()));
+        studentResponse.setPhotoId(student.getPhoto() == null ? null
+                : student.getPhoto().getId());
 
-        studentResponse.setDocPhoto(student.getDocPhoto() == null ? null
-                : attachmentService.getUrlList(student.getDocPhoto()));
+        if (!student.getDocPhoto().isEmpty()) {
+            List<Integer> ids = new ArrayList<>();
+            for (Attachment attachment : student.getDocPhoto()) {
+                ids.add(attachment.getId());
+            }
+            studentResponse.setDocPhotoIds(ids);
+        }
 
-        studentResponse.setMedDocPhoto(student.getMedDocPhoto() == null ? null
-                : attachmentService.getUrl(student.getMedDocPhoto()));
+        studentResponse.setMedDocPhotoId(student.getMedDocPhoto() == null ? null
+                : student.getMedDocPhoto().getId());
 
-        studentResponse.setReference(student.getReference() == null ? null
-                : attachmentService.getUrl(student.getReference()));
+//        studentResponse.setReferenceId(student.getReference() == null ? null
+//                : student.getReference().getId());
 
         studentResponse.setAddedTime(student.getAddedTime().toString());
         studentResponse.setBirthDate(student.getBirthDate().toString());
         studentResponse.setStudentClass(classResponse);
+        studentResponse.setBranch(student.getBranch());
 
         return studentResponse;
     }
@@ -196,5 +195,20 @@ public class StudentService implements BaseService<StudentRequest, Integer> {
         Student student = studentRepository.findByPhoneNumberAndPassword(dto.getPhoneNumber(), dto.getPassword()).orElseThrow(() -> new RecordNotFoundException(STUDENT_NOT_FOUND));
         Journal journal = journalRepository.findByStudentClassIdAndActiveTrue(student.getStudentClass().getId()).orElseThrow(() -> new RecordNotFoundException(JOURNAL_NOT_FOUND));
         return new ApiResponse(SUCCESSFULLY, true, getStudentResponse(student));
+    }
+
+    public ApiResponse search(String name) {
+        List<Student> search = studentRepository.findAllByFirstNameContainingIgnoreCaseAndActiveTrue(name);
+        search.addAll(studentRepository.findAllByLastNameContainingIgnoreCaseAndActiveTrue(name));
+        search.addAll(studentRepository.findAllByDocNumberContainingIgnoreCaseAndActiveTrue(name));
+
+        Set<Student> all = new HashSet<>(search);
+
+        search = new ArrayList<>(all);
+        List<StudentResponse> arrayList = new ArrayList<>();
+        for (Student student : search) {
+            arrayList.add(getStudentResponse(student));
+        }
+        return new ApiResponse("all", true, arrayList);
     }
 }

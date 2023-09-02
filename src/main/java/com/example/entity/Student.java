@@ -60,8 +60,6 @@ public class Student {
     @OneToMany(cascade = CascadeType.ALL)
     private List<Attachment> docPhoto; // guvohnoma yoki pasport rasmi
 
-    @OneToOne(cascade = CascadeType.ALL)
-    private Attachment reference;  // ish joyidan siprafka
 
     @OneToOne(cascade = CascadeType.ALL)
     private Attachment photo;  // 3*4 rasm

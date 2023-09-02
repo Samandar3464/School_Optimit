@@ -5,6 +5,8 @@ import com.example.model.request.FamilyLoginDto;
 import com.example.model.request.StudentRequest;
 import com.example.service.StudentService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -15,7 +17,7 @@ public class StudentController {
     private final StudentService service;
 
     @PostMapping("/create")
-    public ApiResponse create(@ModelAttribute  StudentRequest studentRequest) {
+    public ApiResponse create(@RequestBody StudentRequest studentRequest) {
         return service.create(studentRequest);
     }
 
@@ -25,7 +27,7 @@ public class StudentController {
     }
 
     @PutMapping("/update")
-    public ApiResponse update(@ModelAttribute StudentRequest studentRequest) {
+    public ApiResponse update(@RequestBody StudentRequest studentRequest) {
         return service.update(studentRequest);
     }
 
@@ -54,6 +56,12 @@ public class StudentController {
     @PostMapping("/studentLogin")
     public ApiResponse studentLogin(@RequestBody FamilyLoginDto studentLogin) {
         return service.studentLogIn(studentLogin);
+    }
+
+    @GetMapping("/search")
+    public HttpEntity<?> search(@RequestParam String name) {
+        ApiResponse apiResponse = service.search(name);
+        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
 }

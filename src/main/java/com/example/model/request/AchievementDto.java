@@ -16,7 +16,7 @@ public class AchievementDto {
 
     private String aboutAchievement;
 
-    private MultipartFile photoCertificate;
+    private Integer photoCertificateId;
 
     private Integer userId;
 }

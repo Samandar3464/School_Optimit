@@ -1,5 +1,6 @@
 package com.example.model.response;
 
+import com.example.entity.Branch;
 import com.example.entity.Family;
 import lombok.Data;
 
@@ -24,19 +25,21 @@ public class StudentResponse {
 
     private String docNumber;
 
-    private List<String> docPhoto;
+    private List<Integer> docPhotoIds;
 
-    private String reference;
+    private Integer referenceId;
 
-    private String photo;
+    private Integer photoId;
 
     private StudentClassResponse studentClass;
 
     private boolean active;
 
+    private Branch branch;
+
     private List<Family> families;
 
     private String addedTime;
 
-    private String medDocPhoto;
+    private Integer medDocPhotoId;
 }

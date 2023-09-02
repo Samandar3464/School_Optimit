@@ -1,33 +1,30 @@
 package com.example.entity;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-import java.util.UUID;
 
-@Getter
-@Setter
-@AllArgsConstructor
+@Data
 @NoArgsConstructor
-@Builder
+@AllArgsConstructor
 @Entity
-public class Attachment {
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private UUID id;
+public class Attachment{
 
-    private String originName;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
+
+
+    private String fileOriginalName;
 
     private long size;
 
-    private String newName;
-
-    private String type;
-
     private String contentType;
 
-    private String path;
+    private String name;
 
-    @OneToOne
-    private User user;
+    @ManyToOne
+    private Branch branch;
 }
