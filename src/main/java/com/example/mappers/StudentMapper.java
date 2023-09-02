@@ -20,6 +20,7 @@ public class StudentMapper {
         return student;
     }
 
+
     public static Student update(StudentRequest studentRequest, StudentClass studentClass, Branch branch, Student student) {
         setStudent(studentRequest, studentClass, branch, student);
         return student;
